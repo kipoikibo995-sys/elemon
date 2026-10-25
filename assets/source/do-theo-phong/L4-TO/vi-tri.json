@@ -1,0 +1,62 @@
+{
+ "02_royal-stone-bed.png": [
+  90,
+  281,
+  0.9
+ ],
+ "09_stone-throne.png": [
+  620,
+  270,
+  0.8
+ ],
+ "08_stone-training-golem.png": [
+  869,
+  258,
+  0.85
+ ],
+ "10_earth-banner.png": [
+  58,
+  164,
+  1.0
+ ],
+ "04_amber-crystal-lamp.png": [
+  455,
+  40,
+  1.0
+ ],
+ "11_amber-crystal-pedestal.png": [
+  480,
+  283,
+  0.85
+ ],
+ "05_stone-guardian-statue.png": [
+  1086,
+  302,
+  0.85
+ ],
+ "12_golden-brazier.png": [
+  9,
+  464,
+  0.8
+ ],
+ "03_mountain-altar.png": [
+  1249,
+  481,
+  0.68
+ ],
+ "06_stone-chest.png": [
+  389,
+  484,
+  0.62
+ ],
+ "07_earth-pattern-carpet.png": [
+  561,
+  690,
+  1.0
+ ],
+ "01_ornate-gold-food-bowl.png": [
+  390,
+  684,
+  1.0
+ ]
+}

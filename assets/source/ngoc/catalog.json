@@ -1,0 +1,24 @@
+{
+ "he": {
+  "hoa": "Hỏa",
+  "thuy": "Thủy",
+  "tho": "Thổ",
+  "moc": "Mộc",
+  "kim": "Kim"
+ },
+ "cap": {
+  "1": "Ngọc thô",
+  "2": "Ngọc mài",
+  "3": "Ngọc tinh",
+  "4": "Ngọc khảm",
+  "5": "Ngọc thần"
+ },
+ "file": "r36s/ngoc/NGOC_<he>_<cap>.png (≤32px, icon) · NGOC_<he>_<cap>_lon.png (≤48px, xem chi tiết)",
+ "o_ngoc": {
+  "O_NGOC_trong": "ô trống",
+  "O_NGOC_co-ngoc": "ô mẫu có ngọc",
+  "O_NGOC_khoa": "ô chưa mở",
+  "O_NGOC_khung-2": "khung 2 ô",
+  "O_NGOC_khung-3": "khung 3 ô"
+ }
+}

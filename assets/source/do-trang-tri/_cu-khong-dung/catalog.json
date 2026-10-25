@@ -1,0 +1,1730 @@
+[
+ {
+  "file": "L1_Chung_old-wooden-bowl.png",
+  "level": "L1",
+  "he": "Chung",
+  "name": "old wooden bowl",
+  "from": "L1-HO_nha-hoang",
+  "w": 142,
+  "h": 90
+ },
+ {
+  "file": "L1_Chung_torn-blanket-hay-bed.png",
+  "level": "L1",
+  "he": "Chung",
+  "name": "torn blanket hay bed",
+  "from": "L1-HO_nha-hoang",
+  "w": 347,
+  "h": 205
+ },
+ {
+  "file": "L1_Chung_cracked-lantern.png",
+  "level": "L1",
+  "he": "Chung",
+  "name": "cracked lantern",
+  "from": "L1-HO_nha-hoang",
+  "w": 119,
+  "h": 228
+ },
+ {
+  "file": "L1_Chung_broken-chair.png",
+  "level": "L1",
+  "he": "Chung",
+  "name": "broken chair",
+  "from": "L1-HO_nha-hoang",
+  "w": 190,
+  "h": 258
+ },
+ {
+  "file": "L1_Chung_wooden-bucket.png",
+  "level": "L1",
+  "he": "Chung",
+  "name": "wooden bucket",
+  "from": "L1-HO_nha-hoang",
+  "w": 166,
+  "h": 169
+ },
+ {
+  "file": "L1_Chung_dusty-shelf.png",
+  "level": "L1",
+  "he": "Chung",
+  "name": "dusty shelf",
+  "from": "L1-HO_nha-hoang",
+  "w": 259,
+  "h": 272
+ },
+ {
+  "file": "L1_Chung_small-rag-rug.png",
+  "level": "L1",
+  "he": "Chung",
+  "name": "small rag rug",
+  "from": "L1-HO_nha-hoang",
+  "w": 330,
+  "h": 149
+ },
+ {
+  "file": "L1_Chung_potted-weed.png",
+  "level": "L1",
+  "he": "Chung",
+  "name": "potted weed",
+  "from": "L1-HO_nha-hoang",
+  "w": 161,
+  "h": 212
+ },
+ {
+  "file": "L1_Chung_old-training-post.png",
+  "level": "L1",
+  "he": "Chung",
+  "name": "old training post",
+  "from": "L1-HO_nha-hoang",
+  "w": 192,
+  "h": 291
+ },
+ {
+  "file": "L1_Chung_cobweb-wall-hanging.png",
+  "level": "L1",
+  "he": "Chung",
+  "name": "cobweb wall hanging",
+  "from": "L1-HO_nha-hoang",
+  "w": 246,
+  "h": 261
+ },
+ {
+  "file": "L1_Chung_broken-plank-pile.png",
+  "level": "L1",
+  "he": "Chung",
+  "name": "broken plank pile",
+  "from": "L1-HO_nha-hoang",
+  "w": 326,
+  "h": 192
+ },
+ {
+  "file": "L1_Chung_old-sack.png",
+  "level": "L1",
+  "he": "Chung",
+  "name": "old sack",
+  "from": "L1-HO_nha-hoang",
+  "w": 225,
+  "h": 240
+ },
+ {
+  "file": "L2_Hoa_clay-food-bowl.png",
+  "level": "L2",
+  "he": "Hoa",
+  "name": "clay food bowl",
+  "from": "L2-HO",
+  "w": 127,
+  "h": 93
+ },
+ {
+  "file": "L2_Hoa_hay-bed-with-red-cloth.png",
+  "level": "L2",
+  "he": "Hoa",
+  "name": "hay bed with red cloth",
+  "from": "L2-HO",
+  "w": 362,
+  "h": 209
+ },
+ {
+  "file": "L2_Hoa_small-brazier.png",
+  "level": "L2",
+  "he": "Hoa",
+  "name": "small brazier",
+  "from": "L2-HO",
+  "w": 188,
+  "h": 175
+ },
+ {
+  "file": "L2_Hoa_wooden-stool.png",
+  "level": "L2",
+  "he": "Hoa",
+  "name": "wooden stool",
+  "from": "L2-HO",
+  "w": 179,
+  "h": 181
+ },
+ {
+  "file": "L2_Hoa_red-banner.png",
+  "level": "L2",
+  "he": "Hoa",
+  "name": "red banner",
+  "from": "L2-HO",
+  "w": 191,
+  "h": 281
+ },
+ {
+  "file": "L2_Hoa_firewood-pile.png",
+  "level": "L2",
+  "he": "Hoa",
+  "name": "firewood pile",
+  "from": "L2-HO",
+  "w": 282,
+  "h": 183
+ },
+ {
+  "file": "L2_Hoa_charcoal-bucket.png",
+  "level": "L2",
+  "he": "Hoa",
+  "name": "charcoal bucket",
+  "from": "L2-HO",
+  "w": 191,
+  "h": 206
+ },
+ {
+  "file": "L2_Hoa_ember-lamp.png",
+  "level": "L2",
+  "he": "Hoa",
+  "name": "ember lamp",
+  "from": "L2-HO",
+  "w": 161,
+  "h": 286
+ },
+ {
+  "file": "L2_Hoa_red-cloth-rug.png",
+  "level": "L2",
+  "he": "Hoa",
+  "name": "red cloth rug",
+  "from": "L2-HO",
+  "w": 328,
+  "h": 213
+ },
+ {
+  "file": "L2_Hoa_clay-pot.png",
+  "level": "L2",
+  "he": "Hoa",
+  "name": "clay pot",
+  "from": "L2-HO",
+  "w": 194,
+  "h": 209
+ },
+ {
+  "file": "L2_Hoa_iron-poker-rack.png",
+  "level": "L2",
+  "he": "Hoa",
+  "name": "iron poker rack",
+  "from": "L2-HO",
+  "w": 232,
+  "h": 257
+ },
+ {
+  "file": "L2_Hoa_fire-pattern-wall-hanging.png",
+  "level": "L2",
+  "he": "Hoa",
+  "name": "fire-pattern wall hanging",
+  "from": "L2-HO",
+  "w": 217,
+  "h": 276
+ },
+ {
+  "file": "L2_Kim_tin-food-bowl.png",
+  "level": "L2",
+  "he": "Kim",
+  "name": "tin food bowl",
+  "from": "L2-KI",
+  "w": 127,
+  "h": 83
+ },
+ {
+  "file": "L2_Kim_simple-cot.png",
+  "level": "L2",
+  "he": "Kim",
+  "name": "simple cot",
+  "from": "L2-KI",
+  "w": 333,
+  "h": 178
+ },
+ {
+  "file": "L2_Kim_oil-lantern.png",
+  "level": "L2",
+  "he": "Kim",
+  "name": "oil lantern",
+  "from": "L2-KI",
+  "w": 135,
+  "h": 231
+ },
+ {
+  "file": "L2_Kim_pickaxe-rack.png",
+  "level": "L2",
+  "he": "Kim",
+  "name": "pickaxe rack",
+  "from": "L2-KI",
+  "w": 287,
+  "h": 241
+ },
+ {
+  "file": "L2_Kim_small-ore-cart.png",
+  "level": "L2",
+  "he": "Kim",
+  "name": "small ore cart",
+  "from": "L2-KI",
+  "w": 266,
+  "h": 216
+ },
+ {
+  "file": "L2_Kim_metal-bucket.png",
+  "level": "L2",
+  "he": "Kim",
+  "name": "metal bucket",
+  "from": "L2-KI",
+  "w": 155,
+  "h": 210
+ },
+ {
+  "file": "L2_Kim_silver-ore-rock.png",
+  "level": "L2",
+  "he": "Kim",
+  "name": "silver ore rock",
+  "from": "L2-KI",
+  "w": 216,
+  "h": 197
+ },
+ {
+  "file": "L2_Kim_tool-crate.png",
+  "level": "L2",
+  "he": "Kim",
+  "name": "tool crate",
+  "from": "L2-KI",
+  "w": 283,
+  "h": 238
+ },
+ {
+  "file": "L2_Kim_grey-wool-rug.png",
+  "level": "L2",
+  "he": "Kim",
+  "name": "grey wool rug",
+  "from": "L2-KI",
+  "w": 327,
+  "h": 175
+ },
+ {
+  "file": "L2_Kim_wall-shelf-with-tools.png",
+  "level": "L2",
+  "he": "Kim",
+  "name": "wall shelf with tools",
+  "from": "L2-KI",
+  "w": 319,
+  "h": 242
+ },
+ {
+  "file": "L2_Kim_anvil-block.png",
+  "level": "L2",
+  "he": "Kim",
+  "name": "anvil block",
+  "from": "L2-KI",
+  "w": 264,
+  "h": 250
+ },
+ {
+  "file": "L2_Kim_iron-wall-lamp.png",
+  "level": "L2",
+  "he": "Kim",
+  "name": "iron wall lamp",
+  "from": "L2-KI",
+  "w": 234,
+  "h": 260
+ },
+ {
+  "file": "L2_Moc_wooden-food-bowl.png",
+  "level": "L2",
+  "he": "Moc",
+  "name": "wooden food bowl",
+  "from": "L2-MO",
+  "w": 142,
+  "h": 94
+ },
+ {
+  "file": "L2_Moc_leaf-mat-bed.png",
+  "level": "L2",
+  "he": "Moc",
+  "name": "leaf mat bed",
+  "from": "L2-MO",
+  "w": 329,
+  "h": 219
+ },
+ {
+  "file": "L2_Moc_potted-sapling.png",
+  "level": "L2",
+  "he": "Moc",
+  "name": "potted sapling",
+  "from": "L2-MO",
+  "w": 164,
+  "h": 250
+ },
+ {
+  "file": "L2_Moc_tree-stump-stool.png",
+  "level": "L2",
+  "he": "Moc",
+  "name": "tree-stump stool",
+  "from": "L2-MO",
+  "w": 215,
+  "h": 162
+ },
+ {
+  "file": "L2_Moc_woven-basket.png",
+  "level": "L2",
+  "he": "Moc",
+  "name": "woven basket",
+  "from": "L2-MO",
+  "w": 220,
+  "h": 176
+ },
+ {
+  "file": "L2_Moc_hanging-herb-bundle.png",
+  "level": "L2",
+  "he": "Moc",
+  "name": "hanging herb bundle",
+  "from": "L2-MO",
+  "w": 180,
+  "h": 287
+ },
+ {
+  "file": "L2_Moc_mushroom-cluster.png",
+  "level": "L2",
+  "he": "Moc",
+  "name": "mushroom cluster",
+  "from": "L2-MO",
+  "w": 230,
+  "h": 210
+ },
+ {
+  "file": "L2_Moc_bamboo-shelf.png",
+  "level": "L2",
+  "he": "Moc",
+  "name": "bamboo shelf",
+  "from": "L2-MO",
+  "w": 280,
+  "h": 247
+ },
+ {
+  "file": "L2_Moc_green-woven-rug.png",
+  "level": "L2",
+  "he": "Moc",
+  "name": "green woven rug",
+  "from": "L2-MO",
+  "w": 328,
+  "h": 183
+ },
+ {
+  "file": "L2_Moc_flower-pot.png",
+  "level": "L2",
+  "he": "Moc",
+  "name": "flower pot",
+  "from": "L2-MO",
+  "w": 209,
+  "h": 222
+ },
+ {
+  "file": "L2_Moc_log-bench.png",
+  "level": "L2",
+  "he": "Moc",
+  "name": "log bench",
+  "from": "L2-MO",
+  "w": 314,
+  "h": 178
+ },
+ {
+  "file": "L2_Moc_vine-wall-hanging.png",
+  "level": "L2",
+  "he": "Moc",
+  "name": "vine wall hanging",
+  "from": "L2-MO",
+  "w": 202,
+  "h": 294
+ },
+ {
+  "file": "L2_Thuy_shell-food-bowl.png",
+  "level": "L2",
+  "he": "Thuy",
+  "name": "shell food bowl",
+  "from": "L2-TH",
+  "w": 144,
+  "h": 112
+ },
+ {
+  "file": "L2_Thuy_net-hammock-bed.png",
+  "level": "L2",
+  "he": "Thuy",
+  "name": "net hammock bed",
+  "from": "L2-TH",
+  "w": 316,
+  "h": 216
+ },
+ {
+  "file": "L2_Thuy_fishing-rod-stand.png",
+  "level": "L2",
+  "he": "Thuy",
+  "name": "fishing rod stand",
+  "from": "L2-TH",
+  "w": 196,
+  "h": 330
+ },
+ {
+  "file": "L2_Thuy_water-barrel.png",
+  "level": "L2",
+  "he": "Thuy",
+  "name": "water barrel",
+  "from": "L2-TH",
+  "w": 203,
+  "h": 211
+ },
+ {
+  "file": "L2_Thuy_bucket-of-fish.png",
+  "level": "L2",
+  "he": "Thuy",
+  "name": "bucket of fish",
+  "from": "L2-TH",
+  "w": 209,
+  "h": 242
+ },
+ {
+  "file": "L2_Thuy_rope-coil.png",
+  "level": "L2",
+  "he": "Thuy",
+  "name": "rope coil",
+  "from": "L2-TH",
+  "w": 241,
+  "h": 175
+ },
+ {
+  "file": "L2_Thuy_buoy.png",
+  "level": "L2",
+  "he": "Thuy",
+  "name": "buoy",
+  "from": "L2-TH",
+  "w": 196,
+  "h": 231
+ },
+ {
+  "file": "L2_Thuy_small-wooden-boat-model.png",
+  "level": "L2",
+  "he": "Thuy",
+  "name": "small wooden boat model",
+  "from": "L2-TH",
+  "w": 256,
+  "h": 290
+ },
+ {
+  "file": "L2_Thuy_blue-rag-rug.png",
+  "level": "L2",
+  "he": "Thuy",
+  "name": "blue rag rug",
+  "from": "L2-TH",
+  "w": 335,
+  "h": 191
+ },
+ {
+  "file": "L2_Thuy_hanging-net.png",
+  "level": "L2",
+  "he": "Thuy",
+  "name": "hanging net",
+  "from": "L2-TH",
+  "w": 294,
+  "h": 255
+ },
+ {
+  "file": "L2_Thuy_lantern-on-post.png",
+  "level": "L2",
+  "he": "Thuy",
+  "name": "lantern on post",
+  "from": "L2-TH",
+  "w": 166,
+  "h": 298
+ },
+ {
+  "file": "L2_Thuy_seashell-pile.png",
+  "level": "L2",
+  "he": "Thuy",
+  "name": "seashell pile",
+  "from": "L2-TH",
+  "w": 270,
+  "h": 155
+ },
+ {
+  "file": "L2_Tho_clay-food-bowl.png",
+  "level": "L2",
+  "he": "Tho",
+  "name": "clay food bowl",
+  "from": "L2-TO",
+  "w": 153,
+  "h": 102
+ },
+ {
+  "file": "L2_Tho_straw-mat-bed.png",
+  "level": "L2",
+  "he": "Tho",
+  "name": "straw mat bed",
+  "from": "L2-TO",
+  "w": 350,
+  "h": 211
+ },
+ {
+  "file": "L2_Tho_clay-water-jar.png",
+  "level": "L2",
+  "he": "Tho",
+  "name": "clay water jar",
+  "from": "L2-TO",
+  "w": 200,
+  "h": 212
+ },
+ {
+  "file": "L2_Tho_stone-stool.png",
+  "level": "L2",
+  "he": "Tho",
+  "name": "stone stool",
+  "from": "L2-TO",
+  "w": 218,
+  "h": 185
+ },
+ {
+  "file": "L2_Tho_cactus-pot.png",
+  "level": "L2",
+  "he": "Tho",
+  "name": "cactus pot",
+  "from": "L2-TO",
+  "w": 160,
+  "h": 259
+ },
+ {
+  "file": "L2_Tho_grain-sack.png",
+  "level": "L2",
+  "he": "Tho",
+  "name": "grain sack",
+  "from": "L2-TO",
+  "w": 264,
+  "h": 227
+ },
+ {
+  "file": "L2_Tho_woven-sand-rug.png",
+  "level": "L2",
+  "he": "Tho",
+  "name": "woven sand rug",
+  "from": "L2-TO",
+  "w": 362,
+  "h": 211
+ },
+ {
+  "file": "L2_Tho_clay-oven.png",
+  "level": "L2",
+  "he": "Tho",
+  "name": "clay oven",
+  "from": "L2-TO",
+  "w": 274,
+  "h": 250
+ },
+ {
+  "file": "L2_Tho_stone-shelf.png",
+  "level": "L2",
+  "he": "Tho",
+  "name": "stone shelf",
+  "from": "L2-TO",
+  "w": 264,
+  "h": 248
+ },
+ {
+  "file": "L2_Tho_tribal-wall-hanging.png",
+  "level": "L2",
+  "he": "Tho",
+  "name": "tribal wall hanging",
+  "from": "L2-TO",
+  "w": 200,
+  "h": 267
+ },
+ {
+  "file": "L2_Tho_small-rock-garden.png",
+  "level": "L2",
+  "he": "Tho",
+  "name": "small rock garden",
+  "from": "L2-TO",
+  "w": 346,
+  "h": 214
+ },
+ {
+  "file": "L2_Tho_oil-lamp.png",
+  "level": "L2",
+  "he": "Tho",
+  "name": "oil lamp",
+  "from": "L2-TO",
+  "w": 195,
+  "h": 166
+ },
+ {
+  "file": "L3_Hoa_iron-food-bowl.png",
+  "level": "L3",
+  "he": "Hoa",
+  "name": "iron food bowl",
+  "from": "L3-HO",
+  "w": 145,
+  "h": 94
+ },
+ {
+  "file": "L3_Hoa_warm-stone-bed-with-red-blanket.png",
+  "level": "L3",
+  "he": "Hoa",
+  "name": "warm stone bed with red blanket",
+  "from": "L3-HO",
+  "w": 362,
+  "h": 256
+ },
+ {
+  "file": "L3_Hoa_anvil.png",
+  "level": "L3",
+  "he": "Hoa",
+  "name": "anvil",
+  "from": "L3-HO",
+  "w": 274,
+  "h": 201
+ },
+ {
+  "file": "L3_Hoa_small-furnace.png",
+  "level": "L3",
+  "he": "Hoa",
+  "name": "small furnace",
+  "from": "L3-HO",
+  "w": 228,
+  "h": 294
+ },
+ {
+  "file": "L3_Hoa_weapon-rack.png",
+  "level": "L3",
+  "he": "Hoa",
+  "name": "weapon rack",
+  "from": "L3-HO",
+  "w": 289,
+  "h": 307
+ },
+ {
+  "file": "L3_Hoa_red-banner.png",
+  "level": "L3",
+  "he": "Hoa",
+  "name": "red banner",
+  "from": "L3-HO",
+  "w": 247,
+  "h": 318
+ },
+ {
+  "file": "L3_Hoa_lava-lamp.png",
+  "level": "L3",
+  "he": "Hoa",
+  "name": "lava lamp",
+  "from": "L3-HO",
+  "w": 116,
+  "h": 294
+ },
+ {
+  "file": "L3_Hoa_coal-bucket.png",
+  "level": "L3",
+  "he": "Hoa",
+  "name": "coal bucket",
+  "from": "L3-HO",
+  "w": 183,
+  "h": 217
+ },
+ {
+  "file": "L3_Hoa_red-rug.png",
+  "level": "L3",
+  "he": "Hoa",
+  "name": "red rug",
+  "from": "L3-HO",
+  "w": 338,
+  "h": 181
+ },
+ {
+  "file": "L3_Hoa_iron-training-dummy.png",
+  "level": "L3",
+  "he": "Hoa",
+  "name": "iron training dummy",
+  "from": "L3-HO",
+  "w": 224,
+  "h": 285
+ },
+ {
+  "file": "L3_Hoa_armor-stand.png",
+  "level": "L3",
+  "he": "Hoa",
+  "name": "armor stand",
+  "from": "L3-HO",
+  "w": 195,
+  "h": 314
+ },
+ {
+  "file": "L3_Hoa_fire-crystal-pedestal.png",
+  "level": "L3",
+  "he": "Hoa",
+  "name": "fire crystal pedestal",
+  "from": "L3-HO",
+  "w": 158,
+  "h": 288
+ },
+ {
+  "file": "L3_Kim_steel-food-bowl.png",
+  "level": "L3",
+  "he": "Kim",
+  "name": "steel food bowl",
+  "from": "L3-KI",
+  "w": 143,
+  "h": 92
+ },
+ {
+  "file": "L3_Kim_padded-metal-cot.png",
+  "level": "L3",
+  "he": "Kim",
+  "name": "padded metal cot",
+  "from": "L3-KI",
+  "w": 342,
+  "h": 225
+ },
+ {
+  "file": "L3_Kim_gear-clock.png",
+  "level": "L3",
+  "he": "Kim",
+  "name": "gear clock",
+  "from": "L3-KI",
+  "w": 212,
+  "h": 242
+ },
+ {
+  "file": "L3_Kim_tool-bench.png",
+  "level": "L3",
+  "he": "Kim",
+  "name": "tool bench",
+  "from": "L3-KI",
+  "w": 315,
+  "h": 298
+ },
+ {
+  "file": "L3_Kim_crystal-lamp.png",
+  "level": "L3",
+  "he": "Kim",
+  "name": "crystal lamp",
+  "from": "L3-KI",
+  "w": 141,
+  "h": 281
+ },
+ {
+  "file": "L3_Kim_metal-crates.png",
+  "level": "L3",
+  "he": "Kim",
+  "name": "metal crates",
+  "from": "L3-KI",
+  "w": 295,
+  "h": 275
+ },
+ {
+  "file": "L3_Kim_silver-rug.png",
+  "level": "L3",
+  "he": "Kim",
+  "name": "silver rug",
+  "from": "L3-KI",
+  "w": 362,
+  "h": 209
+ },
+ {
+  "file": "L3_Kim_steel-training-dummy.png",
+  "level": "L3",
+  "he": "Kim",
+  "name": "steel training dummy",
+  "from": "L3-KI",
+  "w": 212,
+  "h": 295
+ },
+ {
+  "file": "L3_Kim_small-anvil.png",
+  "level": "L3",
+  "he": "Kim",
+  "name": "small anvil",
+  "from": "L3-KI",
+  "w": 278,
+  "h": 201
+ },
+ {
+  "file": "L3_Kim_robot-arm-decor.png",
+  "level": "L3",
+  "he": "Kim",
+  "name": "robot arm decor",
+  "from": "L3-KI",
+  "w": 247,
+  "h": 307
+ },
+ {
+  "file": "L3_Kim_glowing-crystal-cluster.png",
+  "level": "L3",
+  "he": "Kim",
+  "name": "glowing crystal cluster",
+  "from": "L3-KI",
+  "w": 222,
+  "h": 273
+ },
+ {
+  "file": "L3_Kim_metal-bookshelf.png",
+  "level": "L3",
+  "he": "Kim",
+  "name": "metal bookshelf",
+  "from": "L3-KI",
+  "w": 280,
+  "h": 327
+ },
+ {
+  "file": "L3_Moc_carved-wooden-food-bowl.png",
+  "level": "L3",
+  "he": "Moc",
+  "name": "carved wooden food bowl",
+  "from": "L3-MO",
+  "w": 169,
+  "h": 104
+ },
+ {
+  "file": "L3_Moc_leaf-hammock-bed.png",
+  "level": "L3",
+  "he": "Moc",
+  "name": "leaf hammock bed",
+  "from": "L3-MO",
+  "w": 361,
+  "h": 301
+ },
+ {
+  "file": "L3_Moc_hanging-lantern.png",
+  "level": "L3",
+  "he": "Moc",
+  "name": "hanging lantern",
+  "from": "L3-MO",
+  "w": 196,
+  "h": 287
+ },
+ {
+  "file": "L3_Moc_bookshelf.png",
+  "level": "L3",
+  "he": "Moc",
+  "name": "bookshelf",
+  "from": "L3-MO",
+  "w": 286,
+  "h": 316
+ },
+ {
+  "file": "L3_Moc_potted-plant.png",
+  "level": "L3",
+  "he": "Moc",
+  "name": "potted plant",
+  "from": "L3-MO",
+  "w": 254,
+  "h": 274
+ },
+ {
+  "file": "L3_Moc_mushroom-stool.png",
+  "level": "L3",
+  "he": "Moc",
+  "name": "mushroom stool",
+  "from": "L3-MO",
+  "w": 227,
+  "h": 220
+ },
+ {
+  "file": "L3_Moc_woven-green-rug.png",
+  "level": "L3",
+  "he": "Moc",
+  "name": "woven green rug",
+  "from": "L3-MO",
+  "w": 362,
+  "h": 184
+ },
+ {
+  "file": "L3_Moc_log-training-dummy.png",
+  "level": "L3",
+  "he": "Moc",
+  "name": "log training dummy",
+  "from": "L3-MO",
+  "w": 209,
+  "h": 286
+ },
+ {
+  "file": "L3_Moc_flower-pots.png",
+  "level": "L3",
+  "he": "Moc",
+  "name": "flower pots",
+  "from": "L3-MO",
+  "w": 308,
+  "h": 297
+ },
+ {
+  "file": "L3_Moc_bird-house.png",
+  "level": "L3",
+  "he": "Moc",
+  "name": "bird house",
+  "from": "L3-MO",
+  "w": 188,
+  "h": 308
+ },
+ {
+  "file": "L3_Moc_tea-table.png",
+  "level": "L3",
+  "he": "Moc",
+  "name": "tea table",
+  "from": "L3-MO",
+  "w": 328,
+  "h": 238
+ },
+ {
+  "file": "L3_Moc_fern-in-carved-pot.png",
+  "level": "L3",
+  "he": "Moc",
+  "name": "fern in carved pot",
+  "from": "L3-MO",
+  "w": 318,
+  "h": 304
+ },
+ {
+  "file": "L3_Thuy_shell-food-bowl.png",
+  "level": "L3",
+  "he": "Thuy",
+  "name": "shell food bowl",
+  "from": "L3-TH",
+  "w": 197,
+  "h": 132
+ },
+ {
+  "file": "L3_Thuy_reed-bed.png",
+  "level": "L3",
+  "he": "Thuy",
+  "name": "reed bed",
+  "from": "L3-TH",
+  "w": 357,
+  "h": 253
+ },
+ {
+  "file": "L3_Thuy_fishing-rod-rack.png",
+  "level": "L3",
+  "he": "Thuy",
+  "name": "fishing rod rack",
+  "from": "L3-TH",
+  "w": 227,
+  "h": 334
+ },
+ {
+  "file": "L3_Thuy_barrel.png",
+  "level": "L3",
+  "he": "Thuy",
+  "name": "barrel",
+  "from": "L3-TH",
+  "w": 197,
+  "h": 231
+ },
+ {
+  "file": "L3_Thuy_shell-lamp.png",
+  "level": "L3",
+  "he": "Thuy",
+  "name": "shell lamp",
+  "from": "L3-TH",
+  "w": 188,
+  "h": 234
+ },
+ {
+  "file": "L3_Thuy_aquarium-jar.png",
+  "level": "L3",
+  "he": "Thuy",
+  "name": "aquarium jar",
+  "from": "L3-TH",
+  "w": 215,
+  "h": 284
+ },
+ {
+  "file": "L3_Thuy_blue-wave-rug.png",
+  "level": "L3",
+  "he": "Thuy",
+  "name": "blue wave rug",
+  "from": "L3-TH",
+  "w": 362,
+  "h": 218
+ },
+ {
+  "file": "L3_Thuy_rope-training-buoy.png",
+  "level": "L3",
+  "he": "Thuy",
+  "name": "rope training buoy",
+  "from": "L3-TH",
+  "w": 169,
+  "h": 286
+ },
+ {
+  "file": "L3_Thuy_conch-decor.png",
+  "level": "L3",
+  "he": "Thuy",
+  "name": "conch decor",
+  "from": "L3-TH",
+  "w": 215,
+  "h": 257
+ },
+ {
+  "file": "L3_Thuy_ship-wheel-wall-decor.png",
+  "level": "L3",
+  "he": "Thuy",
+  "name": "ship wheel wall decor",
+  "from": "L3-TH",
+  "w": 305,
+  "h": 300
+ },
+ {
+  "file": "L3_Thuy_coral-pot.png",
+  "level": "L3",
+  "he": "Thuy",
+  "name": "coral pot",
+  "from": "L3-TH",
+  "w": 228,
+  "h": 291
+ },
+ {
+  "file": "L3_Thuy_anchor-statue.png",
+  "level": "L3",
+  "he": "Thuy",
+  "name": "anchor statue",
+  "from": "L3-TH",
+  "w": 242,
+  "h": 320
+ },
+ {
+  "file": "L3_Tho_clay-food-bowl.png",
+  "level": "L3",
+  "he": "Tho",
+  "name": "clay food bowl",
+  "from": "L3-TO",
+  "w": 129,
+  "h": 96
+ },
+ {
+  "file": "L3_Tho_woven-mat-bed.png",
+  "level": "L3",
+  "he": "Tho",
+  "name": "woven mat bed",
+  "from": "L3-TO",
+  "w": 319,
+  "h": 191
+ },
+ {
+  "file": "L3_Tho_tall-clay-pots.png",
+  "level": "L3",
+  "he": "Tho",
+  "name": "tall clay pots",
+  "from": "L3-TO",
+  "w": 263,
+  "h": 264
+ },
+ {
+  "file": "L3_Tho_cactus-pot.png",
+  "level": "L3",
+  "he": "Tho",
+  "name": "cactus pot",
+  "from": "L3-TO",
+  "w": 181,
+  "h": 265
+ },
+ {
+  "file": "L3_Tho_stone-bench.png",
+  "level": "L3",
+  "he": "Tho",
+  "name": "stone bench",
+  "from": "L3-TO",
+  "w": 321,
+  "h": 200
+ },
+ {
+  "file": "L3_Tho_amber-lamp.png",
+  "level": "L3",
+  "he": "Tho",
+  "name": "amber lamp",
+  "from": "L3-TO",
+  "w": 139,
+  "h": 259
+ },
+ {
+  "file": "L3_Tho_patterned-sand-rug.png",
+  "level": "L3",
+  "he": "Tho",
+  "name": "patterned sand rug",
+  "from": "L3-TO",
+  "w": 362,
+  "h": 211
+ },
+ {
+  "file": "L3_Tho_stone-training-pillar.png",
+  "level": "L3",
+  "he": "Tho",
+  "name": "stone training pillar",
+  "from": "L3-TO",
+  "w": 195,
+  "h": 286
+ },
+ {
+  "file": "L3_Tho_pottery-wheel.png",
+  "level": "L3",
+  "he": "Tho",
+  "name": "pottery wheel",
+  "from": "L3-TO",
+  "w": 288,
+  "h": 238
+ },
+ {
+  "file": "L3_Tho_sandstone-statue.png",
+  "level": "L3",
+  "he": "Tho",
+  "name": "sandstone statue",
+  "from": "L3-TO",
+  "w": 215,
+  "h": 293
+ },
+ {
+  "file": "L3_Tho_clay-shelf.png",
+  "level": "L3",
+  "he": "Tho",
+  "name": "clay shelf",
+  "from": "L3-TO",
+  "w": 246,
+  "h": 298
+ },
+ {
+  "file": "L3_Tho_desert-flower-vase.png",
+  "level": "L3",
+  "he": "Tho",
+  "name": "desert flower vase",
+  "from": "L3-TO",
+  "w": 220,
+  "h": 298
+ },
+ {
+  "file": "L4_Hoa_ornate-gold-food-bowl.png",
+  "level": "L4",
+  "he": "Hoa",
+  "name": "ornate gold food bowl",
+  "from": "L4-HO",
+  "w": 180,
+  "h": 104
+ },
+ {
+  "file": "L4_Hoa_royal-red-bed.png",
+  "level": "L4",
+  "he": "Hoa",
+  "name": "royal red bed",
+  "from": "L4-HO",
+  "w": 335,
+  "h": 238
+ },
+ {
+  "file": "L4_Hoa_sacred-flame-brazier.png",
+  "level": "L4",
+  "he": "Hoa",
+  "name": "sacred flame brazier",
+  "from": "L4-HO",
+  "w": 221,
+  "h": 295
+ },
+ {
+  "file": "L4_Hoa_dragon-statue.png",
+  "level": "L4",
+  "he": "Hoa",
+  "name": "dragon statue",
+  "from": "L4-HO",
+  "w": 246,
+  "h": 314
+ },
+ {
+  "file": "L4_Hoa_golden-incense-burner.png",
+  "level": "L4",
+  "he": "Hoa",
+  "name": "golden incense burner",
+  "from": "L4-HO",
+  "w": 229,
+  "h": 238
+ },
+ {
+  "file": "L4_Hoa_treasure-chest.png",
+  "level": "L4",
+  "he": "Hoa",
+  "name": "treasure chest",
+  "from": "L4-HO",
+  "w": 254,
+  "h": 205
+ },
+ {
+  "file": "L4_Hoa_royal-red-dragon-carpet.png",
+  "level": "L4",
+  "he": "Hoa",
+  "name": "royal red dragon carpet",
+  "from": "L4-HO",
+  "w": 362,
+  "h": 255
+ },
+ {
+  "file": "L4_Hoa_golden-training-dummy.png",
+  "level": "L4",
+  "he": "Hoa",
+  "name": "golden training dummy",
+  "from": "L4-HO",
+  "w": 190,
+  "h": 308
+ },
+ {
+  "file": "L4_Hoa_fire-throne.png",
+  "level": "L4",
+  "he": "Hoa",
+  "name": "fire throne",
+  "from": "L4-HO",
+  "w": 297,
+  "h": 317
+ },
+ {
+  "file": "L4_Hoa_dragon-banner.png",
+  "level": "L4",
+  "he": "Hoa",
+  "name": "dragon banner",
+  "from": "L4-HO",
+  "w": 256,
+  "h": 325
+ },
+ {
+  "file": "L4_Hoa_golden-lantern.png",
+  "level": "L4",
+  "he": "Hoa",
+  "name": "golden lantern",
+  "from": "L4-HO",
+  "w": 184,
+  "h": 324
+ },
+ {
+  "file": "L4_Hoa_phoenix-egg-pedestal.png",
+  "level": "L4",
+  "he": "Hoa",
+  "name": "phoenix egg pedestal",
+  "from": "L4-HO",
+  "w": 251,
+  "h": 306
+ },
+ {
+  "file": "L4_Kim_ornate-silver-food-bowl.png",
+  "level": "L4",
+  "he": "Kim",
+  "name": "ornate silver food bowl",
+  "from": "L4-KI",
+  "w": 174,
+  "h": 117
+ },
+ {
+  "file": "L4_Kim_royal-crystal-bed.png",
+  "level": "L4",
+  "he": "Kim",
+  "name": "royal crystal bed",
+  "from": "L4-KI",
+  "w": 308,
+  "h": 302
+ },
+ {
+  "file": "L4_Kim_sword-altar.png",
+  "level": "L4",
+  "he": "Kim",
+  "name": "sword altar",
+  "from": "L4-KI",
+  "w": 275,
+  "h": 306
+ },
+ {
+  "file": "L4_Kim_diamond-lamp.png",
+  "level": "L4",
+  "he": "Kim",
+  "name": "diamond lamp",
+  "from": "L4-KI",
+  "w": 182,
+  "h": 293
+ },
+ {
+  "file": "L4_Kim_silver-knight-statue.png",
+  "level": "L4",
+  "he": "Kim",
+  "name": "silver knight statue",
+  "from": "L4-KI",
+  "w": 177,
+  "h": 325
+ },
+ {
+  "file": "L4_Kim_crystal-chest.png",
+  "level": "L4",
+  "he": "Kim",
+  "name": "crystal chest",
+  "from": "L4-KI",
+  "w": 263,
+  "h": 213
+ },
+ {
+  "file": "L4_Kim_white-blue-carpet.png",
+  "level": "L4",
+  "he": "Kim",
+  "name": "white-blue carpet",
+  "from": "L4-KI",
+  "w": 350,
+  "h": 212
+ },
+ {
+  "file": "L4_Kim_crystal-training-dummy.png",
+  "level": "L4",
+  "he": "Kim",
+  "name": "crystal training dummy",
+  "from": "L4-KI",
+  "w": 221,
+  "h": 294
+ },
+ {
+  "file": "L4_Kim_diamond-throne.png",
+  "level": "L4",
+  "he": "Kim",
+  "name": "diamond throne",
+  "from": "L4-KI",
+  "w": 248,
+  "h": 316
+ },
+ {
+  "file": "L4_Kim_crystal-banner.png",
+  "level": "L4",
+  "he": "Kim",
+  "name": "crystal banner",
+  "from": "L4-KI",
+  "w": 184,
+  "h": 312
+ },
+ {
+  "file": "L4_Kim_floating-diamond-pedestal.png",
+  "level": "L4",
+  "he": "Kim",
+  "name": "floating diamond pedestal",
+  "from": "L4-KI",
+  "w": 291,
+  "h": 266
+ },
+ {
+  "file": "L4_Kim_silver-mirror.png",
+  "level": "L4",
+  "he": "Kim",
+  "name": "silver mirror",
+  "from": "L4-KI",
+  "w": 207,
+  "h": 312
+ },
+ {
+  "file": "L4_Moc_ornate-jade-food-bowl.png",
+  "level": "L4",
+  "he": "Moc",
+  "name": "ornate jade food bowl",
+  "from": "L4-MO",
+  "w": 158,
+  "h": 113
+ },
+ {
+  "file": "L4_Moc_royal-leaf-bed.png",
+  "level": "L4",
+  "he": "Moc",
+  "name": "royal leaf bed",
+  "from": "L4-MO",
+  "w": 334,
+  "h": 288
+ },
+ {
+  "file": "L4_Moc_jade-shrine.png",
+  "level": "L4",
+  "he": "Moc",
+  "name": "jade shrine",
+  "from": "L4-MO",
+  "w": 244,
+  "h": 293
+ },
+ {
+  "file": "L4_Moc_glowing-flower-pot.png",
+  "level": "L4",
+  "he": "Moc",
+  "name": "glowing flower pot",
+  "from": "L4-MO",
+  "w": 252,
+  "h": 272
+ },
+ {
+  "file": "L4_Moc_spirit-lantern.png",
+  "level": "L4",
+  "he": "Moc",
+  "name": "spirit lantern",
+  "from": "L4-MO",
+  "w": 200,
+  "h": 292
+ },
+ {
+  "file": "L4_Moc_carved-wooden-chest.png",
+  "level": "L4",
+  "he": "Moc",
+  "name": "carved wooden chest",
+  "from": "L4-MO",
+  "w": 293,
+  "h": 210
+ },
+ {
+  "file": "L4_Moc_moss-carpet.png",
+  "level": "L4",
+  "he": "Moc",
+  "name": "moss carpet",
+  "from": "L4-MO",
+  "w": 352,
+  "h": 228
+ },
+ {
+  "file": "L4_Moc_ancient-wooden-training-dummy.png",
+  "level": "L4",
+  "he": "Moc",
+  "name": "ancient wooden training dummy",
+  "from": "L4-MO",
+  "w": 229,
+  "h": 297
+ },
+ {
+  "file": "L4_Moc_spirit-tree-bonsai.png",
+  "level": "L4",
+  "he": "Moc",
+  "name": "spirit tree bonsai",
+  "from": "L4-MO",
+  "w": 309,
+  "h": 300
+ },
+ {
+  "file": "L4_Moc_leaf-banner.png",
+  "level": "L4",
+  "he": "Moc",
+  "name": "leaf banner",
+  "from": "L4-MO",
+  "w": 246,
+  "h": 315
+ },
+ {
+  "file": "L4_Moc_jade-throne.png",
+  "level": "L4",
+  "he": "Moc",
+  "name": "jade throne",
+  "from": "L4-MO",
+  "w": 310,
+  "h": 320
+ },
+ {
+  "file": "L4_Moc_glowing-fairy-ring.png",
+  "level": "L4",
+  "he": "Moc",
+  "name": "glowing fairy ring",
+  "from": "L4-MO",
+  "w": 284,
+  "h": 282
+ },
+ {
+  "file": "L4_Thuy_ornate-pearl-food-bowl.png",
+  "level": "L4",
+  "he": "Thuy",
+  "name": "ornate pearl food bowl",
+  "from": "L4-TH",
+  "w": 167,
+  "h": 123
+ },
+ {
+  "file": "L4_Thuy_royal-clam-bed.png",
+  "level": "L4",
+  "he": "Thuy",
+  "name": "royal clam bed",
+  "from": "L4-TH",
+  "w": 336,
+  "h": 313
+ },
+ {
+  "file": "L4_Thuy_pearl-altar.png",
+  "level": "L4",
+  "he": "Thuy",
+  "name": "pearl altar",
+  "from": "L4-TH",
+  "w": 292,
+  "h": 296
+ },
+ {
+  "file": "L4_Thuy_coral-lamp.png",
+  "level": "L4",
+  "he": "Thuy",
+  "name": "coral lamp",
+  "from": "L4-TH",
+  "w": 229,
+  "h": 321
+ },
+ {
+  "file": "L4_Thuy_treasure-chest.png",
+  "level": "L4",
+  "he": "Thuy",
+  "name": "treasure chest",
+  "from": "L4-TH",
+  "w": 287,
+  "h": 229
+ },
+ {
+  "file": "L4_Thuy_seahorse-statue.png",
+  "level": "L4",
+  "he": "Thuy",
+  "name": "seahorse statue",
+  "from": "L4-TH",
+  "w": 233,
+  "h": 323
+ },
+ {
+  "file": "L4_Thuy_blue-wave-carpet.png",
+  "level": "L4",
+  "he": "Thuy",
+  "name": "blue wave carpet",
+  "from": "L4-TH",
+  "w": 362,
+  "h": 207
+ },
+ {
+  "file": "L4_Thuy_coral-training-dummy.png",
+  "level": "L4",
+  "he": "Thuy",
+  "name": "coral training dummy",
+  "from": "L4-TH",
+  "w": 246,
+  "h": 305
+ },
+ {
+  "file": "L4_Thuy_pearl-throne.png",
+  "level": "L4",
+  "he": "Thuy",
+  "name": "pearl throne",
+  "from": "L4-TH",
+  "w": 279,
+  "h": 325
+ },
+ {
+  "file": "L4_Thuy_jellyfish-lantern.png",
+  "level": "L4",
+  "he": "Thuy",
+  "name": "jellyfish lantern",
+  "from": "L4-TH",
+  "w": 217,
+  "h": 319
+ },
+ {
+  "file": "L4_Thuy_giant-pearl-pedestal.png",
+  "level": "L4",
+  "he": "Thuy",
+  "name": "giant pearl pedestal",
+  "from": "L4-TH",
+  "w": 278,
+  "h": 320
+ },
+ {
+  "file": "L4_Thuy_coral-arch.png",
+  "level": "L4",
+  "he": "Thuy",
+  "name": "coral arch",
+  "from": "L4-TH",
+  "w": 331,
+  "h": 318
+ },
+ {
+  "file": "L4_Tho_ornate-gold-food-bowl.png",
+  "level": "L4",
+  "he": "Tho",
+  "name": "ornate gold food bowl",
+  "from": "L4-TO",
+  "w": 178,
+  "h": 112
+ },
+ {
+  "file": "L4_Tho_royal-stone-bed.png",
+  "level": "L4",
+  "he": "Tho",
+  "name": "royal stone bed",
+  "from": "L4-TO",
+  "w": 347,
+  "h": 313
+ },
+ {
+  "file": "L4_Tho_mountain-altar.png",
+  "level": "L4",
+  "he": "Tho",
+  "name": "mountain altar",
+  "from": "L4-TO",
+  "w": 341,
+  "h": 321
+ },
+ {
+  "file": "L4_Tho_amber-crystal-lamp.png",
+  "level": "L4",
+  "he": "Tho",
+  "name": "amber crystal lamp",
+  "from": "L4-TO",
+  "w": 176,
+  "h": 289
+ },
+ {
+  "file": "L4_Tho_stone-guardian-statue.png",
+  "level": "L4",
+  "he": "Tho",
+  "name": "stone guardian statue",
+  "from": "L4-TO",
+  "w": 271,
+  "h": 304
+ },
+ {
+  "file": "L4_Tho_stone-chest.png",
+  "level": "L4",
+  "he": "Tho",
+  "name": "stone chest",
+  "from": "L4-TO",
+  "w": 283,
+  "h": 229
+ },
+ {
+  "file": "L4_Tho_earth-pattern-carpet.png",
+  "level": "L4",
+  "he": "Tho",
+  "name": "earth-pattern carpet",
+  "from": "L4-TO",
+  "w": 362,
+  "h": 278
+ },
+ {
+  "file": "L4_Tho_stone-training-golem.png",
+  "level": "L4",
+  "he": "Tho",
+  "name": "stone training golem",
+  "from": "L4-TO",
+  "w": 278,
+  "h": 299
+ },
+ {
+  "file": "L4_Tho_stone-throne.png",
+  "level": "L4",
+  "he": "Tho",
+  "name": "stone throne",
+  "from": "L4-TO",
+  "w": 269,
+  "h": 318
+ },
+ {
+  "file": "L4_Tho_earth-banner.png",
+  "level": "L4",
+  "he": "Tho",
+  "name": "earth banner",
+  "from": "L4-TO",
+  "w": 218,
+  "h": 298
+ },
+ {
+  "file": "L4_Tho_amber-crystal-pedestal.png",
+  "level": "L4",
+  "he": "Tho",
+  "name": "amber crystal pedestal",
+  "from": "L4-TO",
+  "w": 186,
+  "h": 317
+ },
+ {
+  "file": "L4_Tho_golden-brazier.png",
+  "level": "L4",
+  "he": "Tho",
+  "name": "golden brazier",
+  "from": "L4-TO",
+  "w": 278,
+  "h": 305
+ }
+]

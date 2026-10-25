@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>Thử chiêu – Hỏa Hổ</title>
+<style>
+  body { margin: 0; background: #111; color: #eee; font: 14px sans-serif; display: flex; flex-direction: column; align-items: center; }
+  canvas { image-rendering: pixelated; margin-top: 16px; border: 2px solid #333; }
+  p { margin: 8px; color: #aaa; }
+</style></head>
+<body>
+<canvas id="c" width="640" height="480"></canvas>
+<p>Hỏa Hổ – Hổ Gầm Hỏa Diệm. A / Enter / Space: tung chiêu lại. Bên phải là bù nhìn trúng đòn (chính Hỏa Hổ quay trái).</p>
+<script>
+// Bản thử riêng để duyệt hiệu ứng chiêu, không phải trang game.
+const ctx = document.getElementById('c').getContext('2d');
+ctx.imageSmoothingEnabled = false;
+const IMG = {}, names = ['idle-0', 'blast-0', 'blast-1', 'blast-2', 'blast-3', 'hurt'];
+const load = (k, src) => new Promise(r => { const i = new Image(); i.onload = () => { IMG[k] = i; r(); }; i.src = src; });
+let FX = [], META;
+
+// cut the 4x2 effect sheet into 8 transparent frames (magenta key)
+function cutFx(img) {
+  const cw = img.width / 4, ch = img.height / 2, out = [];
+  for (let r = 0; r < 2; r++) for (let c = 0; c < 4; c++) {
+    const cv = document.createElement('canvas'); cv.width = cw; cv.height = ch;
+    const x = cv.getContext('2d'); x.drawImage(img, c * cw, r * ch, cw, ch, 0, 0, cw, ch);
+    const d = x.getImageData(0, 0, cw, ch), p = d.data;
+    let x0 = cw, y0 = ch, x1 = 0, y1 = 0;
+    for (let i = 0; i < p.length; i += 4) {
+      if (p[i] > 170 && p[i + 1] < 110 && p[i + 2] > 170) p[i + 3] = 0;
+      else { const k = i / 4, px = k % cw, py = (k / cw) | 0; x0 = Math.min(x0, px); x1 = Math.max(x1, px); y0 = Math.min(y0, py); y1 = Math.max(y1, py); }
+    }
+    x.putImageData(d, 0, 0);
+    const t = document.createElement('canvas'); t.width = x1 - x0 + 1; t.height = y1 - y0 + 1;
+    t.getContext('2d').drawImage(cv, x0, y0, t.width, t.height, 0, 0, t.width, t.height);
+    out.push(t);
+  }
+  return out;
+}
+
+const FEET = 400, ME = 150, FOE = 500, FX_H = 70;   // effect height on the 640x480 screen
+function pet(f, x, left = false, dy = 0) {
+  const im = IMG[f], [ax, ay] = META.anchor, dx = (META.align[f] || [0])[0];
+  ctx.save();
+  if (left) { ctx.translate(x, 0); ctx.scale(-1, 1); ctx.drawImage(im, -ax + dx, FEET - ay + dy); }
+  else ctx.drawImage(im, x - ax + dx, FEET - ay + dy);
+  ctx.restore();
+}
+function fx(i, cx, cy) {
+  const f = FX[i], k = FX_H / FX[0].height, w = f.width * k, h = f.height * k;
+  ctx.drawImage(f, cx - w / 2, cy - h / 2, w, h);
+}
+
+let t0 = performance.now();
+const restart = () => t0 = performance.now();
+addEventListener('keydown', e => { if (['Enter', ' ', 'a', 'A', 'z', 'Z'].includes(e.key)) restart(); });
+document.getElementById('c').onclick = restart;
+
+function frame(now) {
+  const t = now - t0;
+  ctx.fillStyle = '#000'; ctx.fillRect(0, 0, 640, 480);
+  if (IMG.room) ctx.drawImage(IMG.room, 0, 0, 640, 480);
+  ctx.fillStyle = 'rgba(0,0,0,.25)'; ctx.fillRect(0, 0, 640, 480);
+  // caster: blast-0 300, blast-1 380, blast-2 450 (shot leaves), blast-3 320, idle
+  const seq = [['blast-0', 300], ['blast-1', 380], ['blast-2', 450], ['blast-3', 320]];
+  let acc = 0, me = 'idle-0';
+  for (const [f, ms] of seq) { if (t >= acc && t < acc + ms) me = f; acc += ms; }
+  const fire = 680, travel = 520, boom = fire + travel;
+  const hit = t >= boom && t < boom + 520;
+  pet(me, ME);
+  pet(hit ? 'hurt' : 'idle-0', FOE, true, hit ? 0 : 0);
+  const mouthY = FEET - 120;
+  if (t >= fire && t < boom) {                       // flying tiger head, looping row 1
+    const u = (t - fire) / travel, x = ME + 120 + (FOE - 60 - ME - 120) * u;
+    fx(Math.floor((t - fire) / 90) % 4, x, mouthY);
+  } else if (t >= boom && t < boom + 4 * 130) {     // impact, row 2 once
+    fx(4 + Math.floor((t - boom) / 130), FOE - 20, mouthY + 10);
+  }
+  if (t > boom + 1600) restart();
+  requestAnimationFrame(frame);
+}
+
+(async () => {
+  META = await fetch('img/frames.json').then(r => r.json());
+  await Promise.all([...names.map(n => load(n, 'img/' + n + '.png')), load('fxsheet', 'img/fx.png'),
+                     load('room', '../tien-hoa/img/room_L2HO.png').catch(() => 0)]);
+  FX = cutFx(IMG.fxsheet);
+  requestAnimationFrame(frame);
+})();
+</script>
+</body></html>

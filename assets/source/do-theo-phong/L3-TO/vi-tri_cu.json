@@ -1,0 +1,62 @@
+{
+ "10_sandstone-statue.png": [
+  742,
+  299,
+  1.0
+ ],
+ "12_desert-flower-vase.png": [
+  982,
+  325,
+  1.0
+ ],
+ "08_stone-training-pillar.png": [
+  528,
+  364,
+  1.0
+ ],
+ "11_clay-shelf.png": [
+  -44,
+  228,
+  1.0
+ ],
+ "03_tall-clay-pots.png": [
+  1204,
+  380,
+  1.0
+ ],
+ "04_cactus-pot.png": [
+  14,
+  551,
+  1.0
+ ],
+ "09_pottery-wheel.png": [
+  1230,
+  574,
+  0.918
+ ],
+ "06_amber-lamp.png": [
+  150,
+  707,
+  1.0
+ ],
+ "02_woven-mat-bed.png": [
+  114,
+  489,
+  1.0
+ ],
+ "05_stone-bench.png": [
+  1110,
+  749,
+  0.821
+ ],
+ "07_patterned-sand-rug.png": [
+  546,
+  656,
+  1.0
+ ],
+ "01_clay-food-bowl.png": [
+  405,
+  703,
+  1.0
+ ]
+}

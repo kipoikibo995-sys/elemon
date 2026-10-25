@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>Huyền thoại – đốm lửa xoay</title>
+<style>
+  body { margin: 0; background: #1b1424; color: #ddd; font: 14px sans-serif; display: flex; flex-direction: column; align-items: center; }
+  canvas { image-rendering: pixelated; margin-top: 12px; border: 2px solid #333; max-width: 98vw; }
+  p { margin: 6px; color: #aaa; } b { color: #ffcf6e; }
+</style></head>
+<body>
+<canvas id="c" width="1040" height="900"></canvas>
+<p><b>Hàng 1</b>: Huyền thoại đang dùng (viền lửa dính vào người). <b>Hàng 2</b>: thân sạch + đốm lửa vàng xoay quanh. <b>Hàng 3</b>: thân sạch + đốm lửa màu theo hệ.</p>
+<p>Thân sạch ở đây tạm mượn hình Lv4 để thử; Huyền thoại thật sẽ vẽ lại không có viền lửa.</p>
+<script>
+// Bản thử riêng để duyệt đốm lửa xoay quanh Huyền thoại (scripts/legend_orbs.py), không phải trang game.
+const ctx = document.getElementById('c').getContext('2d');
+ctx.imageSmoothingEnabled = false;
+const PETS = [['hoa-ho', 'hoa'], ['kim-te', 'kim'], ['moc-hung', 'moc'], ['thuy-sa', 'thuy'], ['tho-nguu', 'tho']];
+const IMG = {}, K = 0.62, ORBS = 5, LAP = 3200;   // 5 orbs, one lap in 3.2 s
+const load = src => new Promise(r => { const i = new Image(); i.onload = () => r(i); i.src = src; });
+function crop(img) {            // trim the empty canvas around the pet
+  const c = document.createElement('canvas'); c.width = img.width; c.height = img.height;
+  const x = c.getContext('2d'); x.drawImage(img, 0, 0);
+  const p = x.getImageData(0, 0, c.width, c.height).data;
+  let x0 = c.width, y0 = c.height, x1 = 0, y1 = 0;
+  for (let i = 3; i < p.length; i += 4) if (p[i]) { const k = (i - 3) / 4, px = k % c.width, py = (k / c.width) | 0; x0 = Math.min(x0, px); x1 = Math.max(x1, px); y0 = Math.min(y0, py); y1 = Math.max(y1, py); }
+  const o = document.createElement('canvas'); o.width = x1 - x0 + 1; o.height = y1 - y0 + 1;
+  o.getContext('2d').drawImage(c, x0, y0, o.width, o.height, 0, 0, o.width, o.height); return o;
+}
+function keyed(img) {           // magenta -> transparent, cut into 24 px cells
+  const c = document.createElement('canvas'); c.width = img.width; c.height = img.height;
+  const x = c.getContext('2d'); x.drawImage(img, 0, 0);
+  const d = x.getImageData(0, 0, c.width, c.height), p = d.data;
+  for (let i = 0; i < p.length; i += 4) if (p[i] > 200 && p[i + 1] < 60 && p[i + 2] > 200) p[i + 3] = 0;
+  x.putImageData(d, 0, 0); return c;
+}
+(async () => {
+  for (const [p, e] of PETS) {
+    IMG[p + '_lg'] = crop(await load(`img/${p}_lg.png`)); IMG[p + '_lv4'] = crop(await load(`img/${p}_lv4.png`));
+    IMG['orb_' + e] = keyed(await load(`img/orb_${e}.png`));
+  }
+  IMG.orb_vang = keyed(await load('img/orb_vang.png'));
+  requestAnimationFrame(draw);
+})();
+function cell(sheet, col, row, x, y, s) {    // draw one 24 px cell centred on (x, y), scale s
+  ctx.drawImage(sheet, col * 24, row * 24, 24, 24, Math.round(x - 12 * s), Math.round(y - 18 * s), Math.round(24 * s), Math.round(24 * s));
+}
+function orbs(sheet, cx, feet, w, h, t, front) {
+  for (let i = 0; i < ORBS; i++) {
+    const a = (t / LAP + i / ORBS) * Math.PI * 2, depth = Math.sin(a);      // >0: near side
+    if ((depth > 0) !== front) continue;
+    const x = cx + Math.cos(a) * Math.min(w * 0.6, 88), y = feet - h * 0.42 + depth * h * 0.14 + Math.sin(a * 2 + i) * 4;
+    const size = depth > 0.3 ? 2 : depth > -0.3 ? 1 : 0;                  // nearer = bigger
+    cell(sheet, (Math.floor(t / 110) + i) % 4, size, x, y, 1.6);
+  }
+  // sparkles rising from the feet now and then
+  for (let i = 0; i < 4; i++) {
+    const u = ((t / 1400) + i * 0.27) % 1;
+    if (front !== (i % 2 === 0)) continue;
+    const x = cx + Math.sin(i * 7.3) * w * 0.45, y = feet - u * h * 1.05;
+    cell(sheet, Math.floor(u * 8) % 4, 3, x, y, 1.4);
+  }
+}
+function draw(t) {
+  ctx.fillStyle = '#2a1f33'; ctx.fillRect(0, 0, 1040, 900);
+  [270, 570, 870].forEach(y => { ctx.fillStyle = '#3a2c44'; ctx.fillRect(0, y, 1040, 30); });
+  PETS.forEach(([p, e], i) => {
+    const cx = 104 + i * 208;
+    const lg = IMG[p + '_lg'];
+    ctx.drawImage(lg, cx - lg.width * K / 2, 270 - lg.height * K, lg.width * K, lg.height * K);
+    const b = IMG[p + '_lv4'], w = b.width * K * 1.1, h = b.height * K * 1.1;   // a legend is drawn a bit bigger
+    [[570, IMG.orb_vang], [870, IMG['orb_' + e]]].forEach(([feet, sheet]) => {
+      orbs(sheet, cx, feet, w, h, t, false);
+      ctx.drawImage(b, cx - w / 2, feet - h, w, h);
+      orbs(sheet, cx, feet, w, h, t, true);
+    });
+  });
+  requestAnimationFrame(draw);
+}
+</script>
+</body></html>

@@ -1,0 +1,62 @@
+{
+ "03_fishing-rod-stand.png": [
+  656,
+  245,
+  0.85
+ ],
+ "02_net-hammock-bed.png": [
+  68,
+  326,
+  0.9
+ ],
+ "11_lantern-on-post.png": [
+  996,
+  318,
+  0.85
+ ],
+ "10_hanging-net.png": [
+  26,
+  227,
+  1.0
+ ],
+ "07_buoy.png": [
+  1270,
+  232,
+  1.0
+ ],
+ "08_small-wooden-boat-model.png": [
+  452,
+  358,
+  0.8
+ ],
+ "04_water-barrel.png": [
+  1176,
+  375,
+  0.85
+ ],
+ "05_bucket-of-fish.png": [
+  5,
+  533,
+  0.85
+ ],
+ "09_blue-rag-rug.png": [
+  601,
+  666,
+  1.0
+ ],
+ "06_rope-coil.png": [
+  1258,
+  568,
+  0.75
+ ],
+ "12_seashell-pile.png": [
+  380,
+  530,
+  0.6
+ ],
+ "01_shell-food-bowl.png": [
+  390,
+  667,
+  1.0
+ ]
+}

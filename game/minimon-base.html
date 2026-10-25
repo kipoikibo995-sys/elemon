@@ -1,0 +1,2428 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Elemon demo R36S - từ trứng tới Huyền thoại</title>
+<style>
+  body { margin: 0; background: #14110f; color: #f0e4ce; font: 14px "Segoe UI", sans-serif; display: flex;
+         gap: 22px; padding: 14px; justify-content: center; align-items: flex-start; flex-wrap: wrap; }
+  /* the R36S, upright like the real one: screen on top, controls below */
+  .dev { width: 540px; background: linear-gradient(#2b2e33, #1d1f23); border-radius: 26px 26px 60px 60px;
+         padding: 30px 20px 26px; box-shadow: 0 10px 30px #000a, inset 0 1px 0 #ffffff1a; position: relative; }
+  .shoulders { display: flex; justify-content: space-between; margin: -40px 6px 12px; }
+  .shoulders div { display: flex; gap: 6px; }
+  .sh { width: 74px; height: 22px; border-radius: 10px 10px 4px 4px; background: #3a3e45; color: #cfd4da;
+        font: bold 12px sans-serif; display: grid; place-items: center; cursor: pointer; border: 1px solid #50555d; }
+  .bezel { background: #0b0b0c; border-radius: 10px; padding: 14px 16px 10px; }
+  canvas { width: 100%; aspect-ratio: 4 / 3; display: block; image-rendering: pixelated; background: #000; }
+  .brand { color: #6c7179; font: bold 11px sans-serif; letter-spacing: 3px; text-align: center; margin-top: 6px; }
+  .controls { display: grid; grid-template-columns: 1fr 1fr; margin-top: 18px; row-gap: 14px; }
+  .dpad { position: relative; width: 132px; height: 132px; margin-left: 28px; }
+  .dpad .k { position: absolute; width: 44px; height: 44px; background: #3b3f46; color: #dde2e8; display: grid;
+             place-items: center; cursor: pointer; font-size: 16px; border: 1px solid #555a62; }
+  .dpad .up { left: 44px; top: 0; border-radius: 8px 8px 0 0; }
+  .dpad .down { left: 44px; top: 88px; border-radius: 0 0 8px 8px; }
+  .dpad .left { left: 0; top: 44px; border-radius: 8px 0 0 8px; }
+  .dpad .right { left: 88px; top: 44px; border-radius: 0 8px 8px 0; }
+  .dpad .mid { left: 44px; top: 44px; background: #34383e; cursor: default; }
+  .abxy { position: relative; width: 140px; height: 140px; justify-self: end; margin-right: 28px; }
+  .abxy .k { position: absolute; width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center;
+             font: bold 17px sans-serif; cursor: pointer; color: #fff; border: 2px solid #0006; }
+  .abxy .X { left: 47px; top: 0; background: #2f6fd6; }
+  .abxy .A { left: 94px; top: 47px; background: #d64040; }
+  .abxy .B { left: 47px; top: 94px; background: #e6b62e; color: #2a1c00; }
+  .abxy .Y { left: 0; top: 47px; background: #2fa060; }
+  .stick { width: 78px; height: 78px; border-radius: 50%; background: radial-gradient(#4a4f57, #24272c 70%);
+           border: 2px solid #555a62; display: grid; place-items: center; color: #8d939b; font: 11px sans-serif; }
+  .stick.l { margin-left: 52px; } .stick.r { justify-self: end; margin-right: 58px; }
+  .mids { grid-column: 1 / 3; display: flex; justify-content: center; gap: 18px; margin-top: -4px; }
+  .pill { width: 62px; height: 20px; border-radius: 10px; background: #3b3f46; color: #cfd4da; display: grid;
+          place-items: center; font: bold 10px sans-serif; cursor: pointer; border: 1px solid #555a62; }
+  .fn { position: absolute; left: 22px; bottom: 22px; width: 28px; height: 28px; border-radius: 50%; background: #3b3f46;
+        display: grid; place-items: center; font: bold 11px sans-serif; color: #cfd4da; cursor: pointer; border: 1px solid #555a62; }
+  .on { filter: brightness(1.6); transform: translateY(2px); box-shadow: 0 0 10px #ffd36e; }
+  .side { max-width: 380px; }
+  .side h3 { margin: 4px 0 8px; color: #ffd36e; font-size: 16px; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  td { padding: 5px 6px; border-bottom: 1px solid #2c2622; vertical-align: top; }
+  td:first-child { font-weight: bold; white-space: nowrap; }
+  td.key { color: #a08a6e; white-space: nowrap; }
+  tr.on { filter: none; transform: none; box-shadow: none; } tr.on td { background: #4a3416; }
+  .restart { margin-top: 12px; font: bold 14px "Segoe UI", sans-serif; border-radius: 8px; border: 2px solid #8a6a3a;
+             background: #3a2618; color: #f6dfb0; padding: 8px 14px; cursor: pointer; }
+  .last { margin-top: 10px; color: #a08a6e; }
+</style></head><body>
+<div class="dev">
+  <div class="shoulders"><div><span class="sh" data-b="L2">L2</span><span class="sh" data-b="L1">L1</span></div>
+                         <div><span class="sh" data-b="R1">R1</span><span class="sh" data-b="R2">R2</span></div></div>
+  <div class="bezel"><canvas id="c" width="640" height="480"></canvas><div class="brand">R36S · 640×480</div></div>
+  <div class="controls">
+    <div class="dpad"><span class="k up" data-b="UP">▲</span><span class="k left" data-b="LEFT">◀</span>
+      <span class="k mid"></span><span class="k right" data-b="RIGHT">▶</span><span class="k down" data-b="DOWN">▼</span></div>
+    <div class="abxy"><span class="k X" data-b="X">X</span><span class="k Y" data-b="Y">Y</span>
+      <span class="k A" data-b="A">A</span><span class="k B" data-b="B">B</span></div>
+    <div class="mids"><span class="pill" data-b="SELECT">SELECT</span><span class="pill" data-b="START">START</span></div>
+    <div class="stick l">cần trái</div><div class="stick r">cần phải</div>
+  </div>
+  <span class="fn" data-b="F">F</span>
+</div>
+<div class="side">
+  <h3>Nút R36S trong màn này</h3>
+  <table id="legend"></table>
+  <button class="restart" id="btnR">Chơi lại từ đầu (phím R)</button>
+  <div class="last" id="last">Bấm thử một nút…</div>
+  <p class="last">Cắm tay cầm vào máy tính cũng bấm được (kiểu tay cầm Xbox: A dưới, B phải, X trái, Y trên).</p>
+</div>
+<script src="data.js"></script>
+<script>
+// ---------- loading ----------
+const ctx = document.getElementById('c').getContext('2d');
+const IMG = {};
+// many small pictures at once: a load can fail when the browser runs short of sockets, so try again a few times
+function load(name, path, tries = 5) {
+  return new Promise(ok => {
+    const im = new Image();
+    im.onload = () => { IMG[name] = im; ok(); };
+    im.onerror = () => tries > 1 ? setTimeout(() => load(name, path, tries - 1).then(ok), 300) : ok();
+    im.src = path;
+  });
+}
+const NEEDS = [['icon_no', 'cam', 'no'], ['icon_vui', 'hong', 'vui'], ['icon_sach', 'xanh-duong', 'sach'],
+               ['icon_nang-luong', 'xanh-reu', 'nl']];
+// 4 care actions (play is on R2, decorating on Start; shop and training are in the village behind "Ra ngoài")
+const MENU = [['nut_cho-an', 'Ăn'], ['nut_don-dep', 'Dọn'], ['nut_ve-sinh', 'Vệ sinh'], ['nut_ngu', 'Ngủ / Đèn'],
+              ['nut_hoat-dong', 'Hoạt động'], ['nut_ra-ngoai', 'Ra ngoài']];
+// which bag things each menu shows: Vệ sinh = bath and medicine, Ăn = everything else
+const CARE = ['bath', 'medicine'];
+const files = ['room', 'nen', 'bar', 'coin_box', 'badge', 'o_chon', 'panel', 'picker', 'o_hang', 'o_hang-chon',
+  'bong_tim', 'bong_vui', 'bong_doi', 'bong_buon-ngu', 'bong_gian', 'bong_buon', 'vun-do-an', 'lap-lanh', 'tim_nho', 'tim_vua',
+  'z_nho', 'z_vua', 'z_to', 'cot-sang', 'cot-set', 'no-sang', 'vong-song', 'hat-sang', 'hat_vang', 'hat_trang',
+  'hat_lua', 'hat_xoay', 'hat_la', 'hat_nuoc', 'hat_kim', 'hat_dat', 'bang-ron', ...['hoa', 'kim', 'moc', 'thuy', 'tho'].flatMap(he => [0, 1, 2, 3].map(i => `xoay_${he}_${i}`)),
+  ...MENU.map(m => m[0]), ...NEEDS.map(n => n[0]), ...NEEDS.map(n => 'fill_' + n[1]),
+  ...DATA.bag.flatMap(b => ['food_' + b.file, 'mouth_' + b.file]),
+  'gem_cell', 'gem_cell_sel', 'gem_panel', 'tia-sang', ...DATA.gems.rows.map(r => r.fill),
+  ...Object.keys(DATA.gems.attrs).flatMap(he => [1, 2, 3, 4, 5].flatMap(g => [`gem_${he}_${g}`, `gemb_${he}_${g}`])),
+  'map', 'map_info', 'mui-ten_xuong', 'mui-ten_len', ...Object.keys(DATA.map.layers), 'tab_nha',
+  ...DATA.houses.flatMap(h => [h.room, h.thumb, h.bath, ...h.items.flatMap(d => [d.img, d.icon])]),
+  'shop_bg', 'chu-quan', 'bong_trong', 'tab_sel', 'shelf_o_hang', 'shelf_o_hang-chon', 'shelf_o_hang-khoa', 'nhan-gia',
+  'shop_desc', 'nut_mua', 'nut_ban', 'nen-menu_hoang-hon', 'nen-menu_troi-dem', ...DATA.shop.tabs.map(t => t.icon), ...DATA.shop.rows.flat().map(r => r.key),
+  ...DATA.shop.rows[0].flatMap(r => ['food_' + r.file, 'mouth_' + r.file]), ...[2, 3].flatMap(t => DATA.shop.rows[t].map(r => 'food_' + r.file)),
+  'bot_nho', 'bot_vua', 'bot_to', 'hd_bang-ten', 'hd_mui-ten_phai', 'hd_mui-ten_trai', 'hd_nen_cau-ca', 'hd_nen_nong-trai', 'hd_nut_A', 'hd_nut_B', 'hd_the', 'hd_the_chon', 'hd_the_khoa', 'cc_ca_keo_dai6', 'th_nen_lop', 'th_khung-giay', 'th_mui-ten-cuon', 'th_nut_chon', 'th_nut_dung', 'th_nut_sai', 'th_nut_thuong', 'th_thanh-cuon', 'th_the_anh', 'th_the_chon', 'th_the_he', 'th_the_toan', 'th_co_1-cuoi', 'th_co_2-chop-mat', 'th_co_3-giang', 'th_co_4-khen', 'th_co_5-suy-nghi', 'th_co_6-ngac-nhien', 'th_co_7-sai', 'th_co_8-len-cap', 'td_tui', 'td_tab_tat-ca', 'td_tab_nong-san', 'td_tab_ca', 'td_tab_hat', 'td_tab_do-cau', 'td_tab_mon-an', 'td_tab_ngoc', 'td_tab_chon', 'td_so-luong', 'td_o-khoa', 'td_moi', 'td_dung', 'td_yeu-thich', 'td_vut', 'td_sap-xep', 'na_nen_cat', 'na_nen_khuay', 'na_nen_chien', 'na_nen_ban-an', 'na_cat_dai6', 'na_khuay_dai6', 'na_chien_dai6', 'na_xong_dai6', 'na_khung-popup', 'na_nut-bam', 'na_nut-bam_nhan', 'na_mui-ten-xuong', 'na_xoay', 'na_vong_khung', 'na_vong_day', 'na_thanh_khung', 'na_thanh_nhiet', 'na_kim-chi', 'na_sao', 'na_sao_rong', 'na_buff_suc-manh', 'na_hoan-hao', 'na_truot', 'na_lap-lanh', 'na_mon_canh-ca-ca-chua', 'na_mon_ca-chien-ot', 'na_mon_banh-dau', 'na_mon_com-trung-ca-chua', 'na_mon_ham-cu-cai-toi', 'na_mon_sup-lo-nuong', 'na_mon_bap-cai-cuon', 'na_mon_ngo-nuong', 'na_mon_com-chien-dau', 'na_mon_canh-ngo-sen', 'na_mon_nuoc-dua-hau', 'na_mon_com-nam-ca', 'na_mon_sup-bi-ngo', 'na_mon_khoai-lang-nuong', 'na_mon_banh-ca-rot', 'na_mon_lau-hai-san', 'cc_can_quang_dai4', 'cc_can_cho_dai4', 'cc_can_keo_dai4', 'sn_can_1-tre', 'sn_can_2-go', 'sn_can_3-xanh', 'sn_can_4-bac', 'sn_can_5-vang', 'sn_moi_giun', 'sn_moi_vun-banh', 'sn_moi_tom', 'sn_moi_moi-gia', 'sn_moi_phep', 'sn_xo-ca', 'sn_vot', 'sn_hop-do-nghe', 'sn_thung-da', 'sn_thung-ca-da', 'cc_gon-nuoc_dai6', 'cc_phao_can_dai6', 'cc_phao_noi_dai6', 'sn_nen', 'sn_o-hang', 'sn_o-hang_chon', 'sn_tab_ban', 'sn_tab_mua', 'sn_the-gia', 'sn_xu', 'sn_hat_hoa-ot', 'sn_hat_hoa-ca-chua', 'sn_hat_hoa-dau-tay', 'sn_hat_kim-cu-cai', 'sn_hat_kim-sup-lo', 'sn_hat_kim-toi', 'sn_hat_moc-bap-cai', 'sn_hat_moc-dau-ha-lan', 'sn_hat_moc-ngo', 'sn_hat_thuy-sen', 'sn_hat_thuy-dua-hau', 'sn_hat_thuy-lua', 'sn_hat_tho-bi-ngo', 'sn_hat_tho-ca-rot', 'sn_hat_tho-khoai-lang', 'sn_chu_1-cuoi', 'sn_chu_2-chop-mat', 'sn_chu_3-chao', 'sn_chu_4-cuoi-lon', 'sn_chu_5-suy-nghi', 'sn_chu_6-dua-hat', 'sn_chu_7-nhan-xu', 'sn_chu_8-cam-on', 'cc_ca_icon', 'cc_can-cau', 'cc_cham-than', 'cc_fill_tien-do', 'cc_gon-nuoc', 'cc_nen', 'cc_nuoc-ban', 'cc_phao', 'cc_phao_chim', 'cc_ruong_dong', 'cc_ruong_mo', 'cc_thanh-cau', 'cc_thanh-tien-do', 'cc_vung-bat_vang', 'cc_vung-bat_xanh', 'cc_CA_hoa_1', 'cc_CA_hoa_2', 'cc_CA_hoa_3', 'cc_CA_hoa_4', 'cc_CA_kim_1', 'cc_CA_kim_2', 'cc_CA_kim_3', 'cc_CA_kim_4', 'cc_CA_moc_1', 'cc_CA_moc_2', 'cc_CA_moc_3', 'cc_CA_moc_4', 'cc_CA_thuy_1', 'cc_CA_thuy_2', 'cc_CA_thuy_3', 'cc_CA_thuy_4', 'cc_CA_tho_1', 'cc_CA_tho_2', 'cc_CA_tho_3', 'cc_CA_tho_4', 'fm_nen', 'fm_con-tro_o', 'fm_con-tro_o_vang', 'fm_dat_cay-heo', 'fm_dat_co-dai', 'fm_dat_cuoc', 'fm_dat_gieo-hat', 'fm_dat_kho', 'fm_dat_khoa', 'fm_dat_sau', 'fm_dat_tron', 'fm_dat_tuoi', 'fm_fx_nuoc', 'fm_cay_hoa-ot_1-mam', 'fm_cay_hoa-ot_2-non', 'fm_cay_hoa-ot_3-lon', 'fm_cay_hoa-ot_4-chin', 'fm_cay_hoa-ot_5-nong-san', 'fm_cay_hoa-ca-chua_1-mam', 'fm_cay_hoa-ca-chua_2-non', 'fm_cay_hoa-ca-chua_3-lon', 'fm_cay_hoa-ca-chua_4-chin', 'fm_cay_hoa-ca-chua_5-nong-san', 'fm_cay_hoa-dau-tay_1-mam', 'fm_cay_hoa-dau-tay_2-non', 'fm_cay_hoa-dau-tay_3-lon', 'fm_cay_hoa-dau-tay_4-chin', 'fm_cay_hoa-dau-tay_5-nong-san', 'fm_cay_kim-cu-cai_1-mam', 'fm_cay_kim-cu-cai_2-non', 'fm_cay_kim-cu-cai_3-lon', 'fm_cay_kim-cu-cai_4-chin', 'fm_cay_kim-cu-cai_5-nong-san', 'fm_cay_kim-sup-lo_1-mam', 'fm_cay_kim-sup-lo_2-non', 'fm_cay_kim-sup-lo_3-lon', 'fm_cay_kim-sup-lo_4-chin', 'fm_cay_kim-sup-lo_5-nong-san', 'fm_cay_kim-toi_1-mam', 'fm_cay_kim-toi_2-non', 'fm_cay_kim-toi_3-lon', 'fm_cay_kim-toi_4-chin', 'fm_cay_kim-toi_5-nong-san', 'fm_cay_moc-bap-cai_1-mam', 'fm_cay_moc-bap-cai_2-non', 'fm_cay_moc-bap-cai_3-lon', 'fm_cay_moc-bap-cai_4-chin', 'fm_cay_moc-bap-cai_5-nong-san', 'fm_cay_moc-dau-ha-lan_1-mam', 'fm_cay_moc-dau-ha-lan_2-non', 'fm_cay_moc-dau-ha-lan_3-lon', 'fm_cay_moc-dau-ha-lan_4-chin', 'fm_cay_moc-dau-ha-lan_5-nong-san', 'fm_cay_moc-ngo_1-mam', 'fm_cay_moc-ngo_2-non', 'fm_cay_moc-ngo_3-lon', 'fm_cay_moc-ngo_4-chin', 'fm_cay_moc-ngo_5-nong-san', 'fm_cay_thuy-sen_1-mam', 'fm_cay_thuy-sen_2-non', 'fm_cay_thuy-sen_3-lon', 'fm_cay_thuy-sen_4-chin', 'fm_cay_thuy-sen_5-nong-san', 'fm_cay_thuy-dua-hau_1-mam', 'fm_cay_thuy-dua-hau_2-non', 'fm_cay_thuy-dua-hau_3-lon', 'fm_cay_thuy-dua-hau_4-chin', 'fm_cay_thuy-dua-hau_5-nong-san', 'fm_cay_thuy-lua_1-mam', 'fm_cay_thuy-lua_2-non', 'fm_cay_thuy-lua_3-lon', 'fm_cay_thuy-lua_4-chin', 'fm_cay_thuy-lua_5-nong-san', 'fm_cay_tho-bi-ngo_1-mam', 'fm_cay_tho-bi-ngo_2-non', 'fm_cay_tho-bi-ngo_3-lon', 'fm_cay_tho-bi-ngo_4-chin', 'fm_cay_tho-bi-ngo_5-nong-san', 'fm_cay_tho-ca-rot_1-mam', 'fm_cay_tho-ca-rot_2-non', 'fm_cay_tho-ca-rot_3-lon', 'fm_cay_tho-ca-rot_4-chin', 'fm_cay_tho-ca-rot_5-nong-san', 'fm_cay_tho-khoai-lang_1-mam', 'fm_cay_tho-khoai-lang_2-non', 'fm_cay_tho-khoai-lang_3-lon', 'fm_cay_tho-khoai-lang_4-chin', 'fm_cay_tho-khoai-lang_5-nong-san', 'bc_cham-than', 'bc_choang', 'bc_gian', 'bc_hoi', 'bc_mo-hoi-nho', 'bc_mo-hoi', 'bc_not-nhac-doi', 'bc_not-nhac', 'bc_tim-nho', 'bc_tim', 'bc_xi-khoi', 'bc_zzz', 'tam_L1_dau-goi', 'tam_L1_khan', 'tam_L1_vit', 'tam_L1_xa-phong', 'tam_L2_dau-goi', 'tam_L2_khan', 'tam_L2_vit', 'tam_L2_xa-phong', 'tam_L3_dau-goi', 'tam_L3_khan', 'tam_L3_vit', 'tam_L3_xa-phong', 'tam_L4_dau-goi', 'tam_L4_khan', 'tam_L4_vit', 'tam_L4_xa-phong', 'tt_doi', 'tt_ban', 'tt_buon', 'tt_om', 'tt_buon-ngu', 'tt_chan', 'tt_khat', 'tt_vui', 'san_phan-nho', 'san_phan-to', 'san_vet-ban', 'san_vun-do-an', 'san_vung-nuoc', 'san_long', 'san_bui', 'san_sach', 'cs_bat_day', 'cs_bat_nua', 'cs_bat_rong', 'cs_bat_nuoc', 'cs_chau_nuoc', 'cs_chau_bot', 'cs_khan', 'cs_xa-phong', 'cs_do-choi_bong', 'cs_do-choi_chuong', 'cs_do-choi_khuc-go', 'cs_do-choi_long-vu', 'cs_choi_0', 'cs_choi_1', 'cs_choi_2', 'cs_sach-bong', 'cs_bao_chu-y', 'cs_bao_chu-y-2', 'cs_bao_chu-y-3', 'cs_bao_nguy', 'cs_tim_vo', 'cs_dau-x', 'cs_bong_bay', 'cs_sao_no', 'cs_dong-ho-cat', 'title_bg', 'bang_go', 'title_b', 'title_pet', ...(DATA.title_baked ? [] : ['logo_elemon']), 'logo', 'nut-menu_thuong', 'nut-menu_chon', 'nut-menu_khoa', 'con-tro', 'phan_nho', 'phan_vua', 'phan_to', 'bong_om',
+  ...[0, 1, 2, 3].flatMap(i => [`trung_${i}`, `no-trung_${i}`]),
+  ...['hoa', 'kim', 'moc', 'thuy', 'tho'].flatMap(he => [1, 2, 3, 4, 5, 6, 7, 8].map(i => `no_${he}_${i}`)), 'ruoi_0', 'ruoi_1', 'ruoi_2',
+  ...DATA.stats_stages.flatMap(st => [0, 1, 2, 3].map(p => `stats_${st}_${p}`))];
+const jobs = files.map(f => load(f, `img/${f}.png`));
+
+// ---------- the creature the player raises: any of the 31, loaded when picked (pets/<id>.json, frames in ../pets) ----------
+const ELS = ['hoa', 'kim', 'moc', 'thuy', 'tho'];
+const HE_NAME = { hoa: 'Hỏa', kim: 'Kim', moc: 'Mộc', thuy: 'Thủy', tho: 'Thổ' };
+const FOOD_PREFIX = { hoa: 'Hoa_', kim: 'Kim_', moc: 'Moc_', thuy: 'Thuy_', tho: 'Tho_' };
+// the food of the element that overcomes the pet's own (Thủy > Hỏa > Kim > Mộc > Thổ > Thủy): it turns it down
+const HATED_BY = { hoa: 'Thuy_1_fresh-fish', kim: 'Hoa_1_roasted-chili-pepper', moc: 'Kim_1_iron-crunch-biscuit',
+                   tho: 'Moc_1_green-leaf-bundle', thuy: 'Tho_1_roasted-corn' };
+const EL = () => DATA.pet.element;
+const PETJ = {};
+async function petData(id) { return PETJ[id] || (PETJ[id] = await (await fetch(`pets/${id}.json?v=${DATA.build}`)).json()); }
+let PET_READY = false;
+async function loadCreature(id) {
+  PET_READY = false;
+  const j = await petData(id);
+  for (const k of Object.keys(IMG)) if (/^(baby|child|teen|adult|legend|adult4|legend4)\//.test(k)) delete IMG[k];
+  DATA.stages = j.stages; DATA.order = j.order; DATA.creature_name = j.name;
+  DATA.pet.element = j.element; DATA.pet.creature = id;
+  prepStages();
+  await Promise.all(Object.entries(j.stages).flatMap(([st, v]) => v.meta.frames.map(f => load(`${st}/${f}`, `../pets/${v.dir}/${f}.png`))));
+  PET_READY = true;
+}
+
+// ---------- the pet ----------
+const ease = t => 0.5 - 0.5 * Math.cos(Math.PI * Math.min(1, Math.max(0, t)));
+// the gentle standing bounce approved on the stats screen (320 px units)
+const BOUNCE = { loop: true, keys: [{ f: 'idle-0', ms: 300, br: -1 }, { f: 'idle-0', ms: 350, y: -1 },
+                                    { f: 'idle-0', ms: 350, y: 0 }, { f: 'idle-0', ms: 300 }] };
+function total(anim) { return anim.keys.reduce((a, k) => a + k.ms, 0); }
+function sample(anim, ms) {           // -> {f, x, y, br} in 640 px, like scripts/preview_anims.py
+  // a move this stage does not have (e.g. a stage changed mid-move): stand still instead of stopping the page
+  if (!anim || !anim.keys) return { f: 'idle-0', x: 0, y: 0, br: 0 };
+  let t = anim.loop ? ms % total(anim) : Math.min(ms, total(anim) - 1);
+  let prev = { x: 0, y: 0, br: 0 };
+  for (const k of anim.keys) {
+    const goal = { x: k.x ?? prev.x, y: k.y ?? prev.y, br: k.br ?? 0 };
+    if (t < k.ms) {
+      const e = ease((t + 1) / k.ms);
+      return { f: k.f, x: 2 * (prev.x + (goal.x - prev.x) * e), y: 2 * (prev.y + (goal.y - prev.y) * e),
+               br: 2 * (prev.br + (goal.br - prev.br) * e) };
+    }
+    t -= k.ms; prev = goal;
+  }
+  const k = anim.keys[anim.keys.length - 1];
+  return { f: k.f, x: 2 * prev.x, y: 2 * prev.y, br: 2 * prev.br };
+}
+const off = document.createElement('canvas'), octx = off.getContext('2d');
+const dark = document.createElement('canvas'), dctx = dark.getContext('2d');
+// the home the pet lives in (DATA.houses: Hang đá Lv1 ... Đền Hỏa Long Lv4) and where it strolls in it
+const HOME = () => DATA.houses[S.house];
+const isPlaced = (h, id) => !!S.placed[h.key + ':' + id];
+// warm items sink into the warm wooden slots: a cool slate backing inside the frame makes them stand out
+function slotBack(x, y, size) {
+  const m = Math.round(size * 0.15), w = size - 2 * m, cx = x + size / 2, cy = y + size / 2;
+  const g = ctx.createRadialGradient(cx, cy - w * 0.1, 2, cx, cy, w * 0.75);
+  g.addColorStop(0, '#5d7884'); g.addColorStop(1, '#26353d');
+  ctx.fillStyle = g; ctx.beginPath(); ctx.roundRect(x + m, y + m, w, w, 5); ctx.fill();
+}
+const doneCount = h => h.items.filter(d => isPlaced(h, d.id)).length;
+const OUTLINE = '#1a0c06';     // 2 px dark edge so the orange pet does not sink into the orange cave
+const EDGE = [[-2, 0], [2, 0], [0, -2], [0, 2], [-1, -1], [1, -1], [-1, 1], [1, 1], [-1, 0], [1, 0], [0, -1], [0, 1]];
+// the frame with its upper body lifted by br (lowered when negative), white-out k, glow, dark outline
+function drawPet(stage, s, fx, fy, white = 0, glow = 0, left = false) {
+  const st = DATA.stages[stage], m = st.meta, im = IMG[`${stage}/${s.f}`];
+  const [ax, ay] = m.anchor, dx = s.f.startsWith('walk') ? 0 : ((m.align || {})[s.f] || [0])[0];
+  const split = ay - Math.round(m.canvas[1] * 0.4), br = Math.round(s.br), lo = Math.max(0, -br);
+  off.width = im.width; off.height = im.height + 8;
+  octx.drawImage(im, 0, split, im.width, im.height - split, 0, split + 8, im.width, im.height - split);
+  if (br > 0) octx.drawImage(im, 0, split - 1, im.width, 1, 0, split + 8 - br - 1, im.width, br + 1);
+  octx.drawImage(im, 0, lo, im.width, split - lo, 0, 8 - br + lo, im.width, split - lo);
+  if (white > 0) {
+    octx.globalCompositeOperation = 'source-atop';
+    octx.fillStyle = `rgba(255,255,250,${white})`; octx.fillRect(0, 0, off.width, off.height);
+    octx.globalCompositeOperation = 'source-over';
+  }
+  // facing left: the picture is mirrored around the feet, so the anchor and the shift flip too
+  const x = Math.round(left ? fx - s.x - (im.width - ax) - dx : fx + s.x - ax + dx), y = Math.round(fy + s.y - ay - 8);
+  const put = (c, px, py) => {
+    if (!left) return ctx.drawImage(c, px, py);
+    ctx.save(); ctx.translate(px + c.width, py); ctx.scale(-1, 1); ctx.drawImage(c, 0, 0); ctx.restore();
+  };
+  if (glow > 0) { ctx.save(); ctx.shadowColor = `rgba(255,200,90,${glow})`; ctx.shadowBlur = 18; put(off, x, y); ctx.restore(); }
+  else {
+    dark.width = off.width; dark.height = off.height;
+    dctx.drawImage(off, 0, 0); dctx.globalCompositeOperation = 'source-in';
+    dctx.fillStyle = OUTLINE; dctx.fillRect(0, 0, dark.width, dark.height); dctx.globalCompositeOperation = 'source-over';
+    for (const [ox, oy] of EDGE) put(dark, x + ox, y + oy);
+    put(off, x, y);
+  }
+  return { x, y: y + 8, w: im.width, h: im.height };
+}
+
+// ---------- the demo's road: egg -> Con -> Nhi -> Thiếu niên -> Trưởng thành -> Huyền thoại (THIET-KE.md, mục 5) ----------
+const CHAIN = ['baby', 'child', 'teen', 'adult', 'legend'];
+const LV = { baby: [1, 5], child: [6, 20], teen: [21, 45], adult: [46, 99], legend: [100, 150] };
+// demo pace: EXP that fills a whole stage (the real game takes hours to weeks; L2 fast-forwards a quarter)
+const STAGE_EXP = { baby: 160, child: 260, teen: 320, adult: 380, legend: 400 };
+const UNLOCK = { child: 'Mở khóa: Tập luyện ở Võ đường', teen: 'Mở khóa: vùng Hỏa trên bản đồ',
+                 adult: 'Mở khóa: chiêu Đấm, Chưởng (nút Y)', legend: 'Đạt bậc cuối: Huyền thoại!' };
+const HE_KEY = { 'Hỏa': 'hoa', 'Thủy': 'thuy', 'Thổ': 'tho', 'Mộc': 'moc', 'Kim': 'kim' };
+// bag items that are used, not eaten (shop tabs Thuốc / Đặc biệt)
+const USE = { 'DacBiet_1_healing-medicine-bottle': 'medicine', 'DacBiet_2_herbal-pill': 'medicine', 'DacBiet_3_vitamin-candy': 'candy',
+              'DacBiet_4_energy-drink': 'energy', 'DacBiet_5_soap-bubble-bath': 'bath', 'DacBiet_6_toy-ball': 'ball' };
+const asItem = r => ({ file: r.file, name: r.name, he: r.he, effect: r.effect, use: USE[r.file], info: r.info });
+const DEMO_ITEMS = [[2, 0], [2, 4], [3, 0]].map(([t, i]) => DATA.shop.rows[t][i]);     // medicine, soap, ball to start with
+// stages with front-facing frames (front-*, turn, back) get a greeting and a standing-facing-us loop
+function prepStages() {
+for (const st of Object.values(DATA.stages)) {
+  const f = st.meta.frames, a = st.anims;
+  if (!f.includes('front-idle')) continue;
+  const blink = f.includes('front-blink') ? 'front-blink' : 'front-idle', wave = f.includes('front-wave') ? 'front-wave' : 'front-idle';
+  a.greet = { loop: false, keys: [{ f: 'turn', ms: 140 }, { f: 'front-idle', ms: 200 }, { f: wave, ms: 240, br: 1 },
+    { f: 'front-idle', ms: 180 }, { f: wave, ms: 240, br: 1 }, { f: 'front-idle', ms: 180 }, { f: wave, ms: 240, br: 1 },
+    { f: f.includes('front-happy') ? 'front-happy' : 'front-idle', ms: 160, br: -1 },
+    { f: f.includes('front-happy') ? 'front-happy' : 'front-idle', ms: 200, y: -5 },
+    { f: f.includes('front-happy') ? 'front-happy' : 'front-idle', ms: 420, y: 0 }, { f: 'turn', ms: 140 }] };
+  a.frontIdle = { loop: true, keys: [{ f: 'front-idle', ms: 300, br: -1 }, { f: 'front-idle', ms: 350, y: -1 },
+    { f: 'front-idle', ms: 350, y: 0 }, { f: blink, ms: 140 }, { f: 'front-idle', ms: 300, br: -1 },
+    { f: 'front-idle', ms: 350, y: -1 }, { f: 'front-idle', ms: 350, y: 0 }, { f: 'front-idle', ms: 300 }] };
+  if (f.includes('front-sad')) a.frontSad = { loop: true, keys: [{ f: 'front-sad', ms: 1400, br: -1 }, { f: 'front-sad', ms: 1400 }] };
+}
+// training: grown-ups punch, the young flex and hop
+for (const st of Object.values(DATA.stages)) {
+  const f = st.meta.frames, a = st.anims;
+  if (!a.train) a.train = a.punch || a.attack || { loop: true, keys: [{ f: 'flex', ms: 320, br: 1 }, { f: 'idle-0', ms: 180 },
+    { f: 'jump-happy', ms: 220, y: -8 }, { f: 'idle-0', ms: 180 }, { f: 'flex', ms: 320, br: 1 }, { f: 'idle-0', ms: 200 }] };
+}
+}
+
+// ---------- state ----------
+const NEW = () => ({ mode: 'title', titleSel: 0, egg: null, stage: 'baby', t0: performance.now(), popup: 0, popupGoal: 0,
+  fade: 0, level: 1, xp: 0, waitA: false, cursor: 0, picker: 0, pickerGoal: 0, pick: 0,
+  bag: [...DATA.bag.map(b => b.count), 1, 1, 1], need: { no: 70, vui: 70, sach: 90, nl: 80 }, act: null, actT: 0,
+  night: 0, nightGoal: 0, toast: null, toastT: 0, sparkle: 0, bubble: null, stats: null,
+  px: 320, left: false, walk: null, nextWalk: performance.now() + 2500,
+  lk: { hoa: 12, thuy: 4, tho: 6, moc: 5, kim: 3 }, mess: [], tim: 1, poops: [], nextPoop: 0, sick: false, open: {}, askedKey: null,
+  evoFrom: null, evoTo: null, lvlT: -1e9, acts: 0, playT0: 0, endT: 0,
+  house: 0, homes: { 0: true }, ngoc: 0,
+  coins: 10000, items: [...DATA.bag.map(b => ({ ...b })), ...DEMO_ITEMS.map(asItem)], owned: {}, placed: {}, fresh: [], freshT: 0,
+  mapSel: 0, tab: 0, item: 0, buyT: 0,
+  // gem sockets on the Thuộc tính page and the gem bag (test bag: a few of every gem)
+  gems: DATA.gems.start.map(g => g && [...g]), gemMode: null, sock: 0, gp: { r: 0, c: 0 }, gemFx: 0,
+  gemBag: Object.fromEntries(Object.keys(DATA.gems.attrs).flatMap(he => [1, 2, 3, 4, 5].map(g => [`${he}_${g}`, [3, 2, 1, 1, 1][g - 1]]))) });
+let S = NEW();
+const T = { calm: 700, swirl: 1000, pillar: 260, flash: 320, reveal: 700, banner: 600 };
+const EVO = {}; let acc = 0;
+for (const [k, v] of Object.entries(T)) { EVO[k] = [acc, acc + v]; acc += v; }
+const parts = Array.from({ length: 18 }, (_, i) => ({ x: 30 + Math.random() * 580, y: 60 + Math.random() * 380,
+  v: 0.02 + Math.random() * 0.04, img: ['hat_vang', 'hat_trang', 'hat_lua', 'hat_xoay'][i % 4] }));
+
+// big titles (CHÚC MỪNG, TIẾN HÓA, LÊN CẤP...) in the pixel font FatPix VN, drawn on whole multiples of its 16 px
+// grid so it stays crisp; everything else stays Tahoma
+let TITLE_FONT = false;
+try { const ff = new FontFace('FatPixVN', 'url(font/FatPix-VN.ttf)'); document.fonts.add(ff); ff.load().then(() => TITLE_FONT = true, () => {}); } catch (e) {}
+function title(s, x, y, size, color, stroke = 4, align = 'center') {
+  if (!TITLE_FONT) return text(s, x, y, size, color, align, true, stroke);
+  const px = Math.max(16, Math.round(size / 16) * 16);
+  ctx.font = `${px}px FatPixVN`; ctx.textAlign = align; ctx.textBaseline = 'middle';
+  if (stroke) { ctx.lineWidth = stroke + 2; ctx.lineJoin = 'round'; ctx.strokeStyle = '#1a0c06'; ctx.strokeText(s, x, y + 2); }
+  ctx.fillStyle = color; ctx.fillText(s, x, y + 2);
+}
+function text(s, x, y, size, color = '#f0e4ce', align = 'left', bold = true, stroke = 0) {
+  ctx.font = `${bold ? 'bold ' : ''}${size}px Tahoma, sans-serif`;
+  ctx.textAlign = align; ctx.textBaseline = 'middle';
+  if (stroke) { ctx.lineWidth = stroke; ctx.strokeStyle = '#1a0c06'; ctx.strokeText(s, x, y); }
+  ctx.fillStyle = color; ctx.fillText(s, x, y);
+}
+function toast(s) { S.toast = s; S.toastT = performance.now(); }
+
+// ---------- room ----------
+function drawHud() {
+  ctx.fillStyle = 'rgba(18,11,9,0.88)'; ctx.fillRect(0, 0, 640, 38);
+  NEEDS.forEach(([icon, col, key], i) => {
+    const x = 8 + i * 104;
+    ctx.drawImage(IMG[icon], x, 8); ctx.drawImage(IMG.bar, x + 26, 13);
+    const f = IMG['fill_' + col], w = Math.round(4 + (f.width - 8) * S.need[key] / 100);
+    ctx.drawImage(f, 0, 0, w, f.height, x + 26, 14, w, f.height);
+  });
+  drawCoins();
+  ctx.fillStyle = 'rgba(0,0,0,0.5)'; ctx.fillRect(444, 34, 186, 4);
+  ctx.fillStyle = '#ffd36e'; ctx.fillRect(444, 34, Math.round(186 * expFrac()), 4);
+}
+// ---------- growing up ----------
+function expFrac() {
+  const [lo, hi] = LV[S.stage], p = S.xp / STAGE_EXP[S.stage] * (hi - lo);
+  return S.level >= hi ? 1 : p - Math.floor(p);
+}
+function gainExp(n) {
+  const [lo, hi] = LV[S.stage], cap = STAGE_EXP[S.stage];
+  S.acts++;
+  if (S.xp >= cap) return;
+  S.xp = Math.min(cap, S.xp + n);
+  const lv = lo + Math.floor(S.xp / cap * (hi - lo));
+  if (lv > S.level) { S.coins += 150 * (lv - S.level); S.level = lv; S.lvlT = performance.now(); emote('bc_cham-than'); }
+}
+const nextStage = () => CHAIN[CHAIN.indexOf(S.stage) + 1];
+const atCap = () => S.stage !== 'legend' && S.level >= LV[S.stage][1];
+// what this stage needs before it can evolve: [line, met, how to get it]
+function conds() {
+  const lk = Math.round(Math.max(...Object.values(S.lk))), hi = LV[S.stage][1];
+  const c = [[`Đạt Level ${hi}`, S.level >= hi, 'chăm sóc, tập luyện (L2: tua nhanh)']];
+  if (S.stage === 'child') c.push([`Một hệ Linh khí ≥ 30 (đang ${lk})`, lk >= 30, `cho ăn món hệ ${HE_NAME[EL()]}`]);
+  if (S.stage === 'teen') c.push([`Linh khí chủ đạo ≥ 60 (đang ${lk})`, lk >= 60, `cho ăn món hệ ${HE_NAME[EL()]}`]);
+  if (S.stage === 'adult') {
+    c.push([`Đủ 5 tim thân thiết (đang ${Math.floor(S.tim)})`, S.tim >= 5, 'chơi R2, vuốt ve X']);
+    c.push(['Nhà cấp 4 + Hồn lửa xanh (bản demo: bỏ qua)', true, '']);
+  }
+  return c;
+}
+function hint() {
+  if (S.night > 0.5) return 'Đang ngủ… A: đánh thức';
+  if (S.sick) return `${DATA.pet.name} bị ốm: Vệ sinh → Thuốc chữa ốm`;
+  if (S.poops.length) return 'Có phân kìa: bấm Dọn';
+  if (S.need.no < 30) return `${DATA.pet.name} đói: bấm Ăn`;
+  if (S.need.nl < 20) return `${DATA.pet.name} buồn ngủ: bấm Ngủ`;
+  if (S.need.sach < 30) return 'Bẩn rồi: Vệ sinh → Tắm';
+  if (S.need.vui < 30) return `${DATA.pet.name} buồn: R2 chơi, X vuốt ve`;
+  if (atCap()) { const m = conds().find(c => !c[1]); return m ? `Tiến hóa cần: ${m[2]}` : 'Đủ điều kiện tiến hóa: bấm L2'; }
+  if (topTier() < 4 && DATA.houses.some((n, i) => n.tier === topTier() + 1 && !houseNeed(i))) return `Mua được nhà Lv${topTier() + 1}: Ra ngoài → Chợ → Nhà`;
+  if (S.stage === 'legend') return `${DATA.pet.name} đã là Huyền thoại!`;
+  return S.stage === 'baby' ? `Chăm ${DATA.pet.name} tới Lv 5 để tiến hóa` : 'Ra ngoài → Võ đường: tập luyện, nhiều EXP';
+}
+// the needs run down while you play (demo speed), poop turns up, a dirty or starving pet falls ill
+function tickNeeds(dt, now) {
+  const k = dt / 1000, sleeping = S.night > 0.5, n = S.need;
+  n.no = Math.max(0, n.no - k * (sleeping ? 0.25 : 0.55));
+  n.vui = Math.max(0, n.vui - k * (S.sick ? 0.9 : 0.35));
+  n.sach = Math.max(0, n.sach - k * (0.2 + 0.45 * S.poops.length));
+  if (!sleeping) n.nl = Math.max(0, n.nl - k * 0.35);
+  if (!sleeping && now > S.nextPoop && S.poops.length < 3) {
+    const x = 160 + Math.random() * 320;
+    S.poops.push({ x, y: FEET_Y + 8 + Math.random() * 30, img: ['san_phan-nho', 'san_phan-to', 'san_phan-to'][S.poops.length] });
+    S.nextPoop = now + 30000 + Math.random() * 20000;
+  }
+  if (!sleeping && n.sach < 45 && now > (S.nextMess || 0) && S.mess.length < 4) {
+    S.mess.push({ x: 150 + Math.random() * 340, y: FEET_Y + 6 + Math.random() * 34, img: ['san_long', 'san_bui', 'san_vet-ban'][Math.floor(Math.random() * 3)] });
+    S.nextMess = now + 20000 + Math.random() * 15000;
+  }
+  n.sach = Math.max(0, n.sach - k * 0.2 * S.mess.length);
+  if (!S.sick && (n.sach < 12 || n.no < 4)) {
+    S.sick = true; S.act = null; emote('bc_choang'); toast(`${DATA.pet.name} bị ốm rồi! Cho uống thuốc nhé`);
+  }
+}
+function openBag(kind) {
+  S.bagKind = kind;
+  S.view = S.items.map((b, i) => i).filter(i => CARE.includes(S.items[i].use) === (kind === 'care'));
+  if (!S.view.length) return toast(kind === 'care' ? 'Hết xà phòng và thuốc rồi, ra Chợ mua nhé' : 'Hết đồ ăn rồi, ra Chợ mua nhé');
+  S.pick = 0; S.pickerGoal = 1;
+}
+// Vệ sinh -> Tắm: off to the bathroom, the bath move (or bubbles over the pet), then home again
+function drawBath(now) {
+  ctx.drawImage(IMG[HOME().bath], 0, 0);
+  const t = now - S.bathT, a = DATA.stages[S.stage].anims, real = !!a.bath;
+  const s = real ? sample(a.bath, t % total(a.bath)) : sample(idleOf(S.stage), now);
+  if (!real) prop('chau_nuoc', 320, 424, 190);
+  const box = drawPet(S.stage, s, 320, real ? 410 : 360);      // in the tub: sits on the water, body above the rim
+  if (!real) {
+    const f = IMG.cs_chau_bot, w = 196, h = f.height * w / f.width, cut = 0.42;   // only the tub's front wall and foam
+    ctx.drawImage(f, 0, f.height * cut, f.width, f.height * (1 - cut), 320 - w / 2, 428 - h * (1 - cut), w, h * (1 - cut));
+    prop('xa-phong', 452, 424, 52, 1, Math.sin(now / 300) * 0.1);
+    prop('khan', 186, 424, 70);
+  }
+  if (!real) for (let j = 0; j < 7; j++) {                    // no bath frames for this stage: soap bubbles on it
+    const im = IMG[['bot_nho', 'bot_vua', 'bot_to'][j % 3]], ph = (now / 900 + j * 0.37) % 1;
+    ctx.globalAlpha = 1 - ph;
+    ctx.drawImage(im, box.x + box.w * (0.15 + 0.7 * ((j * 0.29) % 1)) - im.width / 2, box.y + box.h * 0.7 - ph * box.h * 0.8);
+    ctx.globalAlpha = 1;
+  }
+  const tier = HOME().tier, P = n => IMG[`tam_L${tier}_${n}`];
+  if (P('vit')) {                                            // this home's bath things (assets/r36s/cham-soc/do-tam)
+    const bob = Math.round(3 * Math.sin(now / 260));
+    ctx.drawImage(P('vit'), 392, 360 + bob);
+    ctx.drawImage(P('xa-phong'), 470, 410);
+    ctx.drawImage(P('dau-goi'), 520, 384);
+    ctx.drawImage(P('khan'), 90, 400);
+  }
+  drawTop('Nhà tắm');
+  text(`${DATA.pet.name} đang tắm…`, 320, 452, 15, '#ffe6a8', 'center', true, 4);
+  if (t > S.bathDur && S.fade === 0) { if (S.mess.length < 4) S.mess.push({ x: S.px, y: FEET_Y + 16, img: 'san_vung-nuoc' }); } if (t > S.bathDur && S.fade === 0) fadeTo(() => { S.mode = 'room'; S.sparkle = performance.now(); toast('Tắm xong thơm phức!'); });
+}
+function consume(i) {
+  S.bag[i]--;
+  if (!S.bag[i]) { S.items.splice(i, 1); S.bag.splice(i, 1); S.pick = Math.min(S.pick, Math.max(0, S.items.length - 1)); }
+}
+function addItem(r) {
+  let i = S.items.findIndex(b => b.file === r.file);
+  if (i < 0) { S.items.push(asItem(r)); S.bag.push(0); i = S.items.length - 1; }
+  S.bag[i]++;
+}
+// medicine, soap, toys...: the moves from the ACT2 sheets when this stage has them
+function useItem(i) {
+  const it = S.items[i], now = performance.now(), n = S.need;
+  S.pickerGoal = 0;
+  if (it.use === 'medicine') {
+    if (!S.sick && it.file.includes('healing')) return toast(`${DATA.pet.name} đang khỏe mà`);
+    S.sick = false; n.vui = Math.min(100, n.vui + 5); S.bubble = 'bong_tim';
+    act(has('medicine') ? 'medicine' : 'happy', { loops: 1 }); toast('Uống thuốc xong, khỏe lại rồi!'); gainExp(10);
+  } else if (it.use === 'bath') {
+    n.sach = Math.min(100, n.sach + 60); S.bubble = 'bong_vui'; gainExp(15);
+    const a = DATA.stages[S.stage].anims.bath;
+    S.bathDur = a ? total(a) * 2 : 2600;
+    fadeTo(() => { S.mode = 'bath'; S.bathT = performance.now(); S.act = null; S.walk = null; });
+  } else if (it.use === 'ball') {
+    if (S.sick) return toast(`${DATA.pet.name} đang ốm, không chơi được`);
+    n.vui = Math.min(100, n.vui + 25); n.nl = Math.max(0, n.nl - 8); S.tim = Math.min(5, S.tim + 0.3); S.bubble = 'bong_vui';
+    act(has('ball') ? 'ball' : 'happy', { loops: has('ball') ? 1 : 2 }); gainExp(20);
+    return;                                                   // the ball is a toy: it stays in the bag
+  } else if (it.use === 'energy') { n.nl = Math.min(100, n.nl + 30); act('happy', { loops: 1 }); toast('Năng lượng +30'); }
+  else if (it.use === 'candy') { n.vui = Math.min(100, n.vui + 15); act('happy', { loops: 1 }); toast('Vui +15'); }
+  consume(i);
+}
+function drawCoins() {
+  ctx.drawImage(IMG.coin_box, 444, 4); text(S.coins.toLocaleString('en-US'), 548, 19, 15, '#f0e4ce', 'right');
+  text('Lv', 566, 19, 13); ctx.drawImage(IMG.badge, 596, 3); text(String(S.level), 612, 19, 13, '#f0e4ce', 'center');
+}
+function drawTop(title) {
+  ctx.fillStyle = 'rgba(18,11,9,0.88)'; ctx.fillRect(0, 0, 640, 38);
+  text(title, 14, 19, 18, '#ffd67a'); drawCoins();
+}
+
+// the menu sits right on the room (no bar): the chosen button is full bright, a bit bigger, glowing; the rest dimmed
+function drawMenu(now) {
+  MENU.forEach(([n, label], i) => {
+    const im = IMG[n], on = i === S.cursor, k = on ? 1.04 : 1, w = im.width * k, h = im.height * k;
+    const cx = 54 + i * 106.4, y = 476 - h - (on ? Math.round(2 + 2 * Math.sin(now / 200)) : 0);
+    ctx.save();
+    if (on) { ctx.shadowColor = 'rgba(255,214,90,0.95)'; ctx.shadowBlur = 16; }
+    else ctx.filter = 'brightness(0.62) saturate(0.8)';
+    ctx.drawImage(im, cx - w / 2, y, w, h);
+    ctx.restore();
+    if (on) text(label, cx, y - 10, 14, '#ffe6a8', 'center', true, 4);
+  });
+  // the hint lines never sit straight on the room picture: a dark strip (65%) under the HUD carries them
+  ctx.fillStyle = 'rgba(12,7,5,0.65)'; ctx.fillRect(0, 38, 640, 44);
+  ctx.fillStyle = 'rgba(255,214,120,0.25)'; ctx.fillRect(0, 82, 640, 1);
+  text(hint(), 12, 52, 15, '#ffe6a8', 'left', true, 3);
+  text('R2 chơi · X vuốt ve · L2 tua nhanh', 12, 71, 13, '#c9bba8', 'left', false, 2);
+}
+
+// the bag: takes the menu bar's place, so the room stays open; B goes back
+function drawPicker() {
+  const p = ease(S.picker), y = Math.round(480 - IMG.picker.height * p);
+  ctx.drawImage(IMG.picker, 10, y);
+  const care = S.bagKind === 'care';
+  text(care ? 'Vệ sinh' : 'Túi đồ', 32, y + 16, 14, '#ffd67a');
+  text(`◀ ▶ chọn · A: ${care ? 'dùng' : 'cho ăn'} · B: quay lại`, 610, y + 16, 12, '#b8a080', 'right', false);
+  const first = Math.max(0, Math.min(S.pick - 5, S.view.length - 6));
+  S.view.slice(first, first + 6).forEach((i, j) => {
+    const b = S.items[i], sx = 34 + j * 70, sy = y + 36;
+    ctx.drawImage(IMG[first + j === S.pick ? 'o_hang-chon' : 'o_hang'], sx, sy);
+    slotBack(sx, sy, 56);
+    const f = IMG['food_' + b.file];
+    ctx.drawImage(f, sx + 28 - f.width / 2, sy + 28 - f.height / 2);
+    text('x' + S.bag[i], sx + 52, sy + 48, 12, S.bag[i] ? '#f0e4ce' : '#e66e5a', 'right', true, 3);
+  });
+  if (first > 0) text('◀', 22, y + 64, 12, '#ffd67a', 'center');
+  if (first + 6 < S.view.length) text('▶', 450, y + 64, 12, '#ffd67a', 'center');
+  const b = S.items[S.view[S.pick]];
+  text(b.name, 462, y + 44, 16);
+  if (b.use) { text(b.info + (b.use === 'ball' ? ' (dùng mãi)' : ''), 462, y + 64, 12, '#f0e4ce', 'left', false); return; }
+  text('Hệ ' + b.he, 462, y + 64, 12, '#b8a080', 'left', false);
+  const e = b.effect.split(' · ');
+  for (let j = 0; j < e.length; j += 2) text(e.slice(j, j + 2).join(' · '), 462, y + 80 + j * 8, 12, '#f0e4ce', 'left', false);
+}
+
+const FEET_Y = 344;
+// a small emote that pops over the head for a moment (assets/r36s/bieu-cam): S.emo = { img, t }
+function emote(img) { S.emo = { img, t: performance.now() }; }
+function drawEmote(now, box) {
+  const e = S.emo; if (!e || !IMG[e.img]) return;
+  const t = now - e.t; if (t > 1600) { S.emo = null; return; }
+  const im = IMG[e.img], k = Math.min(1, t / 160), y = box.y - 6 - im.height - Math.round(6 * Math.sin(Math.min(1, t / 300) * Math.PI));
+  ctx.globalAlpha = Math.min(1, (1600 - t) / 300);
+  ctx.drawImage(im, box.x + box.w / 2 - im.width * k / 2 + 30, y, im.width * k, im.height * k);
+  ctx.globalAlpha = 1;
+}
+const TT = { bong_doi: 'tt_doi', bong_buon: 'tt_buon', bong_om: 'tt_om', 'bong_buon-ngu': 'tt_buon-ngu', bong_vui: 'tt_vui',
+             bong_tim: 'tt_vui', bong_gian: 'tt_buon' };
+const bubbleImg = b => IMG[TT[b] || b] || IMG[b];
+function prop(name, x, y, w, a = 1, ang = 0) {
+  const im = IMG['cs_' + name]; if (!im) return;
+  const h = im.height * w / im.width;
+  ctx.save(); ctx.globalAlpha = a; ctx.translate(x, y); ctx.rotate(ang); ctx.drawImage(im, -w / 2, -h, w, h); ctx.restore();
+}
+function drawDecor(front) {
+  const h = HOME();
+  for (const d of h.items) if (isPlaced(h, d.id) && (d.floor > FEET_Y) === front) ctx.drawImage(IMG[d.img], d.x, d.y);
+}
+function drawRoom(now) {
+  ctx.drawImage(IMG[HOME().room], 0, 0);
+  drawDecor(false);
+  let s, act = S.act, at = now - S.actT;
+  const anims = DATA.stages[S.stage].anims;
+  if (act && (!anims[act.anim] || at > total(anims[act.anim]) * (act.loops || 1) && !act.hold)) { S.act = act = null; }
+  const sad = S.need.vui < 30 && anims.sad;      // low spirits: it stands sad and does not stroll
+  if (S.bubble !== S.bubLast) { S.bubLast = S.bubble; S.bubT = now; }      // a bubble after an action fades out
+  if (S.bubble && now - S.bubT > 3500) S.bubble = null;
+  const busy = act || S.popup > 0.05 || S.picker > 0.05 || S.night > 0.05 || S.fade > 0;
+  if (S.walk) {
+    const t = Math.max(0, Math.min(1, (now - S.walk.t0) / S.walk.dur));
+    S.px = S.walk.from + (S.walk.to - S.walk.from) * t;
+    if (t >= 1 || busy) {
+      S.walk = null; S.nextWalk = now + 2000 + Math.random() * 3000;
+      S.faceUs = !!anims.frontIdle && Math.random() < 0.5; S.turnT = S.faceUs ? now : 0;
+    }
+  } else if (!busy && now > S.nextWalk && anims.walk && !sad && !S.sick) {
+    // a new spot on the floor, not too close; the body stays clear of the rocks
+    let to = S.px;
+    const [wa, wb] = HOME().walk;
+    while (Math.abs(to - S.px) < 90) to = wa + Math.random() * (wb - wa);
+    const left = to < S.px, turn = anims.frontIdle && (left !== S.left || S.faceUs) ? 160 : 0;
+    S.walk = { from: S.px, to, t0: now + turn, dur: Math.abs(to - S.px) / 70 * 1000 };
+    S.left = left; S.faceUs = false; S.turnT = turn ? now : 0;
+  }
+  const turning = !act && S.turnT && now - S.turnT < 160 && DATA.stages[S.stage].meta.frames.includes('turn');
+  s = act ? sample(anims[act.anim], at) : turning ? { f: 'turn', x: 0, y: 0, br: 0 }
+    : S.walk ? sample(anims.walk, Math.max(0, now - S.walk.t0))
+    : S.sick && anims.sick ? sample(anims.sick, now) : sad ? sample(S.faceUs && anims.frontSad || anims.sad, now)
+    : S.faceUs && anims.frontIdle ? sample(anims.frontIdle, now) : sample(idleOf(S.stage), now);
+  const px = Math.round(S.px), front = S.left ? -1 : 1;
+  for (const m of S.mess) { const im = IMG[m.img]; if (im) ctx.drawImage(im, m.x - im.width / 2, m.y - im.height); }
+  for (const pp of S.poops) {                                // poop, with a fly buzzing over it
+    const im = IMG[pp.img], fl = IMG['ruoi_' + (Math.floor(now / 90) % 3)];
+    ctx.drawImage(im, pp.x - im.width / 2, pp.y - im.height);
+    ctx.drawImage(fl, pp.x - 9 + 14 * Math.sin(now / 300 + pp.x), pp.y - im.height - 16 + 6 * Math.cos(now / 230 + pp.x));
+  }
+  // eating: the food sits on the floor in front of the pet and gets smaller bite by bite (drawn under the head)
+  if (act && act.food && DATA.stages[S.stage].meta.frames.includes('eat-bite')) {
+    const done = at / (total(anims.eat) * (act.loops || 1)), fx = px + front * 70;
+    ctx.fillStyle = 'rgba(0,0,0,0.25)'; ctx.beginPath(); ctx.ellipse(fx, FEET_Y + 2, 30, 5, 0, 0, 7); ctx.fill();
+    prop(done < 0.4 ? 'bat_day' : done < 0.8 ? 'bat_nua' : 'bat_rong', fx, FEET_Y + 4, 64);
+    if (done < 0.25) {                                         // the food tips in at the start
+      const f = IMG['food_' + act.food], k = 0.8 * (1 - done * 2);
+      ctx.drawImage(f, fx - f.width * k / 2, FEET_Y - 34 - f.height * k + done * 60, f.width * k, f.height * k);
+    }
+  }
+  const box = drawPet(S.stage, s, px, FEET_Y, 0, 0, S.left);
+  drawDecor(true);
+  // items just bought sparkle for a moment the first time the room is seen
+  if (S.fresh.length && S.fade === 0) {
+    if (!S.freshT) S.freshT = now;
+    for (const id of S.fresh) {
+      const d = HOME().items.find(e => e.id === id), im = IMG[d.img];
+      ctx.drawImage(IMG['lap-lanh'], d.x + im.width / 2 - 13 + 10 * Math.sin(now / 90), d.y + im.height / 2 - 13);
+    }
+    if (now - S.freshT > 1800) { S.fresh = []; S.freshT = 0; }
+  }
+  drawEmote(now, box);
+  if (S.night > 0.5 && IMG.bc_zzz) ctx.drawImage(IMG.bc_zzz, box.x + box.w / 2 + 20, box.y - 30 + Math.round(3 * Math.sin(now / 400)));
+  const hx = box.x + box.w / 2 + 24, hy = box.y - 38 + Math.round(2 * Math.sin(now / 200));
+  if (act && act.food && s.f === 'eat-chew' && Math.floor(at / 130) % 2)
+    ctx.drawImage(IMG['vun-do-an'], px + front * 46 - 15, FEET_Y - 12);
+  if (act && act.anim === 'happy') {
+    const toy = ['do-choi_long-vu', 'do-choi_chuong', 'do-choi_khuc-go'][act.toy || 0];
+    const sw = Math.sin(at / 120) * 0.35;
+    if (toy === 'do-choi_long-vu') prop(toy, px + front * 80, box.y + 60, 60, 1, sw * front);
+    else prop(toy, px + front * 74, FEET_Y + 2 - Math.abs(Math.sin(at / 160)) * 26, toy === 'do-choi_chuong' ? 30 : 46, 1, sw);
+  }
+  if (act && act.anim === 'happy')
+    for (let j = 0; j < 3; j++) ctx.drawImage(IMG[j % 2 ? 'tim_vua' : 'tim_nho'], px - 30 + j * 30, box.y + 30 - ((at / 16 + j * 23) % 60));
+  const urgent = !act && S.night < 0.5 && (S.sick || S.need.no < 12 || S.need.sach < 12 || S.need.nl < 10);
+  if (urgent && Math.floor(now / 500) % 2) prop(S.sick ? 'bao_nguy' : 'bao_chu-y', box.x + box.w / 2 - 34, Math.max(96, box.y - 6), 44);
+  if (act && (act.anim === 'angry' || act.anim === 'refuse')) prop('tim_vo', hx + 20, Math.max(96, hy + 40), 40, 1 - at / 2400);
+  const bored = !sad && S.need.vui < 50 && now - (S.playedT || 0) > 40000;
+  const bub = urgent ? null : S.bubble || (S.sick ? 'bong_om' : S.need.no < 30 ? 'bong_doi' : sad ? 'bong_buon'
+    : S.need.nl < 20 ? 'bong_buon-ngu' : S.need.sach < 30 ? 'tt_ban' : bored ? 'tt_chan' : null);
+  if (bub && !act) ctx.drawImage(bubbleImg(bub), hx, hy);
+  if (S.sweepT && now - S.sweepT < 1400) {                   // sweeping: the broom goes left to right
+    const k = (now - S.sweepT) / 1400, bx = 120 + k * 400;
+    prop('choi_' + (Math.floor(now / 110) % 3), bx, FEET_Y + 26, 74);
+    for (let j = 0; j < 4; j++) ctx.drawImage(IMG['lap-lanh'], bx - 80 - j * 50, FEET_Y - 8 - (j % 2) * 18);
+  } else if (S.sweepT && now - S.sweepT < 2200) {          // clean: a puff of white with sparkles
+    const im = IMG.san_sach, a = 1 - (now - S.sweepT - 1400) / 800;
+    ctx.globalAlpha = Math.max(0, a); ctx.drawImage(im, px + 50 - im.width / 2, FEET_Y - im.height + 6); ctx.globalAlpha = 1;
+  }
+  if (S.sparkle && now - S.sparkle < 900) ctx.drawImage(IMG['lap-lanh'], px - 20 + 40 * Math.sin(now / 90), 300);
+  if (S.night > 0) { ctx.fillStyle = `rgba(8,10,40,${0.62 * S.night})`; ctx.fillRect(0, 0, 640, 480); }
+  if (S.night > 0.5) prop('dong-ho-cat', 600, 112, 30, 0.9, Math.floor(now / 1500) % 2 ? Math.PI : 0);
+  if (S.night > 0.5) for (let j = 0; j < 3; j++) {
+    const ph = (now / 33 + j * 18) % 54;
+    ctx.drawImage(IMG[['z_nho', 'z_vua', 'z_to'][j]], px + 30 + j * 10 + ph / 4, box.y - ph);
+  }
+  if (atCap() && S.popup < 0.05 && Math.floor(now / 400) % 2)
+    text('!', box.x + box.w / 2 + 34, Math.max(90, box.y - 6), 26, '#ffd36e', 'center', true, 4);
+  if (now - S.lvlT < 1500) {                                // level up
+    const k = (now - S.lvlT) / 1500, ty = Math.max(100, box.y - 10) - 24 * k;
+    prop('sao_no', px, ty + 14, 70 + 30 * k, 1 - k);
+    title('LÊN CẤP!', px, ty, 22, '#ffe066', 4);
+    text('Lv ' + S.level, px, ty + 24, 16, '#fff2d8', 'center', true, 4);
+    for (let j = 0; j < 4; j++) ctx.drawImage(IMG['lap-lanh'], px - 60 + j * 34, ty + 30 + 12 * Math.sin(now / 80 + j));
+  }
+  // menus open: the room dims a little so they read clearly
+  const dim = Math.max(S.picker, S.popup) * 0.18;
+  if (dim > 0) { ctx.fillStyle = `rgba(0,0,0,${dim})`; ctx.fillRect(0, 38, 640, 442); }
+  drawHud();
+  if (S.picker > 0) drawPicker(); else drawMenu(now);
+  if (S.toast && now - S.toastT < 1800) {
+    ctx.fillStyle = 'rgba(18,11,9,0.85)'; ctx.fillRect(140, 190, 360, 40);
+    text(S.toast, 320, 210, 14, '#f0e4ce', 'center');
+  }
+  if (S.popup > 0) drawPopup();
+}
+
+function drawPopup() {
+  const p = ease(S.popup), y = Math.round(480 - (480 - 140) * p);
+  ctx.fillStyle = `rgba(0,0,0,${0.35 * p})`; ctx.fillRect(0, 0, 640, 480);
+  ctx.drawImage(IMG.panel, 100, y);
+  const c = conds(), ok = c.every(x => x[1]);
+  text(ok ? `${DATA.pet.name} đủ điều kiện tiến hóa!` : `${DATA.pet.name} sắp tiến hóa`, 320, y + 30, 18, '#ffd36e', 'center');
+  text(`${DATA.creature_name}: ${DATA.stages[S.stage].name}  →  ${DATA.stages[nextStage()].name}`, 320, y + 56, 15, '#f0e4ce', 'center');
+  c.forEach(([t, v], i) => text((v ? '✓ ' : '✗ ') + t, 320, y + 84 + i * 20, 13, v ? '#8ce16e' : '#ef9a80', 'center', false));
+  text(ok ? 'A: Tiến hóa' : 'A: Đã hiểu', 230, y + 162, 15, '#f0e4ce', 'center');
+  text('B: Để sau', 410, y + 162, 15, '#b8a080', 'center');
+}
+
+// ---------- stats screen (SELECT): 4 pages, L1/R1 or ◀ ▶ to turn, B back ----------
+function drawStats(now) {
+  const bg = IMG[`stats_${S.stage}_${S.stats}`];
+  ctx.drawImage(bg, 0, 0);
+  drawPet(S.stage, sample(idleOf(S.stage), now), 130, 350);          // PET_FEET in preview_ui_stats.py
+  if (S.stats === 2) drawAttrLive(now);
+}
+// standing still: young stages bounce gently (approved), grown-ups play their own idle loop
+function idleOf(stage) { return stage === 'baby' || stage === 'child' || stage === 'teen' ? BOUNCE : DATA.stages[stage].anims.idle; }
+
+// ---------- page 3 (Thuộc tính): gem sockets; a socketed gem raises its element's two attributes ----------
+const GEM = DATA.gems, HE = Object.keys(GEM.attrs);
+function gemBonus() {
+  const b = [0, 0, 0, 0, 0, 0];
+  for (const g of S.gems) if (g) for (const a of GEM.attrs[g[0]]) b[a] += GEM.grades[g[1] - 1][1];
+  return b;
+}
+function drawAttrLive(now) {
+  const bonus = gemBonus();
+  GEM.rows.forEach((r, i) => {
+    const v = r.base + bonus[i], f = IMG[r.fill], w = r.cap + Math.round((f.width - 2 * r.cap) * Math.min(100, v) / 100);
+    ctx.drawImage(f, 0, 0, w, f.height, r.x, r.y, w, f.height);
+    text(String(v), 612, r.yc + 1 - (bonus[i] ? 7 : 0), 17, '#eee2ce', 'right');
+    if (bonus[i]) text('+' + bonus[i], 612, r.yc + 15, 12, '#8ce16e', 'right', false);
+  });
+  GEM.sockets.forEach(([cx, cy], i) => {
+    const g = S.gems[i];
+    if (g) { const im = IMG[`gem_${g[0]}_${g[1]}`]; ctx.drawImage(im, cx - im.width / 2, cy - im.height / 2); }
+    else text('+', cx, cy, 17, '#b0967a', 'center');
+    if (S.gemMode && i === S.sock) {
+      ctx.strokeStyle = `rgba(255,214,90,${0.65 + 0.35 * Math.sin(now / 150)})`; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.arc(cx, cy, 17, 0, 7); ctx.stroke();
+    }
+  });
+  const fx = (now - S.gemFx) / 600;
+  if (fx < 1) {
+    const [cx, cy] = GEM.sockets[S.sock], im = IMG['tia-sang'], k = 0.6 + 0.8 * fx;
+    ctx.globalAlpha = 1 - fx; ctx.drawImage(im, cx - im.width * k / 2, cy - im.height * k / 2, im.width * k, im.height * k);
+    ctx.globalAlpha = 1;
+  }
+  if (S.gemMode === 'pick') drawGemBag();
+  if (S.gemMode) {
+    ctx.fillStyle = '#000'; ctx.fillRect(0, 456, 640, 24);
+    text(S.gemMode === 'pick' ? 'Mũi tên: chọn ngọc · A: khảm · B: quay lại' : '◀ ▶ chọn ô · A: chọn ngọc · X: gỡ ngọc · B: xong',
+         632, 468, 12, '#b0967a', 'right', false);
+  }
+}
+function drawGemBag() {
+  const X = 16, Y = 140;
+  ctx.drawImage(IMG.gem_panel, X, Y);
+  text('Túi ngọc', X + 18, Y + 22, 15, '#ffd67a');
+  HE.forEach((he, r) => {
+    for (let g = 1; g <= 5; g++) {
+      const cx = X + 12 + (g - 1) * 42, cy = Y + 38 + r * 42, n = S.gemBag[`${he}_${g}`], im = IMG[`gemb_${he}_${g}`];
+      ctx.drawImage(IMG[S.gp.r === r && S.gp.c === g - 1 ? 'gem_cell_sel' : 'gem_cell'], cx, cy);
+      ctx.globalAlpha = n ? 1 : 0.3; ctx.drawImage(im, cx + 20 - im.width / 2, cy + 20 - im.height / 2); ctx.globalAlpha = 1;
+      if (n) text('x' + n, cx + 39, cy + 34, 11, '#f0e4ce', 'right', true, 3);
+    }
+  });
+  const he = HE[S.gp.r], [gn, amt] = GEM.grades[S.gp.c];
+  text(`Ngọc ${GEM.names[he]} · ${gn}`, X + 18, Y + 266, 14, '#f0e4ce');
+  text(GEM.attrs[he].map(a => `${GEM.rows[a].name} +${amt}`).join(' · '), X + 18, Y + 284, 12, '#8ce16e', 'left', false);
+}
+function gemInput(btn) {
+  if (S.gemMode === 'pick') {
+    const d = { LEFT: [0, -1], RIGHT: [0, 1], UP: [-1, 0], DOWN: [1, 0] }[btn];
+    if (d) S.gp = { r: (S.gp.r + d[0] + 5) % 5, c: (S.gp.c + d[1] + 5) % 5 };
+    if (btn === 'B') S.gemMode = 'sock';
+    if (btn === 'A') {
+      const he = HE[S.gp.r], g = S.gp.c + 1, key = `${he}_${g}`, old = S.gems[S.sock];
+      if (!S.gemBag[key]) return toast('Chưa có viên này');
+      if (old) S.gemBag[`${old[0]}_${old[1]}`]++;
+      S.gemBag[key]--; S.gems[S.sock] = [he, g]; S.gemFx = performance.now(); S.gemMode = 'sock';
+      toast(`Đã khảm Ngọc ${GEM.names[he]} · ${GEM.grades[g - 1][0]}`);
+    }
+    return;
+  }
+  if (btn === 'LEFT' || btn === 'UP') S.sock = (S.sock + 4) % 5;
+  if (btn === 'RIGHT' || btn === 'DOWN') S.sock = (S.sock + 1) % 5;
+  if (btn === 'B') S.gemMode = null;
+  if (btn === 'X') {
+    const old = S.gems[S.sock];
+    if (!old) return toast('Ô này đang trống');
+    S.gemBag[`${old[0]}_${old[1]}`]++; S.gems[S.sock] = null; toast('Đã gỡ ngọc, cất vào túi');
+  }
+  if (btn === 'A') {
+    const g = S.gems[S.sock];
+    S.gp = g ? { r: HE.indexOf(g[0]), c: g[1] - 1 } : S.gp;
+    S.gemMode = 'pick';
+  }
+}
+
+// ---------- world map (Ra ngoài): arrows pick a place, A goes in, B goes home ----------
+const PL = DATA.map.places;
+function layer(name) { const [x, y] = DATA.map.layers[name]; ctx.drawImage(IMG[name], x, y); }
+function drawMap(now, dt) {
+  ctx.drawImage(IMG.map, 0, 0);
+  const sel = PL[S.mapSel];
+  for (const p of PL) if (p.kind === 'region' && !S.open[p.key]) layer('khoa_' + p.key);
+  if (sel.kind === 'region') { ctx.globalAlpha = 0.65 + 0.35 * Math.sin(now / 220); layer('chon_' + sel.key); ctx.globalAlpha = 1; }
+  else {                                  // a building in the village: a soft gold ring on the ground
+    ctx.strokeStyle = `rgba(255,214,90,${0.6 + 0.3 * Math.sin(now / 220)})`; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.ellipse(sel.x, sel.y + 8, 30, 12, 0, 0, 7); ctx.stroke();
+  }
+  // the only marker on the map: a gold arrow bobbing over the chosen place
+  const a = IMG['mui-ten_xuong'], aw = a.width * 1.5, ah = a.height * 1.5;
+  ctx.drawImage(a, sel.x - aw / 2, sel.y - 30 - ah + Math.round(4 * Math.sin(now / 150)), aw, ah);
+  drawTop('Bản đồ');
+  ctx.drawImage(IMG.map_info, 10, 404);
+  text(sel.name, 32, 426, 16, '#ffd67a');
+  const open = S.open[sel.key], line = sel.kind === 'region' && open ? 'Đã mở' : sel.line.replace('{pet}', DATA.pet.name);
+  text(line, 32, 450, 13, sel.kind === 'region' && !open ? '#e6a08a' : '#f0e4ce', 'left', false);
+  const go = { home: 'A: về phòng', shop: 'A: vào chợ', train: 'A: tập luyện', soon: '', region: '' }[sel.kind];
+  text([go, 'B: về nhà'].filter(Boolean).join(' · '), 608, 438, 12, '#b8a080', 'right', false);
+}
+// the arrow keys pick the nearest place that way
+function mapMove(dir) {
+  const [ux, uy] = { UP: [0, -1], DOWN: [0, 1], LEFT: [-1, 0], RIGHT: [1, 0] }[dir], c = PL[S.mapSel];
+  let best = -1, score = 1e9;
+  PL.forEach((p, i) => {
+    const dx = p.x - c.x, dy = p.y - c.y, d = Math.hypot(dx, dy), cos = (dx * ux + dy * uy) / (d || 1);
+    if (i === S.mapSel || cos < 0.4) return;
+    const sc = d * (1 + 2 * (1 - cos));
+    if (sc < score) { score = sc; best = i; }
+  });
+  if (best >= 0) S.mapSel = best;
+}
+function openMap() {
+  S.mode = 'map'; S.mapSel = 0; S.pickerGoal = 0; S.act = null;
+}
+
+// ---------- the shop (Chợ): L1/R1 tabs, arrows pick, A buys, B back to the map ----------
+const SH = DATA.shop;
+SH.tabs.push({ icon: 'tab_nha', name: 'Nhà' });
+const SAY = ['Mua mấy món\nngon cho Bông\nnào!', 'Mua đủ đồ\ntrong nhà là\nlên nhà mới!', 'Có thuốc phòng\nốm nè!',
+             'Đồ hiếm đây,\nnhìn thử đi!', 'Nhà mới đẹp\nlắm, dọn qua\nđi nào!'];
+// rows of a tab: the Trang trí tab sells the items of the home the pet lives in, the Nhà tab the homes after Lv1
+function rowsOf(tab) {
+  const h = HOME();
+  if (tab === 1) return h.items.map(d => ({ key: d.icon, id: d.id, name: d.name, price: d.price, info: `Đồ phòng ${h.name}`, state: '' }));
+  if (tab === 4) return DATA.houses.slice(1).map((n, j) => ({ key: n.thumb, house: j + 1, name: n.name, price: n.price,
+    priceText: n.paid === 'ngoc' ? '1 Ngọc' : String(n.price),
+    info: `Lv${n.tier} · hệ ${n.he} · ${n.paid === 'ngoc' ? 'đổi 1 Ngọc Hồn' : n.price + ' vàng'}` }));
+  return SH.rows[tab];
+}
+// the highest tier owned; a home up to that tier can be bought any time, the next tier once a home of the top
+// tier owned is fully furnished (nen/README.md: buy every item of the room to move up); Lv4 also takes a Ngọc Hồn
+const topTier = () => Math.max(...Object.keys(S.homes).map(i => DATA.houses[i].tier));
+function houseNeed(i) {
+  const n = DATA.houses[i], top = topTier();
+  if (S.homes[i]) return '';
+  if (n.tier > top + 1) return `Mở nhà Lv${top + 1} trước đã`;
+  if (n.tier === top + 1) {
+    const full = Object.keys(S.homes).map(k => DATA.houses[k]).filter(h => h.tier === top);
+    if (!full.some(h => doneCount(h) === h.items.length)) {
+      const h = HOME().tier === top ? HOME() : full[0];
+      return `Cần mua đủ đồ ${h.name} (${doneCount(h)}/${h.items.length})`;
+    }
+  }
+  if (n.paid === 'ngoc' && S.ngoc < 1) return 'Cần 1 Ngọc Hồn (rơi từ boss)';
+  return '';
+}
+const stateOf = r => r.house !== undefined ? (r.house === S.house ? 'co' : S.homes[r.house] ? 'own' : houseNeed(r.house) ? 'lock' : '')
+  : r.id && isPlaced(HOME(), r.id) ? 'co' : r.state;
+const placedCount = () => doneCount(HOME());
+function owned(tab, r) {
+  const i = S.items.findIndex(b => b.file === r.file);
+  return i < 0 ? 0 : S.bag[i];
+}
+function drawShop(now) {
+  ctx.fillStyle = '#180e0a'; ctx.fillRect(0, 0, 640, 480);
+  ctx.drawImage(IMG['nen-menu_troi-dem'] || IMG.shop_bg, 0, 40);
+  const kp = IMG['chu-quan']; ctx.drawImage(kp, 4, 480 - kp.height - 30);
+  ctx.drawImage(IMG.bong_trong, 118, 150);
+  SAY[S.tab].split('\n').forEach((l, j) => text(l, 182, 186 + j * 15, 12, '#462814', 'center', false));
+  drawTop('Cửa hàng');
+  SH.tabs.forEach((t, i) => {
+    const tx = 176 + i * 54;
+    if (i === S.tab) ctx.drawImage(IMG.tab_sel, tx - 4, -1);
+    ctx.drawImage(IMG[t.icon], tx, 3);
+  });
+  text(SH.tabs[S.tab].name, 380, 66, 16, '#ffd67a', 'center');
+  const rows = rowsOf(S.tab), top = Math.max(0, Math.floor(S.item / 4) - 1);   // 2 rows show at a time
+  rows.forEach((r, i) => {
+    const row = Math.floor(i / 4) - top;
+    if (row < 0 || row > 1) return;
+    const sx = 270 + (i % 4) * 90, sy = 84 + row * 104, st = stateOf(r);
+    ctx.drawImage(IMG[st === 'khoa' ? 'shelf_o_hang-khoa' : i === S.item ? 'shelf_o_hang-chon' : 'shelf_o_hang'], sx, sy);
+    if (st !== 'khoa') slotBack(sx, sy, 64);
+    const ic = IMG[r.key];
+    if (st !== 'khoa') {
+      if (st === 'co' || st === 'lock') ctx.globalAlpha = 0.45;
+      ctx.drawImage(ic, sx + 32 - ic.width / 2, sy + 32 - ic.height / 2); ctx.globalAlpha = 1;
+    }
+    ctx.drawImage(IMG['nhan-gia'], sx - 7, sy + 68);
+    text(st === 'co' ? (r.house !== undefined ? 'Đang ở' : 'Đã có') : st === 'own' ? 'Dọn về' : st === 'lock' ? 'Khóa'
+         : r.priceText || (r.price ? String(r.price) : '—'), sx + 66, sy + 80, 13,
+         st === 'co' || st === 'own' ? '#8ce16e' : st === 'lock' ? '#e6a08a' : '#f0e4ce', 'right');
+    if (st === 'lock') text('🔒', sx + 32, sy + 32, 18, '#fff', 'center');
+    if (i === S.item && now - S.buyT < 700) ctx.drawImage(IMG['lap-lanh'], sx + 40 + 4 * Math.sin(now / 60), sy - 8);
+  });
+  const bob = Math.round(2 * Math.sin(now / 160));
+  if (top > 0) ctx.drawImage(IMG['mui-ten_len'], 608, 80 + bob);
+  if ((top + 2) * 4 < rows.length) ctx.drawImage(IMG['mui-ten_xuong'], 608, 266 - bob);
+  ctx.drawImage(IMG.shop_desc, 264, 300);
+  const r = rows[S.item];
+  text(r.name, 284, 322, 16);
+  text(r.info, 284, 346, 13, '#f0e4ce', 'left', false);
+  if (!r) return;
+  const h = HOME();
+  const line3 = S.tab === 1 ? `${stateOf(r) === 'co' ? 'Đã đặt trong phòng · ' : ''}Bộ ${h.name}: ${placedCount()}/${h.items.length} món`
+    : S.tab === 4 ? (r.house === S.house ? 'Đang ở nhà này' : S.homes[r.house] ? 'Nhà của bạn: A để dọn về'
+      : houseNeed(r.house) || (DATA.houses[r.house].he !== HE_NAME[EL()] ? 'Khác hệ Bông: điểm hệ sẽ đổi dần · A để mua' : 'Đủ điều kiện: A để mua'))
+    : `Trong túi: ${owned(S.tab, r)}`;
+  text(line3, 284, 366, 13, S.tab === 4 && !S.homes[r.house] && houseNeed(r.house) ? '#e6a08a' : '#b8a080', 'left', false);
+  if (S.tab === 4) text(`Ngọc Hồn: ${S.ngoc}`, 520, 322, 13, '#d8b0ff', 'left', true);
+  const down = now - S.buyT < 140 ? 2 : 0;
+  ctx.drawImage(IMG.nut_ban, 264, 412); ctx.drawImage(IMG.nut_mua, 508, 412 + down);
+  text('Bán', 324, 428, 14, '#f0e4ce', 'center', true, 2); text('Mua', 568, 428 + down, 14, '#f0e4ce', 'center', true, 2);
+  text('L1 / R1: đổi mục · A: mua · B: ra bản đồ', 630, 468, 12, '#b8a080', 'right', false);
+}
+function buyHouse(r) {
+  const n = DATA.houses[r.house];
+  if (r.house === S.house) return toast('Đang ở nhà này rồi');
+  if (!S.homes[r.house]) {                                    // a new home: pay for it
+    const need = houseNeed(r.house);
+    if (need) return toast(need);
+    if (n.paid === 'ngoc') S.ngoc--;
+    else { if (S.coins < n.price) return toast('Không đủ tiền'); S.coins -= n.price; }
+    S.homes[r.house] = true;
+  }
+  S.buyT = performance.now(); S.house = r.house;
+  fadeTo(() => {
+    S.mode = 'room'; S.px = 320; S.walk = null; S.fresh = []; S.poops = []; S.sparkle = performance.now();
+    if (has('greet')) act('greet'); else act('happy', { loops: 2 });
+    toast(`Dọn sang ${n.name} (Lv${n.tier})!`);
+  });
+}
+function buy() {
+  const r = rowsOf(S.tab)[S.item];
+  if (!r) return;
+  if (r.house !== undefined) return buyHouse(r);
+  if (stateOf(r) === 'khoa') return toast(r.info);
+  if (stateOf(r) === 'co') return toast('Món này đặt trong phòng rồi');
+  if (S.coins < r.price) return toast('Không đủ tiền');
+  S.coins -= r.price; S.buyT = performance.now();
+  if (S.tab === 0) {                                          // foods go into the bag, ready for "Ăn"
+    addItem(r);
+  } else if (r.id) {                                          // a room item: it goes straight into the room
+    const h = HOME();
+    S.placed[h.key + ':' + r.id] = true; S.fresh.push(r.id); S.freshT = 0;
+    if (placedCount() === h.items.length)
+      return toast(h.tier < 4 ? `Đủ bộ ${h.name} ${h.items.length}/${h.items.length}! Ra mục Nhà mua nhà Lv${h.tier + 1}` : `Đủ bộ ${h.name}!`);
+  } else addItem(r);
+  toast(`Đã mua ${r.name} (-${r.price})`);
+}
+
+// ---------- Hoạt động: the mini games (fishing, farm) and ones still to come ----------
+// Hoạt động (assets/CAP-NHAT_man-chao-elemon.md, mockup ui/man-hinh-mau/hoat-dong.png): the background follows the
+// chosen card (fades over 200 ms), name board on top, three cards (centres x 115 / 320 / 525, bottom 395), the chosen
+// one bigger; each card has a window the game's picture shows through (drawn BEHIND the card)
+const ACTS = [{ key: 'fish', name: 'Câu cá', line: 'Ra hồ câu cá', bg: 'hd_nen_cau-ca', pic: 'cc_nen', crop: [0, 230, 300, 250] },
+              { key: 'farm', name: 'Nông trại', line: 'Trồng rau, thu hoạch', bg: 'hd_nen_nong-trai', pic: 'fm_nen', crop: [90, 120, 460, 360] },
+              { key: 'cook', name: 'Nấu ăn', line: 'Nấu món, nhận buff', bg: 'na_nen_ban-an', pic: 'na_nen_khuay', crop: [130, 150, 380, 330] },
+              { key: 'school', name: 'Trường học', line: 'Học bài với cô Rắn', bg: 'th_nen_lop', pic: 'th_nen_lop', crop: [380, 150, 260, 230] }];
+const CARD_X = [115, 320, 525], CARD_BOTTOM = 395;
+function drawAct(now) {
+  // background: the last game card chosen, cross-faded
+  const want = ACTS[S.actSel].bg || S.actBg || ACTS[0].bg;
+  if (want !== S.actBg) { S.actBgPrev = S.actBg; S.actBg = want; S.actBgT = now; }
+  const fade = Math.min(1, (now - (S.actBgT || 0)) / 200);
+  if (S.actBgPrev && fade < 1) ctx.drawImage(IMG[S.actBgPrev], 0, 0);
+  ctx.globalAlpha = S.actBgPrev ? fade : 1; ctx.drawImage(IMG[want], 0, 0); ctx.globalAlpha = 1;
+  // the name board
+  ctx.drawImage(IMG['hd_bang-ten'], 170, 8);
+  text('HOẠT ĐỘNG', 320, 41, 22, '#3f6a3a', 'center', true);
+  text(`${DATA.pet.name} · Lv ${S.level}`, 628, 22, 13, '#5a4a3a', 'right', true);
+  const first = Math.max(0, Math.min(S.actSel - 1, ACTS.length - 3));
+  ACTS.forEach((a, i) => {
+    if (i < first || i > first + 2) return;
+    const cx = CARD_X[i - first], on = i === S.actSel, card = IMG[!a.key ? 'hd_the_khoa' : on ? 'hd_the_chon' : 'hd_the'];
+    const bob = on ? Math.round(2 * Math.sin(now / 260)) : 0;
+    const x = cx - card.width / 2, y = CARD_BOTTOM - card.height + bob;
+    if (a.pic) {                                              // the game's picture in the card's window
+      const [wx0, wy0, wx1, wy1] = on ? [39, 56, 168, 196] : [23, 30, 147, 165], [cx, cy, cw, ch] = a.crop;
+      const ww = wx1 - wx0, wh = wy1 - wy0, k = Math.max(ww / cw, wh / ch);
+      ctx.save(); ctx.beginPath(); ctx.rect(x + wx0, y + wy0, ww, wh); ctx.clip();
+      ctx.drawImage(IMG[a.pic], cx, cy, cw, ch, x + wx0 + (ww - cw * k) / 2, y + wy0 + (wh - ch * k) / 2, cw * k, ch * k);
+      ctx.restore();
+    }
+    ctx.drawImage(card, x, y);
+    const ty = y + card.height * 0.86;
+    text(a.name, cx, ty - 8, on ? 19 : 16, a.key ? (on ? '#c4553a' : '#4a3020') : '#a8a098', 'center', true);
+    text(a.line, cx, ty + 12, 11, a.key ? '#7a5a40' : '#a8a098', 'center', true);
+  });
+  // the bag and the shop, reachable straight from here
+  [['td_tui', 'Túi đồ', 'X', '#3a7ad8'], [null, 'Cửa hàng', 'Y', '#3aa84a']].forEach(([ic, nm, key, kc], j) => {
+    const cx = 42 + j * 70, cy = 44;
+    ctx.fillStyle = '#fffaf0'; ctx.strokeStyle = '#7fb0d0'; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.arc(cx, cy, 25, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    if (ic) fit(IMG[ic], cx, cy, 34, 32);
+    else { ctx.save(); ctx.beginPath(); ctx.arc(cx, cy, 23, 0, Math.PI * 2); ctx.clip();       // the stall keeper's face
+           ctx.drawImage(IMG['sn_chu_1-cuoi'], 13, 0, 100, 96, cx - 25, cy - 22, 50, 48); ctx.restore(); }
+    ctx.fillStyle = kc; ctx.beginPath(); ctx.arc(cx + 19, cy + 18, 9, 0, Math.PI * 2); ctx.fill();
+    text(key, cx + 19, cy + 18, 11, '#fff', 'center', true);
+    text(nm, cx, cy + 38, 12, '#fff2d8', 'center', true, 3);
+  });
+  ctx.drawImage(IMG['hd_mui-ten_trai'], 382, 430); ctx.drawImage(IMG['hd_mui-ten_phai'], 414, 430);
+  ctx.drawImage(IMG.hd_nut_A, 470, 432); text('A', 483, 446, 13, '#fff', 'center', true); text('Vào', 504, 446, 14, '#3a2a1a', 'left', true);
+  ctx.drawImage(IMG.hd_nut_B, 550, 432); text('B', 563, 446, 13, '#fff', 'center', true); text('Về', 584, 446, 14, '#3a2a1a', 'left', true);
+}
+function actInput(btn) {
+  if (btn === 'LEFT' || btn === 'UP') S.actSel = (S.actSel + ACTS.length - 1) % ACTS.length;
+  if (btn === 'RIGHT' || btn === 'DOWN') S.actSel = (S.actSel + 1) % ACTS.length;
+  if (btn === 'B') fadeTo(comeHome);
+  if (btn === 'X') return fadeTo(() => openTui('act'));
+  if (btn === 'Y') return openSeedShop(0, 'act');
+  if (btn === 'A') {
+    const a = ACTS[S.actSel];
+    if (!a.key) return toast('Mini game này sắp ra mắt');
+    if (S.sick) return toast(`${DATA.pet.name} đang ốm, chữa xong rồi đi`);
+    if (a.key === 'fish') fadeTo(() => { S.mode = 'fish'; S.fish = { st: 'ready', t: performance.now() }; });
+    else if (a.key === 'cook') fadeTo(openKitchen);
+    else if (a.key === 'school') fadeTo(() => openSchool('act'));
+    else fadeTo(() => { S.mode = 'farm'; S.farmSel = Math.max(0, plotAt(4, 1)); S.seed = SEEDS.findIndex(x => x.he === EL()); S.fx = null; });
+  }
+}
+
+// ---------- Câu cá: A to cast, A when the float dips, then hold A to keep the green bar on the fish ----------
+const FISH_NAME = ['Cá con', 'Cá vừa', 'Cá quý', 'Cá thần'];
+const BOB = [430, 392];                       // where the float lands: well out on the lake
+const CAST = 900;                             // ms from pressing A to the float landing
+const ROD_AT = [120, 286];                    // can_*_dai4 frames (130x130): the stand's foot on the jetty
+const FISH_SELL = [15, 40, 100, 250];
+// tackle from the stall (assets/r36s/shop-nong-san/do-cau): a better rod and bait bring rarer fish
+const TACKLE = [
+  { k: 'can_1-tre', n: 'Cần câu tre', price: 60, rod: 1, d: 'Cần cơ bản, ai cũng có' },
+  { k: 'can_2-go', n: 'Cần câu gỗ', price: 150, rod: 2, d: 'Cá vừa dễ câu hơn' },
+  { k: 'can_3-xanh', n: 'Cần câu xanh', price: 250, rod: 3, d: 'Cá hiếm dễ câu hơn' },
+  { k: 'can_4-bac', n: 'Cần câu bạc', price: 400, rod: 4, d: 'Cá quý cắn nhiều hơn' },
+  { k: 'can_5-vang', n: 'Cần câu vàng', price: 800, rod: 5, d: 'Cá thần cũng phải cắn câu' },
+  { k: 'moi_giun', n: 'Mồi giun', price: 5, bait: 1, d: 'Cá cắn nhanh hơn · dùng 1 lần' },
+  { k: 'moi_vun-banh', n: 'Mồi vụn bánh', price: 12, bait: 2, d: 'Cá cắn nhanh, cá to hơn chút' },
+  { k: 'moi_tom', n: 'Mồi tôm', price: 30, bait: 3, d: 'Cá quý thích mồi tôm' },
+  { k: 'moi_moi-gia', n: 'Mồi giả', price: 50, bait: 4, d: 'Cá hiếm hay đớp mồi giả' },
+  { k: 'moi_phep', n: 'Mồi phép', price: 80, bait: 5, d: 'Linh khí dụ cá thần lên' },
+  { k: 'xo-ca', n: 'Xô cá', price: 40, gear: 1, d: 'Câu được +10% kinh nghiệm' },
+  { k: 'vot', n: 'Vợt', price: 80, gear: 1, d: 'Cá khó sổng hơn khi kéo' },
+  { k: 'hop-do-nghe', n: 'Hộp đồ nghề', price: 100, gear: 1, d: 'Vùng kéo xanh rộng hơn' },
+  { k: 'thung-da', n: 'Thùng đá', price: 120, gear: 1, d: 'Cá giữ tươi: bán +20% xu' },
+  { k: 'thung-ca-da', n: 'Thùng cá đá', price: 200, gear: 1, d: 'Cá tươi rói: bán +40% xu' }];
+function gear() { return S.gear || (S.gear = { rod: 1, bait: {}, own: {} }); }
+function fishPrice(tier) { const g = gear().own; return Math.round(FISH_SELL[tier - 1] * (g['thung-ca-da'] ? 1.4 : g['thung-da'] ? 1.2 : 1)); }
+function bestBait() { const b = gear().bait; return [...TACKLE].reverse().find(t => t.bait && b[t.k] > 0); }
+function rodStrip(name, k) {                  // one 130x130 frame of a can_<name>_dai4 strip; returns the rod's tip
+  const im = IMG[`cc_can_${name}_dai4`]; k = Math.max(0, Math.min(3, k));
+  if (im) ctx.drawImage(im, k * 130, 0, 130, 130, ROD_AT[0], ROD_AT[1], 130, 130);
+  const t = (DATA.rod_tips || {})[name];       // the build strips the drawn line and float and notes the tip
+  return t ? [ROD_AT[0] + t[k][0], ROD_AT[1] + t[k][1]] : [ROD_AT[0] + 100, ROD_AT[1] + 60];
+}
+function fishLine(tip, x, y, sag) {           // the line from the rod's tip to the float, sagging a little
+  ctx.strokeStyle = 'rgba(245,245,235,0.85)'; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(tip[0], tip[1]);
+  ctx.quadraticCurveTo((tip[0] + x) / 2, (tip[1] + y) / 2 + sag, x, y); ctx.stroke();
+}
+function drawFloat(x, y) { const fl = IMG.cc_phao; if (fl) ctx.drawImage(fl, x - fl.width / 2, y - fl.height); }
+// the effect strips (assets/r36s/mini-game/cau-ca/fx/*_dai6.png): 6 frames side by side; draw frame k centred on x, bottom on y
+function strip(name, k, x, y, n = 6) {
+  const im = IMG['cc_' + name + '_dai6']; if (!im) return false;
+  const w = im.width / n, f = Math.max(0, Math.min(n - 1, k));
+  ctx.drawImage(im, f * w, 0, w, im.height, Math.round(x - w / 2), Math.round(y - im.height), w, im.height);
+  return true;
+}
+function bag(file, name, he, effect) {        // a caught fish / a crop goes into the bag as food
+  IMG['food_' + file] = IMG['food_' + file] || IMG[file.startsWith('CA_') ? 'cc_' + file : file.startsWith('mon_') ? 'na_' + file : 'fm_' + file];
+  let i = S.items.findIndex(b => b.file === file);
+  if (i < 0) { S.items.push({ file, name, he, effect }); S.bag.push(0); i = S.items.length - 1; }
+  (S.newItems || (S.newItems = {}))['it:' + file] = true;
+  S.bag[i]++;
+}
+function fishInput(btn, now) {
+  const f = S.fish;
+  if (btn === 'B' && f.st !== 'reel') return fadeTo(() => { S.mode = 'act'; });
+  if (btn === 'X' && f.st !== 'reel') return openSeedShop(1, 'fish');
+  if (btn !== 'A') return;
+  if (f.st === 'ready' || f.st === 'done' || f.st === 'lost') {
+    const bt = bestBait(); if (bt) gear().bait[bt.k]--;      // one bait per cast, the best one in the box
+    const bl = bt ? bt.bait : 0;
+    S.fish = { st: 'wait', t: now, bite: now + 700 + (1500 + Math.random() * 3500) * (1 - bl * 0.12), bl };
+  } else if (f.st === 'wait') { S.fish = { st: 'ready', t: now }; toast('Kéo sớm quá, cá chưa cắn'); }
+  else if (f.st === 'bite') {
+    // rod and bait shift the odds toward rarer fish
+    const k = gear().rod - 1 + (f.bl || 0) * 0.6, w = [50 - 8 * k, 30 + 2 * k, 15 + 4 * k, 5 + 2 * k].map(x => Math.max(1, x));
+    let r = Math.random() * w.reduce((a, b) => a + b), tier = 1; while (r > w[tier - 1]) r -= w[tier++ - 1];
+    const he = ELS[Math.floor(Math.random() * 5)];
+    S.fish = { st: 'reel', t: now, tier, he, zone: 150, vz: 0, fy: 120, ft: 120, fnext: now, prog: 30 };
+  }
+}
+function drawFish(now, dt) {
+  const f = S.fish, TOP = 40, H = 245;                        // the water inside the reel bar
+  ctx.filter = 'brightness(0.72) saturate(0.85)'; ctx.drawImage(IMG.cc_nen, 0, 0); ctx.filter = 'none';   // the lake toned down, less glare
+  // the pet on the jetty, rod out over the lake
+  const fx = 66, fy = 410;
+  // every stage the same size on the jetty (spec: about 90 px tall), measured on its idle frame, feet kept in place
+  const idle = IMG[`${S.stage}/idle-0`], ph = idle ? inked(idle)[3] : 90, pk = Math.min(1, 90 / ph);
+  ctx.save(); ctx.translate(fx, fy); ctx.scale(pk, pk);
+  drawPet(S.stage, sample(idleOf(S.stage), now), 0, 0);
+  ctx.restore();
+  // the auto rod (spec: quang 1-4 on the cast, cho 1<->2 while waiting, cho 3-4 on a bite and the reel, keo 1-4 on a catch)
+  const since = now - f.t;
+  if (f.st === 'wait' && since < CAST) {                      // the cast: the rod swings, the float flies far out in an arc
+    const tip = rodStrip('quang', Math.floor(since / 110)), p = Math.max(0, (since - 200) / (CAST - 200));
+    const x = tip[0] + (BOB[0] - tip[0]) * p, y = tip[1] + (BOB[1] - tip[1]) * p - 110 * Math.sin(Math.PI * p);
+    fishLine(tip, x, y, 0); drawFloat(x, y + 6);
+  } else if (f.st === 'wait') {                               // waiting: slack line, the float bobbing
+    const tip = rodStrip('cho', Math.floor(now / 500) % 2);
+    fishLine(tip, BOB[0], BOB[1] - 4, 26);
+    if (since < CAST + 700) strip('gon-nuoc', Math.floor((since - CAST) / 117), BOB[0], BOB[1] + 8);
+    if (!strip('phao_noi', Math.floor(now / 160) % 6, BOB[0], BOB[1] + 10)) drawFloat(BOB[0], BOB[1] + 2 * Math.sin(now / 400));
+  } else if (f.st === 'bite' || f.st === 'reel') {            // a bite: the rod bends, the line goes tight, the float jerks under
+    const tip = rodStrip('cho', 2 + Math.floor(now / (f.st === 'bite' ? 120 : 160)) % 2);
+    fishLine(tip, BOB[0], BOB[1] + 2, 4);
+    strip('phao_can', f.st === 'bite' ? Math.floor(since / 110) % 6 : 5 - Math.floor(now / 140) % 2, BOB[0], BOB[1] + 10);
+  } else if (f.st === 'done' && since < 720) {                // the catch: the rod heaves, the fish leaps on the line
+    const tip = rodStrip('keo', Math.floor(since / 180));
+    fishLine(tip, BOB[0], BOB[1] - 10, 0);
+  } else {                                                    // ready / lost / after a catch: rod upright, float hanging
+    const tip = rodStrip('quang', 0);
+    fishLine(tip, tip[0] - 2, tip[1] + 22, 0); drawFloat(tip[0] - 2, tip[1] + 30);
+  }
+  if (f.st === 'wait' && now > f.bite) { S.fish = { st: 'bite', t: now }; }
+  if (f.st === 'bite') {
+    const e = IMG['cc_cham-than']; ctx.drawImage(e, fx - 10, fy - 140 + Math.round(3 * Math.sin(now / 60)));
+    if (now - f.t > 900) { S.fish = { st: 'lost', t: now }; toast('Cá sổng mất rồi!'); }
+  }
+  if (f.st === 'reel') {
+    const bx = 560, by = 90, k = dt / 16;
+    // the green bar: holding A lifts it, letting go it sinks
+    const ZH = 72, own = gear().own, zh = own['hop-do-nghe'] ? 88 : ZH;
+    f.vz += (HELD.A ? -0.55 : 0.45) * k; f.vz = Math.max(-7, Math.min(7, f.vz)); f.zone += f.vz * k;
+    if (f.zone < 0) { f.zone = 0; f.vz = 0; } if (f.zone > H - zh) { f.zone = H - zh; f.vz = 0; }
+    // the fish darts about; rarer ones dart faster and further
+    if (now > f.fnext) { f.ft = 10 + Math.random() * (H - 40); f.fnext = now + (900 - f.tier * 150) * (0.5 + Math.random()); }
+    f.fy += (f.ft - f.fy) * Math.min(1, 0.02 * f.tier * k + 0.01 * k);
+    const on = f.fy + 11 > f.zone && f.fy + 11 < f.zone + zh;
+    f.prog = Math.max(0, Math.min(100, f.prog + (on ? 0.42 - f.tier * 0.04 : own.vot ? -0.22 : -0.32) * k));
+    ctx.drawImage(IMG['cc_thanh-tien-do'], bx - 44, by);
+    const fill = IMG['cc_fill_tien-do'], fh = Math.round(fill.height * f.prog / 100);
+    ctx.drawImage(fill, 0, fill.height - fh, fill.width, fh, bx - 44 + 10, by + 14 + fill.height - fh, fill.width, fh);
+    ctx.drawImage(IMG['cc_thanh-cau'], bx, by);
+    const zim = IMG[on ? 'cc_vung-bat_xanh' : 'cc_vung-bat_vang']; ctx.drawImage(zim, bx + 17, by + TOP + f.zone, zim.width, zh);
+    ctx.drawImage(IMG.cc_ca_icon, bx + 16, by + TOP + f.fy);
+    text('Giữ A để kéo vùng xanh theo cá', 300, 452, 14, '#fff2d8', 'center', true, 3);
+    if (f.prog >= 100) {
+      const name = `${FISH_NAME[f.tier - 1]} ${HE_NAME[f.he]}`, file = `CA_${f.he}_${f.tier}`;
+      bag(file, name, HE_NAME[f.he], `No +${10 + f.tier * 5} · Linh khí ${HE_NAME[f.he]} +${f.tier * 2}`);
+      const coins = fishPrice(f.tier); gainExp(Math.round((10 + f.tier * 8) * (own['xo-ca'] ? 1.1 : 1)));
+      S.need.vui = Math.min(100, S.need.vui + 8);
+      S.fish = { st: 'done', t: now, name, file, tier: f.tier, coins };
+    } else if (f.prog <= 0) { S.fish = { st: 'lost', t: now }; toast('Cá giật đứt dây, sổng mất!'); }
+  }
+  if (f.st === 'done' && now - f.t < 720) {                  // the fish leaps out of the water first
+    strip('ca_keo', Math.floor((now - f.t) / 120), BOB[0], BOB[1] + 14);
+  } else if (f.st === 'done') {                               // then the catch, held up big
+    const im = IMG['cc_' + f.file], k = 3, t = Math.min(1, (now - f.t - 720) / 300);
+    ctx.fillStyle = 'rgba(0,0,0,0.45)'; ctx.fillRect(0, 0, 640, 480);
+    if (f.tier === 4) ctx.drawImage(IMG.cc_ruong_mo, 320 - 43, 150);
+    ctx.drawImage(im, 320 - im.width * k * t / 2, 230 - im.height * k * t / 2, im.width * k * t, im.height * k * t);
+    title(f.tier >= 3 ? 'CÁ HIẾM!' : 'BẮT ĐƯỢC!', 320, 120, 32, '#ffe6a8', 4);
+    text(f.name, 320, 300, 20, '#fff2d8', 'center', true, 4);
+    text(`Đã cho vào túi · bán ở quầy được ${f.coins} xu`, 320, 328, 14, '#ffe0b0', 'center', true, 3);
+  }
+  drawTop('Câu cá');
+  const hint = { ready: 'A: thả câu · X: quầy đồ câu · B: quay lại', wait: 'Chờ phao chìm…', bite: 'CÁ CẮN! Bấm A ngay!',
+                 reel: '', done: 'A: câu tiếp · X: quầy · B: quay lại', lost: 'A: thả câu lại · X: quầy · B: quay lại' }[f.st];
+  if (f.st !== 'reel' && !(f.st === 'done' && since >= 720)) {    // what is on the line: the rod and the bait left
+    const g = gear(), rod = TACKLE[g.rod - 1], bt = bestBait();
+    ctx.fillStyle = 'rgba(12,7,5,0.6)'; ctx.beginPath(); ctx.roundRect(440, 40, 192, 50, 8); ctx.fill();
+    fit(IMG['sn_' + rod.k], 466, 65, 36, 36); text(rod.n, 490, 56, 13, '#ffe6a8', 'left', true, 2);
+    text(bt ? `${bt.n} ×${g.bait[bt.k]}` : 'Không mồi', 490, 76, 12, '#f0e4ce', 'left', false, 2);
+  }
+  if (hint) text(hint, 320, 466, f.st === 'bite' ? 16 : 13, f.st === 'bite' ? '#ffe066' : '#f0e4ce', 'center', true, 3);
+}
+
+// ---------- Nông trại: a 6x6 field seen at an angle (assets/r36s/farm: nen.png, o-dat/, cay/, toa-do.json) ----------
+// arrows walk the plots, A does what the plot needs (clear weeds, hoe, sow, water, pick pests, harvest, open a new plot)
+const KINDS = { hoa: [['ot', 'Ớt'], ['ca-chua', 'Cà chua'], ['dau-tay', 'Dâu tây']], kim: [['cu-cai', 'Củ cải'], ['sup-lo', 'Súp lơ'], ['toi', 'Tỏi']],
+                moc: [['bap-cai', 'Bắp cải'], ['dau-ha-lan', 'Đậu Hà Lan'], ['ngo', 'Ngô']],
+                thuy: [['sen', 'Sen'], ['dua-hau', 'Dưa hấu'], ['lua', 'Lúa']], tho: [['bi-ngo', 'Bí ngô'], ['ca-rot', 'Cà rốt'], ['khoai-lang', 'Khoai lang']] };
+const SEEDS = ELS.flatMap((he, e) => KINDS[he].map(([k, n], j) => {
+  const price = [10, 12, 18][j] + e * 2, days = 2 + j + (e % 2);
+  return { he, k, n, price, days, sell: Math.round(price * 2.5) };
+}));
+const seedKey = sd => `${sd.he}-${sd.k}`;
+const seedsOf = sd => (S.seeds || (S.seeds = Object.fromEntries(SEEDS.map(x => [seedKey(x), x.he === EL() ? 3 : 0]))))[seedKey(sd)] || 0;
+const CROP_ST = ['1-mam', '2-non', '3-lon', '4-chin'];
+const FIELD = DATA.farm ? DATA.farm.tam_o.map(t => ({ r: t.o[0], c: t.o[1], x: t.tam[0], y: t.tam[1] })) : [];
+const plotAt = (r, c) => FIELD.findIndex(p => p.r === r && p.c === c);
+function farmPlots() {        // the 9 plots at the front corner start open; the rest are opened with gold
+  return S.farm || (S.farm = FIELD.map(p => ({ s: p.r >= 3 && p.c <= 2 ? (Math.random() < 0.4 ? 'co' : 'tron') : 'khoa' })));
+}
+const OPEN_COST = 200;
+function plotTile(p, now) {
+  if (p.s === 'khoa') return 'fm_dat_khoa';
+  if (p.s === 'co') return 'fm_dat_co-dai';
+  if (p.s === 'tron') return 'fm_dat_tron';
+  if (p.s === 'dat') return 'fm_dat_cuoc';
+  if (p.dead) return 'fm_dat_cay-heo';
+  if (p.pest) return 'fm_dat_sau';
+  if (p.weed) return 'fm_dat_co-dai';
+  if (p.stage <= 1 && now >= p.wet) return 'fm_dat_gieo-hat';
+  return now < p.wet ? 'fm_dat_tuoi' : 'fm_dat_kho';
+}
+function plotAction(p, now) {
+  if (p.s === 'khoa') return `Mở ô đất (${OPEN_COST} vàng)`;
+  if (p.s === 'co') return 'Nhổ cỏ';
+  if (p.s === 'tron') return 'Cuốc đất';
+  if (p.s === 'dat') return seedsOf(SEEDS[S.seed]) ? `Gieo ${SEEDS[S.seed].n} (còn ${seedsOf(SEEDS[S.seed])})` : `Hết hạt ${SEEDS[S.seed].n}: X ra quầy`;
+  if (p.dead) return 'Dọn cây héo';
+  if (p.pest) return 'Bắt sâu';
+  if (p.weed) return 'Nhổ cỏ';
+  if (p.stage >= 4) return 'Thu hoạch';
+  if (now >= p.wet) return 'Tưới nước';
+  return 'Đang lớn…';
+}
+function farmTick(now, dt) {
+  for (const p of farmPlots()) {
+    if (p.s !== 'cay' || p.dead || p.stage >= 4) continue;
+    if (now < p.wet && !p.pest && !p.weed) { p.grow = (p.grow || 0) + dt; if (p.grow > 7000) { p.grow = 0; p.stage++; } p.dry = 0; }
+    else if (now >= p.wet) { p.dry = (p.dry || 0) + dt; if (p.dry > 30000) p.dead = true; }
+    if (!p.pest && !p.weed && Math.random() < dt / 70000) Math.random() < 0.5 ? p.pest = true : p.weed = true;
+  }
+}
+function farmInput(btn, now) {
+  const ps = farmPlots(), cur = FIELD[S.farmSel];
+  const go = (dr, dc) => { const k = plotAt(cur.r + dr, cur.c + dc); if (k >= 0) S.farmSel = k; };
+  // on screen: up = further back (c+1), down = nearer (c-1), left / right along the other side
+  if (btn === 'UP') go(-1, 0); if (btn === 'DOWN') go(1, 0); if (btn === 'LEFT') go(0, -1); if (btn === 'RIGHT') go(0, 1);
+  if (btn === 'L1' || btn === 'R1') { S.seed = (S.seed + (btn === 'R1' ? 1 : SEEDS.length - 1)) % SEEDS.length; toast(`Hạt giống: ${SEEDS[S.seed].n} (hệ ${HE_NAME[SEEDS[S.seed].he]})`); }
+  if (btn === 'B') return fadeTo(() => { S.mode = 'act'; });
+  if (btn === 'X') return openSeedShop();
+  if (btn !== 'A') return;
+  const p = ps[S.farmSel], label = plotAction(p, now);
+  if (label.startsWith('Mở ô')) {
+    if (S.coins < OPEN_COST) return toast('Không đủ vàng');
+    S.coins -= OPEN_COST; p.s = 'tron'; toast('Đã mở thêm một ô đất');
+  } else if (label === 'Nhổ cỏ') { if (p.s === 'co') p.s = 'tron'; p.weed = false; gainExp(2); }
+  else if (label === 'Cuốc đất') { p.s = 'dat'; gainExp(3); }
+  else if (label === 'Bắt sâu') { p.pest = false; emote('bc_cham-than'); gainExp(4); }
+  else if (label === 'Dọn cây héo') { Object.assign(p, { s: 'dat', dead: false, stage: 0 }); }
+  else if (label.startsWith('Hết hạt')) { openSeedShop(); }
+  else if (label.startsWith('Gieo')) { const sd = SEEDS[S.seed]; S.seeds[seedKey(sd)]--; Object.assign(p, { s: 'cay', he: sd.he, k: sd.k, n: sd.n, stage: 1, wet: 0, grow: 0, dry: 0 }); gainExp(3); }
+  else if (label === 'Tưới nước') { p.wet = now + 22000; S.fx = { t: now, i: S.farmSel }; gainExp(2); }
+  else if (label === 'Thu hoạch') {
+    bag(`cay_${p.he}-${p.k}_5-nong-san`, p.n, HE_NAME[p.he], `No +20 · Linh khí ${HE_NAME[p.he]} +5`);
+    S.coins += 30; gainExp(20); S.need.vui = Math.min(100, S.need.vui + 5); emote('bc_tim');
+    toast(`Thu hoạch ${p.n}! Đã cho vào túi`);
+    Object.assign(p, { s: 'dat', stage: 0, he: null });
+  } else toast('Cây đang lớn, chờ chút nhé');
+}
+function drawFarm(now, dt) {
+  farmTick(now, dt);
+  ctx.drawImage(IMG.fm_nen, 0, 0);
+  const ps = farmPlots();
+  FIELD.forEach((f, i) => { const t = IMG[plotTile(ps[i], now)]; if (t) ctx.drawImage(t, f.x - t.width / 2, f.y - t.height / 2); });
+  const sel = FIELD[S.farmSel], cur = IMG[ps[S.farmSel].s === 'khoa' ? 'fm_con-tro_o' : 'fm_con-tro_o_vang'];
+  if (cur) { ctx.globalAlpha = 0.55 + 0.45 * Math.abs(Math.sin(now / 260)); ctx.drawImage(cur, sel.x - cur.width / 2, sel.y - cur.height / 2); ctx.globalAlpha = 1; }
+  // crops and the pet, back to front
+  const items = FIELD.map((f, i) => ({ y: f.y, draw: () => {
+    const p = ps[i];
+    if (p.s !== 'cay' || p.dead) return;
+    const c = IMG[`fm_cay_${p.he}-${p.k}_${CROP_ST[Math.min(3, p.stage - 1)]}`];
+    if (c) ctx.drawImage(c, f.x - c.width / 2, f.y + 8 - c.height + (p.stage >= 4 ? Math.round(Math.sin(now / 300)) : 0));
+    if (p.stage >= 4 && Math.floor(now / 400) % 2) ctx.drawImage(IMG['lap-lanh'], f.x + 12, f.y - 40);
+  } }));
+  items.sort((a, b) => a.y - b.y).forEach(it => it.draw());   // no pet here: the blinking square is the cursor
+  if (S.fx && now - S.fx.t < 800 && IMG.fm_fx_nuoc) {
+    const f = FIELD[S.fx.i], im = IMG.fm_fx_nuoc, k = (now - S.fx.t) / 800;
+    ctx.globalAlpha = 1 - k * 0.6; ctx.drawImage(im, f.x - im.width / 2, f.y - im.height - 6 - k * 10); ctx.globalAlpha = 1;
+  }
+  drawTop('Nông trại');
+  ctx.fillStyle = 'rgba(12,7,5,0.72)'; ctx.fillRect(0, 432, 640, 48);
+  const sd = SEEDS[S.seed], icon = IMG[`fm_cay_${sd.he}-${sd.k}_5-nong-san`];
+  if (icon) ctx.drawImage(icon, 10, 436);
+  text('A: ' + plotAction(ps[S.farmSel], now), 60, 448, 16, '#ffe6a8', 'left', true, 3);
+  text(`Hạt: ${sd.n} ×${seedsOf(sd)} (L1/R1 đổi) · X: quầy nông sản · B: quay lại`, 60, 468, 12, '#c9bba8', 'left', false, 2);
+}
+
+// ---------- Nấu ăn: first person, follow the popup (assets/r36s/nau-an, ui/man-hinh-mau/nau-an_4-buoc.jpg) ----------
+// pick a dish (its ingredients come from the farm and the lake), then each step: cắt = tap A, khuấy = turn the D-pad,
+// chiên = A while the needle is in the green; the accuracy of all steps gives 1-3 stars and the buff
+const CROP_NAME = Object.fromEntries(ELS.flatMap(he => KINDS[he].map(([k, n]) => [k, n])));
+const DISHES = [
+  ['canh-ca-ca-chua', 'Canh cá cà chua', 'thuy', ['ca-chua', 'CA'], ['cat', 'khuay']],
+  ['ca-chien-ot', 'Cá chiên ớt', 'hoa', ['ot', 'CA'], ['cat', 'chien']],
+  ['banh-dau', 'Bánh dâu', 'hoa', ['dau-tay', 'lua'], ['cat', 'khuay']],
+  ['com-trung-ca-chua', 'Cơm trứng cà chua', 'hoa', ['lua', 'ca-chua'], ['cat', 'chien']],
+  ['ham-cu-cai-toi', 'Hầm củ cải tỏi', 'kim', ['cu-cai', 'toi'], ['cat', 'khuay']],
+  ['sup-lo-nuong', 'Súp lơ nướng', 'kim', ['sup-lo'], ['cat', 'chien']],
+  ['bap-cai-cuon', 'Bắp cải cuộn', 'moc', ['bap-cai'], ['cat', 'khuay']],
+  ['ngo-nuong', 'Ngô nướng', 'moc', ['ngo'], ['cat', 'chien']],
+  ['com-chien-dau', 'Cơm chiên đậu', 'moc', ['lua', 'dau-ha-lan'], ['cat', 'chien']],
+  ['canh-ngo-sen', 'Canh ngó sen', 'thuy', ['sen', 'ngo'], ['cat', 'khuay']],
+  ['nuoc-dua-hau', 'Nước dưa hấu', 'thuy', ['dua-hau'], ['cat', 'khuay']],
+  ['com-nam-ca', 'Cơm nắm cá', 'thuy', ['lua', 'CA'], ['cat', 'chien', 'khuay']],
+  ['sup-bi-ngo', 'Súp bí ngô', 'tho', ['bi-ngo'], ['cat', 'khuay']],
+  ['khoai-lang-nuong', 'Khoai lang nướng', 'tho', ['khoai-lang'], ['cat', 'chien']],
+  ['banh-ca-rot', 'Bánh cà rốt', 'tho', ['ca-rot', 'lua'], ['cat', 'khuay', 'chien']],
+  ['lau-hai-san', 'Lẩu hải sản', 'thuy', ['CA', 'CA', 'cu-cai'], ['cat', 'chien', 'khuay', 'chien']]
+].map(([k, n, he, need, steps]) => ({ k, n, he, need, steps }));
+const STEP = { cat: { n: 'Cắt', bg: 'na_nen_cat', how: 'Bấm A liên tục để cắt' },
+               khuay: { n: 'Khuấy', bg: 'na_nen_khuay', how: 'Xoay D-pad ↑ → ↓ ← để khuấy' },
+               chien: { n: 'Chiên', bg: 'na_nen_chien', how: 'Bấm A khi kim ở vùng xanh' } };
+const BUFF = { hoa: 'Sức mạnh', kim: 'Phòng thủ', moc: 'Hồi máu', thuy: 'Nhanh nhẹn', tho: 'Bền bỉ' };
+const ingName = k => k === 'CA' ? 'Cá' : CROP_NAME[k];
+function ingSlot(k, skip = []) {               // the bag slot an ingredient comes from (fish: the smallest one)
+  const ok = i => S.bag[i] - skip.filter(x => x === i).length > 0;
+  const m = S.items.map((b, i) => ({ b, i })).filter(x => (k === 'CA' ? /^CA_/.test(x.b.file) : x.b.file.endsWith(`-${k}_5-nong-san`)) && ok(x.i));
+  m.sort((a, b) => a.b.file.slice(-1) - b.b.file.slice(-1));
+  return m.length ? m[0].i : -1;
+}
+function ingSlots(d) {                         // one slot per ingredient (the same slot twice for 2 fish), or null
+  const used = [];
+  for (const k of d.need) { const i = ingSlot(k, used); if (i < 0) return null; used.push(i); }
+  return used;
+}
+function openKitchen() {
+  // the first visit: a basket so the first dish can be cooked straight away
+  if (!S.kitchen) {
+    S.kitchen = true;
+    bag('cay_hoa-ca-chua_5-nong-san', 'Cà chua', HE_NAME.hoa, `No +20 · Linh khí ${HE_NAME.hoa} +5`);
+    bag('CA_thuy_1', `${FISH_NAME[0]} ${HE_NAME.thuy}`, HE_NAME.thuy, `No +15 · Linh khí ${HE_NAME.thuy} +2`);
+    toast('Bếp tặng giỏ nguyên liệu: cà chua + cá');
+  }
+  S.mode = 'cook'; S.cook = { st: 'menu', i: 0 };
+}
+function cookStep(now) {                      // start step c.si of the dish
+  const c = S.cook, kind = c.d.steps[c.si];
+  Object.assign(c, { st: 'intro', t: now, kind, taps: 0, q: 0, qt: 0, quarter: 0, dir: -1, stirT: 0, hits: [], flipT: -1e9, mark: null });
+}
+function cookScore(c) {
+  if (c.kind === 'cat') return Math.min(1, c.taps / 12);
+  if (c.kind === 'khuay') return Math.min(1, c.quarter / 12);
+  return c.hits.reduce((a, b) => a + b, 0) / 3;
+}
+function cookNext(now) {
+  const c = S.cook; c.scores.push(cookScore(c));
+  if (++c.si < c.d.steps.length) return cookStep(now);
+  const avg = c.scores.reduce((a, b) => a + b, 0) / c.scores.length, stars = avg >= 0.85 ? 3 : avg >= 0.55 ? 2 : 1;
+  const d = c.d, file = 'mon_' + d.k;
+  bag(file, d.n, HE_NAME[d.he], `No +${20 + stars * 10} · ${BUFF[d.he]} +${stars * 2} (${stars} sao)`);
+  gainExp(15 + stars * 10); S.need.vui = Math.min(100, S.need.vui + 6);
+  Object.assign(c, { st: 'done', t: now, stars });
+}
+function cookInput(btn, now) {
+  const c = S.cook;
+  if (c.st === 'menu') {
+    const n = DISHES.length;
+    if (btn === 'LEFT') c.i = (c.i + n - 1) % n; if (btn === 'RIGHT') c.i = (c.i + 1) % n;
+    if (btn === 'UP') c.i = (c.i + n - 4) % n; if (btn === 'DOWN') c.i = (c.i + 4) % n;
+    if (btn === 'B') return fadeTo(() => { S.mode = 'act'; });
+    if (btn !== 'A') return;
+    const d = DISHES[c.i], slots = ingSlots(d);
+    if (!slots) return toast('Thiếu: ' + d.need.filter((k, j) => !ingSlots({ need: d.need.slice(0, j + 1) })).map(ingName).join(', '));
+    // use the ingredients (largest slot first so the indexes stay right)
+    [...slots].sort((a, b) => b - a).forEach(i => { if (!--S.bag[i]) { S.items.splice(i, 1); S.bag.splice(i, 1); } });
+    return fadeTo(() => { Object.assign(S.cook, { d, si: 0, scores: [] }); cookStep(performance.now()); });
+  }
+  if (c.st === 'done') {
+    if (now - c.t < 1600) return;
+    if (btn === 'A') return fadeTo(() => { S.cook = { st: 'menu', i: c.i }; });
+    if (btn === 'B') return fadeTo(() => { S.mode = 'act'; });
+    return;
+  }
+  if (c.st !== 'play') return;
+  if (c.kind === 'cat' && btn === 'A') { c.taps++; c.q = Math.min(2, c.q + 1); if (c.q === 1) c.qt = now; c.pressT = now; if (c.taps >= 12) c.end = now + 400; }
+  if (c.kind === 'khuay') {
+    const k = ['UP', 'RIGHT', 'DOWN', 'LEFT'].indexOf(btn);
+    if (k >= 0 && (c.dir < 0 || k === (c.dir + 1) % 4)) { if (c.dir >= 0) c.quarter++; c.dir = k; c.stirT = now; if (c.quarter >= 12) c.end = now + 500; }
+  }
+  if (c.kind === 'chien' && btn === 'A' && now - c.flipT > 400 && c.hits.length < 3) {
+    const p = needle(now), hit = p >= 0.34 && p <= 0.59 ? 1 : p >= 0.22 && p <= 0.75 ? 0.5 : 0;
+    c.hits.push(hit); c.flipT = now; c.mark = { t: now, ok: hit === 1 };
+    if (c.hits.length >= 3) c.end = now + 700;
+  }
+}
+const needle = now => { const ph = ((now - S.cook.t) % 1500) / 1500; return ph < 0.5 ? ph * 2 : 2 - ph * 2; };
+function cookStrip(name, k, x, y, sc) {       // frame k of a 6-frame cooking strip, drawn at (x, y) scaled sc
+  const im = IMG['na_' + name + '_dai6']; if (!im) return;
+  const fw = im.width / 6; ctx.drawImage(im, (k % 6) * fw, 0, fw, im.height, x, y, fw * sc, im.height * sc);
+}
+function shadow(x, y, w, h, a) { ctx.fillStyle = `rgba(30,15,5,${a})`; ctx.beginPath(); ctx.ellipse(x, y, w / 2, h / 2, 0, 0, Math.PI * 2); ctx.fill(); }
+function popupBox(x, y, w, h) {                // khung-popup stretched: corners kept, middle stretched
+  const im = IMG['na_khung-popup'], e = 18, W = im.width, H = im.height;
+  const xs = [[0, e, x, e], [e, W - 2 * e, x + e, w - 2 * e], [W - e, e, x + w - e, e]];
+  const ys = [[0, e, y, e], [e, H - 2 * e, y + e, h - 2 * e], [H - e, e, y + h - e, e]];
+  for (const [sx, sw, dx, dw] of xs) for (const [sy, sh, dy, dh] of ys) ctx.drawImage(im, sx, sy, sw, sh, dx, dy, dw, dh);
+}
+function drawCookMenu(now) {
+  const c = S.cook;
+  ctx.drawImage(IMG['na_nen_ban-an'], 0, 0);
+  ctx.fillStyle = 'rgba(20,12,6,0.35)'; ctx.fillRect(0, 0, 640, 480);
+  popupBox(24, 40, 592, 382);
+  DISHES.forEach((d, i) => {
+    const x = 50 + (i % 4) * 92, y = 56 + Math.floor(i / 4) * 88, on = i === c.i, ok = !!ingSlots(d);
+    ctx.fillStyle = on ? '#ffe2b8' : '#f6efe0'; ctx.strokeStyle = on ? '#e08838' : '#c8d8e8'; ctx.lineWidth = on ? 3 : 2;
+    ctx.beginPath(); ctx.roundRect(x, y, 80, 76, 10); ctx.fill(); ctx.stroke();
+    ctx.globalAlpha = ok ? 1 : 0.45; fit(IMG['na_mon_' + d.k], x + 40, y + 38 + (on ? Math.round(Math.sin(now / 250)) : 0), 64, 56); ctx.globalAlpha = 1;
+    if (ok) text('✓', x + 70, y + 12, 13, '#2a8a2a', 'center', true);
+  });
+  // the chosen dish: what it needs and how it is made
+  const d = DISHES[c.i], sx = 432;
+  text(d.n, 522, 70, 17, '#c4553a', 'center', true);
+  fit(IMG['na_mon_' + d.k], 522, 140, 128, 96);
+  text(`Hệ ${HE_NAME[d.he]} · buff ${BUFF[d.he]}`, 522, 202, 12, '#7a5a40', 'center', true);
+  text('Nguyên liệu:', sx, 230, 13, '#4a3020', 'left', true);
+  const used = [];
+  d.need.forEach((k, j) => {
+    const i = ingSlot(k, used); if (i >= 0) used.push(i);
+    text(`${i >= 0 ? '✓' : '✗'} ${ingName(k)}`, sx + 8, 252 + j * 20, 13, i >= 0 ? '#2a7a2a' : '#b84a3a', 'left', true);
+  });
+  text('Các bước: ' + d.steps.map(k => STEP[k].n).join(' → '), sx, 252 + d.need.length * 20 + 12, 12, '#4a3020', 'left', false);
+  drawTop('Nấu ăn');
+  ctx.fillStyle = 'rgba(12,7,5,0.6)'; ctx.fillRect(0, 456, 640, 24);
+  text('Mũi tên: chọn món · A: nấu · B: quay lại', 320, 468, 12, '#f0e4ce', 'center', false, 2);
+}
+function drawCook(now) {
+  const c = S.cook;
+  if (c.st === 'menu') return drawCookMenu(now);
+  if (c.st === 'done') return drawCookDone(now);
+  if (c.st === 'intro' && now - c.t > 1100) { c.st = 'play'; c.t = now; c.end = now + (c.kind === 'chien' ? 9000 : c.kind === 'cat' ? 5000 : 6500); }
+  if (c.st === 'play' && now > c.end) return cookNext(now);
+  const st = STEP[c.kind];
+  ctx.drawImage(IMG[st.bg], 0, 0);
+  if (c.kind === 'cat') {                     // x1.35, the frame's bottom on the screen's bottom edge
+    let k = 0;
+    if (c.q > 0) { k = Math.floor((now - c.qt) / 60); if (k >= 6) { c.q--; c.qt = now; k = 0; } }
+    cookStrip('cat', k, 310 - 362 * 1.35 / 2, 480 - 362 * 1.35, 1.35);
+  } else if (c.kind === 'khuay') {            // v2 cells (362 px) x1.15, the cell's bottom on the screen's: arms reach the edge
+    shadow(300, 382, 330, 80, 0.28);
+    const stirring = c.st === 'play' && now - c.stirT < 450;
+    cookStrip('khuay', stirring ? Math.floor(now / 120) : 0, 300 - 362 * 1.15 / 2, 480 - 362 * 1.15, 1.15);
+  } else {                                    // x1.2 round (318,285): sizzle 1-3, flip 4-6 on a press
+    shadow(318, 300, 300, 80, 0.25);
+    const fl = now - c.flipT, k = fl < 360 ? 3 + Math.floor(fl / 120) : Math.floor(now / 120) % 3;
+    cookStrip('chien', k, 318 - 192, 285 - 192, 1.2);
+  }
+  // the popup, top right
+  const px = 388, py = 40;                    // below the top bar
+  popupBox(px, py, 240, 85);
+  if (c.kind === 'cat') {
+    const pressed = now - (c.pressT || -1e9) < 110, nb = IMG[pressed ? 'na_nut-bam_nhan' : 'na_nut-bam'];
+    const ar = IMG['na_mui-ten-xuong'], bob = Math.round(2 * Math.sin(now / 120));
+    ctx.drawImage(ar, px + 52, py + 6 + bob); ctx.drawImage(ar, px + 156, py + 6 + bob);
+    fit(nb, px + 120, py + 26 + (pressed ? 4 : 0), 46, 46);
+    ctx.fillStyle = '#e8eef4'; ctx.beginPath(); ctx.roundRect(px + 22, py + 56, 196, 14, 7); ctx.fill();
+    ctx.fillStyle = '#6ad05a'; ctx.beginPath(); ctx.roundRect(px + 22, py + 56, Math.max(14, 196 * Math.min(1, c.taps / 12)), 14, 7); ctx.fill();
+    ctx.strokeStyle = '#3a8ad8'; ctx.lineWidth = 2; ctx.beginPath(); ctx.roundRect(px + 22, py + 56, 196, 14, 7); ctx.stroke();
+  } else if (c.kind === 'khuay') {
+    const xo = IMG.na_xoay; ctx.save(); ctx.translate(px + 70, py + 42); if (now - c.stirT < 450) ctx.rotate(now / 180);
+    ctx.drawImage(xo, -xo.width / 2, -xo.height / 2); ctx.restore();
+    const vx = px + 140, vy = py + 11, pr = Math.min(1, c.quarter / 12);
+    ctx.drawImage(IMG.na_vong_khung, vx, vy);
+    ctx.save(); ctx.beginPath(); ctx.moveTo(vx + 32, vy + 31); ctx.arc(vx + 32, vy + 31, 40, -Math.PI / 2, -Math.PI / 2 + pr * Math.PI * 2); ctx.closePath(); ctx.clip();
+    ctx.drawImage(IMG.na_vong_day, vx, vy); ctx.restore();
+  } else {
+    const bx = px + 10, by = py + 20;
+    ctx.drawImage(IMG.na_thanh_nhiet, bx, by);
+    const kx = bx + 10 + needle(now) * 200, kim = IMG['na_kim-chi']; ctx.drawImage(kim, kx - kim.width / 2, by - 12);
+    for (let j = 0; j < 3; j++) {             // the three flips
+      const h = c.hits[j]; ctx.fillStyle = h === undefined ? '#d8d0c0' : h === 1 ? '#5ac04a' : h ? '#f0c040' : '#e05a4a';
+      ctx.beginPath(); ctx.arc(px + 96 + j * 24, py + 70, 6, 0, Math.PI * 2); ctx.fill();
+    }
+    if (c.mark && now - c.mark.t < 600) {
+      const im = IMG[c.mark.ok ? 'na_hoan-hao' : 'na_truot']; ctx.drawImage(im, 320 - im.width / 2, 150 - (now - c.mark.t) / 20);
+    }
+  }
+  if (c.st === 'play') {                      // time left
+    const left = Math.max(0, (c.end - now) / 1000);
+    text(left.toFixed(1) + 's', px + 228, py + 92, 12, '#fff2d8', 'right', true, 3);
+  }
+  drawTop('Nấu ăn');
+  if (c.st === 'intro') {
+    ctx.fillStyle = 'rgba(0,0,0,0.4)'; ctx.fillRect(0, 170, 640, 110);
+    title(`BƯỚC ${c.si + 1}/${c.d.steps.length}: ${st.n.toUpperCase()}`, 320, 210, 28, '#ffe6a8', 4);
+    text(st.how, 320, 252, 15, '#fff2d8', 'center', true, 3);
+  }
+  ctx.fillStyle = 'rgba(12,7,5,0.6)'; ctx.fillRect(0, 456, 640, 24);
+  text(`${c.d.n} · ${st.how}`, 320, 468, 12, '#f0e4ce', 'center', false, 2);
+}
+function drawCookDone(now) {
+  const c = S.cook, since = now - c.t;
+  ctx.drawImage(IMG['na_nen_ban-an'], 0, 0);
+  if (since < 1500) {                         // the pot: steam, then sparkles
+    shadow(320, 420, 330, 56, 0.4);
+    cookStrip('xong', since < 960 ? Math.floor(since / 240) : 4 + Math.floor(since / 160) % 2, 160, 434 - 273, 1);
+  } else {                                    // the dish on the table
+    const k = Math.min(1, (since - 1500) / 300), im = IMG['na_mon_' + c.d.k], sc = 3.2 * (0.7 + 0.3 * k);
+    shadow(320, 395, 230 * k, 40, 0.3);
+    ctx.drawImage(im, 320 - im.width * sc / 2, 400 - im.height * sc, im.width * sc, im.height * sc);
+    if (Math.floor(now / 300) % 2) { const sp = IMG['na_lap-lanh']; ctx.drawImage(sp, 400, 230); ctx.drawImage(sp, 160, 280); }
+  }
+  if (since > 900) {                          // stars and the buff, top right
+    popupBox(388, 40, 240, 110);
+    for (let j = 0; j < 3; j++) {
+      const on = j < c.stars && since > 900 + j * 220, im = IMG[on ? 'na_sao' : 'na_sao_rong'];
+      ctx.drawImage(im, 412 + j * 64, 50);
+    }
+    if (since > 1600) {
+      ctx.drawImage(IMG['na_buff_suc-manh'], 400, 94, 60, 41);
+      text(`${BUFF[c.d.he]} +${c.stars * 2}`, 470, 115, 15, '#c4553a', 'left', true);
+    }
+  }
+  if (since > 1600) {
+    title(c.stars === 3 ? 'HOÀN HẢO!' : 'NẤU XONG!', 190, 80, 26, '#ffe6a8', 4);
+    text(`${c.d.n} · đã cho vào túi`, 320, 432, 15, '#fff2d8', 'center', true, 3);
+  }
+  drawTop('Nấu ăn');
+  ctx.fillStyle = 'rgba(12,7,5,0.6)'; ctx.fillRect(0, 456, 640, 24);
+  if (since > 1600) text('A: nấu món khác · B: quay lại', 320, 468, 12, '#f0e4ce', 'center', false, 2);
+}
+
+// ---------- Trường học: an open-air classroom, the snake teacher asks, the pet answers
+// (assets/r36s/truong-hoc: nen_lop.png, co-giao/, ui/; mockups ui/man-hinh-mau/truong-hoc.png, truong_chon-mon.png, truong_tieng-anh.png)
+// pick a subject card, then 5 questions with 4 answers A-D; short ones are chalked on the board, long ones go on the paper scroll
+const SUBJECTS = [['Toán', 'the_toan'], ['Tiếng Anh', 'the_anh'], ['Học Hệ', 'the_he']];
+const TEACHER = { idle: 'th_co_1-cuoi', blink: 'th_co_2-chop-mat', ask: 'th_co_3-giang', yes: 'th_co_4-khen', think: 'th_co_5-suy-nghi',
+                  wow: 'th_co_6-ngac-nhien', no: 'th_co_7-sai', done: 'th_co_8-len-cap', hi: 'th_co_1-cuoi' };
+// a starter bank of TOEIC part 5 style questions (300-800), until the real bank (JSON/CSV) is in
+const TOEIC = [
+  ['The quarterly report must be ______ to the manager before Friday so that the team can review it next week.', ['submitted', 'submit', 'submitting', 'submits'], 0],
+  ['Ms. Tanaka has worked at the company ______ ten years.', ['for', 'since', 'during', 'while'], 0],
+  ['All employees are required to wear their ID badges ______ in the building.', ['while', 'during', 'among', 'between'], 0],
+  ['The new software is ______ easier to use than the old version.', ['much', 'very', 'many', 'more'], 0],
+  ['Please send the invoice to ______ in the accounting department.', ['me', 'my', 'I', 'mine'], 0],
+  ['The meeting has been ______ until next Monday because of the holiday.', ['postponed', 'postpone', 'postponing', 'postpones'], 0],
+  ['Our store will be closed ______ renovations from June 1 to June 15.', ['for', 'by', 'at', 'on'], 0],
+  ['If you have any questions, please do not hesitate ______ us.', ['to contact', 'contacting', 'contact', 'contacted'], 0],
+  ['The hotel offers free breakfast to ______ guests.', ['all', 'every', 'each', 'whole'], 0],
+  ['Mr. Lee was promoted because of his ______ work on the project.', ['excellent', 'excellence', 'excel', 'excellently'], 0],
+  ['The train to Boston departs ______ 9:30 A.M. every day.', ['at', 'in', 'on', 'by'], 0],
+  ['Applicants must have ______ three years of experience in sales.', ['at least', 'at last', 'least', 'the least'], 0],
+  ['The package was delivered ______ than we expected.', ['sooner', 'soon', 'soonest', 'as soon'], 0],
+  ['Neither the manager ______ her assistant was available for comment.', ['nor', 'or', 'and', 'but'], 0],
+  ['The conference room is ______ for the training session this afternoon.', ['reserved', 'reserve', 'reserving', 'reservation'], 0],
+  ['Customers can return items ______ 30 days of purchase.', ['within', 'among', 'along', 'beside'], 0],
+  ['The CEO thanked the staff for their hard work and ______.', ['dedication', 'dedicate', 'dedicated', 'dedicating'], 0],
+  ['Please read the instructions ______ before using the machine.', ['carefully', 'careful', 'care', 'cared'], 0],
+  ['The company plans to ______ its operations to Asia next year.', ['expand', 'expansion', 'expanding', 'expanded'], 0],
+  ['Tickets for the concert sold out ______ two hours.', ['in', 'at', 'on', 'by'], 0],
+  ['The budget proposal was approved ______ the board of directors.', ['by', 'from', 'with', 'of'], 0],
+  ['Ms. Garcia is responsible ______ training new staff.', ['for', 'to', 'with', 'on'], 0],
+  ['The flight was delayed ______ heavy fog at the airport.', ['due to', 'because', 'so that', 'although'], 0],
+  ['We look forward to ______ you at the annual dinner.', ['seeing', 'see', 'seen', 'saw'], 0],
+  ['The printer on the third floor is ______ repaired today.', ['being', 'been', 'be', 'to be'], 0],
+  ['Sales increased ______ after the advertising campaign.', ['significantly', 'significant', 'significance', 'signify'], 0],
+  ['Each department must submit ______ own budget report.', ['its', 'it', "it's", 'their'], 0],
+  ['The museum is open daily ______ Mondays.', ['except', 'besides', 'without', 'unless'], 0],
+];
+const SINH = { moc: 'hoa', hoa: 'tho', tho: 'kim', kim: 'thuy', thuy: 'moc' }, KHAC = { moc: 'tho', tho: 'thuy', thuy: 'hoa', hoa: 'kim', kim: 'moc' };
+const QN = 5;
+function openSchool(back) { S.mode = 'school'; S.sch = { st: 'pick', subj: 0, back, t: performance.now() }; teacher('hi', 1200); }
+const leaveSchool = () => fadeTo(() => { S.mode = S.sch.back || 'act'; });
+function teacher(face, ms = 1200) { S.schFace = face; S.schFaceT = performance.now() + ms; }
+const pickN = (arr, n) => [...arr].sort(() => Math.random() - 0.5).slice(0, n);
+function makeQ(subj, used) {                   // { q, long, choices[4], ok }
+  if (subj === 0) {                            // two operations mixed (+, −, ×), × done first; never below 0
+    const big = 9 + Math.min(11, S.level * 2), n = m => 1 + Math.floor(Math.random() * m);
+    let a, b, c, o1, o2, ans;
+    do {
+      [a, b, c] = [n(big), n(big), n(big)];
+      [o1, o2] = [Math.floor(Math.random() * 3), Math.floor(Math.random() * 3)];
+      if (o1 === 2) { a = n(9) + 1; b = n(9) + 1; } if (o2 === 2) { b = Math.min(b, 9); c = n(9) + 1; }
+      const v = [a, b, c], op = [o1, o2];
+      for (let k = 0; k < op.length; k++) if (op[k] === 2) { v.splice(k, 2, v[k] * v[k + 1]); op.splice(k, 1); k--; }
+      ans = v[0]; op.forEach((o, k) => { ans = o === 0 ? ans + v[k + 1] : ans - v[k + 1]; });
+    } while (ans < 0 || ans > 150 || (o1 !== 2 && o2 !== 2 && Math.random() < 0.6));   // mostly with a ×
+    const sign = ['+', '−', '×'];
+    const near = [ans - 10, ans - 2, ans - 1, ans + 1, ans + 2, ans + 10];
+    if (o1 === 2 || o2 === 2) near.push(o1 === 2 ? a * (b + (o2 === 0 ? c : -c)) : (o1 === 0 ? a + b : a - b) * c);  // the trap: left to right
+    const choices = pickN([ans, ...pickN([...new Set(near)].filter(x => x >= 0 && x !== ans), 3)], 4);
+    return { q: `${a} ${sign[o1]} ${b} ${sign[o2]} ${c} = ?`, choices: choices.map(String), ok: choices.indexOf(ans) };
+  }
+  if (subj === 1) {
+    const free = TOEIC.map((t, k) => k).filter(k => !used.includes(k)), k = free[Math.floor(Math.random() * free.length)];
+    used.push(k);
+    const [q, opts] = TOEIC[k], choices = pickN(opts, 4);
+    return { q, long: true, choices, ok: choices.indexOf(opts[0]) };
+  }
+  const he = ELS[Math.floor(Math.random() * 5)], sinh = Math.random() < 0.5, ans = (sinh ? SINH : KHAC)[he];
+  const choices = pickN(ELS.filter(x => x !== he), 4);
+  return { q: `${HE_NAME[he]} ${sinh ? 'sinh' : 'khắc'} ?`, choices: choices.map(x => HE_NAME[x]), ok: choices.indexOf(ans) };
+}
+function schoolInput(btn, now) {
+  const c = S.sch;
+  if (c.st === 'pick') {
+    if (btn === 'LEFT') c.subj = (c.subj + 2) % 3; if (btn === 'RIGHT') c.subj = (c.subj + 1) % 3;
+    if (btn === 'B') return leaveSchool();
+    if (btn === 'A') { c.used = []; Object.assign(c, { st: 'q', qi: 0, res: [], sel: 0, cur: makeQ(c.subj, c.used), t: now }); teacher('ask', 1400); }
+    return;
+  }
+  if (c.st === 'q') {                          // the answers sit 2 x 2: A B / C D
+    if (btn === 'LEFT' || btn === 'RIGHT') c.sel ^= 1;
+    if (btn === 'UP' || btn === 'DOWN') c.sel ^= 2;
+    if (btn === 'B') return leaveSchool();
+    if (btn === 'A') {
+      const ok = c.sel === c.cur.ok; c.res.push(ok); Object.assign(c, { st: 'ans', t: now });
+      teacher(ok ? 'yes' : 'no', 1300); if (ok) { gainExp(8); S.coins += 15; }
+    }
+    return;
+  }
+  if (c.st === 'done' && now - c.t > 900) {
+    if (btn === 'A') { c.st = 'pick'; teacher('idle', 10); }
+    if (btn === 'B') leaveSchool();
+  }
+}
+function wrapLines(str, maxW, font) {
+  ctx.font = font; const out = [''];
+  for (const w of str.split(' ')) { const t = (out[out.length - 1] + ' ' + w).trim(); if (ctx.measureText(t).width > maxW) out.push(w); else out[out.length - 1] = t; }
+  return out;
+}
+function pill(x, y, w, h, label, on, size = 17) {   // the cream label boxes with a blue rim from the mockups
+  ctx.fillStyle = '#fbf6ea'; ctx.strokeStyle = on ? '#e8a070' : '#7fb0d0'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.roundRect(x, y, w, h, 8); ctx.fill(); ctx.stroke();
+  text(label, x + w / 2, y + h / 2, size, on ? '#c4553a' : '#4a3a2a', 'center', true);
+}
+function drawSchool(now) {
+  const c = S.sch;
+  if (c.st === 'ans' && now - c.t > 1300) {                   // next question, or the end of the lesson
+    if (c.res.length < QN) { Object.assign(c, { st: 'q', qi: c.qi + 1, sel: 0, cur: makeQ(c.subj, c.used), t: now }); teacher('ask', 1200); }
+    else {
+      const score = c.res.filter(Boolean).length;
+      Object.assign(c, { st: 'done', t: now, score }); teacher(score >= 4 ? 'done' : score >= 2 ? 'yes' : 'wow', 2600);
+      if (score === QN) { gainExp(30); S.coins += 50; }
+      S.need.vui = Math.min(100, S.need.vui + 4);
+    }
+  }
+  if (c.st === 'q' && now - c.t > 4000 && now > (S.schFaceT || 0)) teacher('think', 900);
+  // the classroom; softened behind the subject cards
+  if (c.st === 'pick') { ctx.filter = 'blur(2px)'; ctx.drawImage(IMG.th_nen_lop, 0, 0); ctx.filter = 'none'; ctx.fillStyle = 'rgba(255,248,236,0.28)'; ctx.fillRect(0, 0, 640, 480); }
+  else ctx.drawImage(IMG.th_nen_lop, 0, 0);
+  const chalk = '#f4f1e6';
+  if (c.st === 'pick') {
+    pill(170, 46, 300, 40, 'Chọn môn học', false, 19);
+    SUBJECTS.forEach(([n, card], j) => {
+      const cx = 140 + j * 180, on = j === c.subj, bob = on ? Math.round(2 * Math.sin(now / 260)) : 0;
+      if (on) ctx.drawImage(IMG.th_the_chon, cx - 75 - 10, 118 - 6 + bob);
+      ctx.drawImage(IMG['th_' + card], cx - 75, 118 + bob);
+      pill(cx - 65, 290, 130, 32, n, on);
+    });
+  } else if (c.st === 'q' || c.st === 'ans') {
+    const q = c.cur;
+    if (q.long) {                              // a long sentence: the paper scroll over the board
+      const font = '17px Tahoma, sans-serif', lines = wrapLines(q.q, 470, font), h = Math.max(103, 40 + lines.length * 24);
+      const pg = IMG['th_khung-giay'];
+      ctx.drawImage(pg, 0, 0, pg.width, 40, 40, 64, 560, 40);                    // top, stretched middle, bottom
+      ctx.drawImage(pg, 0, 40, pg.width, pg.height - 80, 40, 104, 560, h - 80);
+      ctx.drawImage(pg, 0, pg.height - 40, pg.width, 40, 40, 64 + h - 40, 560, 40);
+      lines.slice(0, 5).forEach((l, k) => text(l, 92, 92 + k * 24, 17, '#3a2a1a', 'left', false));
+    } else {
+      text(q.q, 320, 116, 44, chalk, 'center', true);
+    }
+    // the answers, 2 x 2, each button's own body aligned on its bottom edge (the lit ones have sparks above)
+    q.choices.forEach((ch, k) => {
+      const st = c.st === 'ans' ? (k === q.ok ? 'dung' : k === c.sel ? 'sai' : 'thuong') : k === c.sel ? 'chon' : 'thuong';
+      const im = IMG['th_nut_' + st], sc = 0.92, x = 66 + (k % 2) * 262, bottom = 268 + Math.floor(k / 2) * 74;
+      ctx.drawImage(im, x, bottom - im.height * sc, im.width * sc, im.height * sc);
+      const ring = { thuong: [41, 38], chon: [47, 58] }[st], top = bottom - im.height * sc;   // the letter circle in each image
+      if (ring) text('ABCD'[k], x + ring[0] * sc, top + ring[1] * sc, 15, st === 'chon' ? '#7a3a10' : '#2a3a5a', 'center', true);
+      text(ch, x + 80, bottom - 37, ch.length > 14 ? 15 : 17, '#3a2a1a', 'left', true);
+    });
+  } else {
+    title(c.score === QN ? 'XUẤT SẮC!' : c.score >= 3 ? 'GIỎI LẮM!' : 'CỐ LÊN NHÉ!', 320, 112, 34, '#ffe6a8', 4);
+    text(`Đúng ${c.score}/${QN} câu · +${c.score * 15 + (c.score === QN ? 50 : 0)} vàng`, 320, 166, 19, chalk, 'center', true);
+    text('A: học tiếp · B: về', 320, 214, 15, '#d8e8d0', 'center', true);
+  }
+  // the notebook: the subject, and a tick or a cross for each question so far
+  if (c.st !== 'pick') {
+    const ink = '#2a3a6a';
+    text(SUBJECTS[c.subj][0], 236, 418, 15, ink, 'center', true);
+    text(`Câu ${Math.min(QN, (c.qi || 0) + 1)}/${QN}`, 236, 440, 13, ink, 'center', false);
+    for (let k = 0; k < QN; k++) {
+      const r = c.res[k];
+      text(r === undefined ? '·' : r ? '✓' : '✗', 362 + k * 22, 428, 18, r === undefined ? '#8a8a9a' : r ? '#2a8a3a' : '#c8402a', 'center', true);
+    }
+  }
+  // the teacher, small in the bottom right corner (as the mockups); blinks now and then
+  const face = now < (S.schFaceT || 0) ? S.schFace : (Math.floor(now / 2400) % 4 === 0 && now % 2400 < 170 ? 'blink' : 'idle');
+  const tc = IMG[TEACHER[face]], k = 0.9, hop = face === 'yes' || face === 'done' ? -Math.abs(Math.round(4 * Math.sin(now / 90))) : 0;
+  if (tc) ctx.drawImage(tc, 582 - tc.width * k / 2, 470 - tc.height * k + hop, tc.width * k, tc.height * k);
+  if (face === 'think') text('?', 548, 470 - 150 * k - 4 + Math.round(2 * Math.sin(now / 150)), 22, '#7a5ac8', 'center', true, 3);
+  drawTop('Trường học');
+  ctx.fillStyle = 'rgba(12,7,5,0.6)'; ctx.fillRect(0, 456, 640, 24);
+  text(c.st === 'pick' ? '◀ ▶: chọn môn · A: vào học · B: về' : c.st === 'done' ? 'A: học tiếp · B: về' : 'Mũi tên: chọn đáp án · A: trả lời · B: về',
+       300, 468, 12, '#f0e4ce', 'center', false, 2);
+}
+
+// ---------- Túi đồ: everything the pet owns, by kind (assets/r36s/ui/tui-do, ui/man-hinh-mau/tui-do.png) ----------
+// 7 round tabs, a 6x4 grid of shop slots at (40,128) step 64, the details at (440,128)-(604,384) with Dùng / Thích / Vứt
+const TUI_TABS = [['tat-ca', 'Tất cả'], ['nong-san', 'Nông sản'], ['ca', 'Cá'], ['hat', 'Hạt giống'], ['do-cau', 'Đồ câu'],
+                  ['mon-an', 'Món ăn'], ['ngoc', 'Ngọc']];
+const TUI_CAP = 48;
+function tuiKind(b) {
+  if (b.file.startsWith('cay_')) return 'nong-san';
+  if (b.file.startsWith('CA_')) return 'ca';
+  return b.use ? 'do-dung' : 'mon-an';
+}
+function tuiAll() {                            // every slot of the bag, in the order of the tabs
+  const out = [], g = gear(), fav = S.fav || {};
+  S.items.forEach((b, i) => {
+    if (!S.bag[i]) return;
+    const kind = tuiKind(b), crop = kind === 'nong-san' && SEEDS.find(x => b.file === `cay_${x.he}-${x.k}_5-nong-san`);
+    const desc = kind === 'nong-san' ? `Dùng nấu món tăng ${BUFF[crop ? crop.he : 'tho']}` : kind === 'ca' ? `Bán ${fishPrice(+b.file.slice(-1))} xu · dùng nấu món`
+               : b.use ? b.info : b.effect;
+    out.push({ key: 'it:' + b.file, kind, img: IMG['food_' + b.file], name: b.name, he: b.he, n: S.bag[i], desc, item: i });
+  });
+  SEEDS.forEach((sd, j) => { const n = seedsOf(sd); if (n) out.push({ key: 'hat:' + seedKey(sd), kind: 'hat', img: IMG[`sn_hat_${sd.he}-${sd.k}`],
+    name: 'Hạt ' + sd.n.toLowerCase(), he: HE_NAME[sd.he], n, desc: `Gieo ${sd.days} ngày là thu · bán ${sd.sell} xu`, seed: j }); });
+  TACKLE.forEach(t => {
+    const n = t.rod ? (t.rod === g.rod ? 1 : 0) : t.bait ? g.bait[t.k] || 0 : g.own[t.k] ? 1 : 0;
+    if (n) out.push({ key: 'dc:' + t.k, kind: 'do-cau', img: IMG['sn_' + t.k], name: t.n, he: null, n, desc: t.d, tackle: t });
+  });
+  for (const [k, n] of Object.entries(S.gemBag)) if (n > 0) {
+    const [he, gr] = k.split('_');
+    out.push({ key: 'ng:' + k, kind: 'ngoc', img: IMG[`gemb_${he}_${gr}`], name: `${DATA.gems.grades[gr - 1][0]} ${DATA.gems.names[he]}`,
+               he: DATA.gems.names[he], n, desc: 'Gắn vào ô ngọc ở mục Thuộc tính', gem: k });
+  }
+  const order = ['nong-san', 'ca', 'mon-an', 'hat', 'do-cau', 'ngoc', 'do-dung'];
+  out.sort((a, b) => (fav[b.key] ? 1 : 0) - (fav[a.key] ? 1 : 0) || order.indexOf(a.kind) - order.indexOf(b.kind)
+                    || (S.tb && S.tb.sort ? b.n - a.n : 0));
+  return out;
+}
+const tuiRows = () => { const k = TUI_TABS[S.tb.tab][0]; return tuiAll().filter(r => k === 'tat-ca' || r.kind === k); };
+function openTui(back) { S.mode = 'tui'; S.tb = { tab: 0, i: 0, focus: 0, btn: 0, back, sort: false }; }
+function tuiInput(btn) {
+  const tb = S.tb, rows = tuiRows(), n = rows.length;
+  if (tb.focus) {                              // the Dùng / Thích / Vứt buttons
+    if (btn === 'LEFT') tb.btn = (tb.btn + 2) % 3; if (btn === 'RIGHT') tb.btn = (tb.btn + 1) % 3;
+    if (btn === 'B') tb.focus = 0;
+    if (btn === 'A' && rows[tb.i]) tuiDo(rows[tb.i], tb.btn);
+    return;
+  }
+  if (btn === 'L1' || btn === 'R1') { tb.tab = (tb.tab + (btn === 'R1' ? 1 : TUI_TABS.length - 1)) % TUI_TABS.length; tb.i = 0; return; }
+  if (btn === 'Y') { tb.sort = !tb.sort; return toast(tb.sort ? 'Xếp theo số lượng' : 'Xếp theo loại'); }
+  if (btn === 'B') return fadeTo(() => { if (tb.back === 'act') S.mode = 'act'; else comeHome(); });
+  if (!n) return;
+  if (btn === 'LEFT') tb.i = (tb.i + n - 1) % n; if (btn === 'RIGHT') tb.i = (tb.i + 1) % n;
+  if (btn === 'UP') tb.i = Math.max(0, tb.i - 6); if (btn === 'DOWN') tb.i = Math.min(n - 1, tb.i + 6);
+  if (btn === 'A') { tb.focus = 1; tb.btn = 0; }
+}
+function tuiDo(r, which) {
+  const g = gear();
+  if (which === 1) { const f = S.fav || (S.fav = {}); f[r.key] = !f[r.key]; S.tb.focus = 0; S.tb.i = 0;
+                     return toast(f[r.key] ? `Đã thích ${r.name} · xếp lên đầu` : `Bỏ thích ${r.name}`); }
+  if (which === 2) {                           // throw one away
+    if (r.tackle && !r.tackle.bait) return toast('Đồ câu không vứt được');
+    if (r.item !== undefined) { if (!--S.bag[r.item]) { S.items.splice(r.item, 1); S.bag.splice(r.item, 1); } }
+    else if (r.seed !== undefined) S.seeds[seedKey(SEEDS[r.seed])]--;
+    else if (r.tackle) g.bait[r.tackle.k]--;
+    else if (r.gem) S.gemBag[r.gem]--;
+    if (r.n <= 1) S.tb.focus = 0;
+    S.tb.i = Math.max(0, Math.min(S.tb.i, tuiRows().length - 1));
+    return toast(`Đã vứt 1 ${r.name}`);
+  }
+  // Dùng: each kind goes where it is used
+  if (r.item !== undefined) {
+    const it = S.items[r.item];
+    return fadeTo(() => { comeHome(); openBag(it.use ? 'care' : 'food'); const k = S.view.indexOf(r.item); if (k >= 0) S.pick = k; });
+  }
+  if (r.seed !== undefined) return fadeTo(() => { S.mode = 'farm'; S.farmSel = Math.max(0, plotAt(4, 1)); S.seed = r.seed; S.fx = null; toast(`Chọn ô đất trống để gieo ${SEEDS[r.seed].n}`); });
+  if (r.tackle) return fadeTo(() => { S.mode = 'fish'; S.fish = { st: 'ready', t: performance.now() }; });
+  if (r.gem) return toast('Gắn ngọc ở mục Thuộc tính (thông tin pet)');
+}
+function drawTui(now) {
+  const tb = S.tb, rows = tuiRows(), all = tuiAll().length;
+  // the scene behind, dimmed, and the big cream panel
+  // the game's night menu backdrop (as the market) and a dark wooden panel
+  ctx.fillStyle = '#180e0a'; ctx.fillRect(0, 0, 640, 480);
+  ctx.drawImage(IMG['nen-menu_troi-dem'] || IMG.shop_bg, 0, 40);
+  drawTop('');
+  fit(IMG.td_tui, 30, 19, 30, 28); text('Túi đồ', 52, 19, 18, '#ffd67a', 'left', true);
+  text(`${all}/${TUI_CAP}`, 432, 19, 13, '#f0e4ce', 'right', true);
+  ctx.fillStyle = 'rgba(24,14,10,0.6)';                     // the backdrop has its own gold frame
+  ctx.beginPath(); ctx.roundRect(22, 54, 596, 388, 10); ctx.fill();
+  // the tabs; the chosen one sits on the peach ring
+  TUI_TABS.forEach(([k], t) => {
+    const cx = 49 + t * 46, cy = 80;
+    if (t === tb.tab) ctx.drawImage(IMG.td_tab_chon, 8, 0, 42, 40, cx - 21, cy - 20, 42, 40);   // the ring only: its left 8 px are motion marks
+    const im = IMG['td_tab_' + k]; ctx.drawImage(im, cx - im.width / 2, cy - im.height / 2);
+  });
+  text(TUI_TABS[tb.tab][1], 380, 80, 14, '#ffd67a', 'left', true);
+  const sp = IMG['td_sap-xep']; ctx.drawImage(sp, 594 - sp.width / 2, 80 - sp.height / 2);
+  // the grid: 20 open slots a page and the last row's end locked, like the mockup
+  const top = Math.max(0, Math.floor(tb.i / 6) - 3) * 6, open = Math.max(20, Math.ceil(rows.length / 6) * 6);
+  for (let j = 0; j < 24; j++) {
+    const i = top + j, x = 40 + (j % 6) * 64, y = 128 + Math.floor(j / 6) * 64, r = rows[i];
+    if (i >= open) { ctx.drawImage(IMG['shelf_o_hang-khoa'], x, y, 58, 58); continue; }
+    ctx.drawImage(IMG[r && i === tb.i ? 'shelf_o_hang-chon' : 'shelf_o_hang'], x, y, 58, 58);
+    if (!r) continue;
+    if (r.img) fit(r.img, x + 29, y + 27, 42, 40);
+    const sl = IMG['td_so-luong']; ctx.drawImage(sl, x + 58 - sl.width, y + 58 - sl.height);
+    text(String(r.n), x + 50, y + 50, 11, '#2a4a6a', 'center', true);
+    if ((S.newItems || {})[r.key]) ctx.drawImage(IMG.td_moi, x + 44, y - 6);
+    if ((S.fav || {})[r.key]) fit(IMG['td_yeu-thich'], x + 10, y + 10, 16, 16);
+  }
+  if (!rows.length) text('Chưa có gì ở mục này', 522, 256, 13, '#b8a080', 'center', true);
+  // the details
+  ctx.fillStyle = 'rgba(52,34,24,0.9)'; ctx.strokeStyle = '#8a6a4a'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.roundRect(440, 128, 164, 256, 12); ctx.fill(); ctx.stroke();
+  const r = rows[tb.i];
+  if (r) {
+    if (S.newItems) delete S.newItems[r.key];
+    if (r.img) fit(r.img, 522, 186, 100, 80);
+    text(r.name, 522, 246, 17, '#ffd67a', 'center', true);
+    text((r.he ? `Hệ ${r.he} · ` : '') + `x${r.n}`, 522, 266, 12, '#b8a080', 'center', true);
+    ctx.font = '12px Tahoma, sans-serif'; const words = String(r.desc || '').split(' '), lines = [''];
+    for (const w of words) { const t = (lines[lines.length - 1] + ' ' + w).trim(); if (ctx.measureText(t).width > 148) lines.push(w); else lines[lines.length - 1] = t; }
+    lines.slice(0, 3).forEach((l, j) => text(l, 522, 292 + j * 16, 12, '#f0e4ce', 'center', false));
+    [['td_dung', 'Dùng'], ['td_yeu-thich', 'Thích'], ['td_vut', 'Vứt']].forEach(([ic, nm], j) => {
+      const cx = 474 + j * 48, cy = 348, on = tb.focus && tb.btn === j;
+      if (on) { ctx.fillStyle = '#ffe2c8'; ctx.strokeStyle = '#e8a070'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(cx, cy, 17, 0, Math.PI * 2); ctx.fill(); ctx.stroke(); }
+      const im = IMG[ic]; ctx.drawImage(im, cx - im.width / 2, cy - im.height / 2);
+      text(nm, cx, cy + 26, 12, on ? '#ffb07a' : '#f0e4ce', 'center', true);
+    });
+  }
+  text(tb.focus ? '◀ ▶: chọn nút · A: làm · B: thôi' : 'L1/R1: đổi mục · A: chọn · Y: sắp xếp · B: đóng', 34, 430, 12, '#b8a080', 'left', true);
+}
+
+// ---------- quầy nông sản: buy seeds, sell crops (assets/r36s/shop-nong-san, ui/man-hinh-mau/shop-nong-san.png) ----------
+// the keeper's face follows what happens: hello on arrival, thinking while you browse, hands over seeds, takes the coins
+const KEEPER = { idle: 'sn_chu_1-cuoi', blink: 'sn_chu_2-chop-mat', hi: 'sn_chu_3-chao', big: 'sn_chu_4-cuoi-lon',
+                 think: 'sn_chu_5-suy-nghi', give: 'sn_chu_6-dua-hat', coin: 'sn_chu_7-nhan-xu', thanks: 'sn_chu_8-cam-on' };
+function keeper(face, ms = 1200, say) { S.ss.face = face; S.ss.faceT = performance.now() + ms; if (say) S.ss.say = say; }
+const SHOP_TABS = ['Hạt', 'Đồ câu', 'Bán'], SHOP_SAY = ['Mua hạt gì nè?', 'Có cần mới về đó nha!', 'Có gì bán cho tôi không?'];
+function openSeedShop(tab = 0, back = 'farm') {
+  fadeTo(() => { S.mode = 'seedShop'; S.ss = { tab, back, i: tab ? 0 : S.seed || 0, say: 'Chào bạn! ' + SHOP_SAY[tab] }; keeper('hi', 1500); });
+}
+function sellRows() { return S.items.map((b, i) => ({ b, i })).filter(x => /^(cay_|CA_)/.test(x.b.file) && S.bag[x.i] > 0); }
+function sellPrice(b) {
+  if (b.file.startsWith('CA_')) return fishPrice(+b.file.slice(-1));
+  const sd = SEEDS.find(x => b.file === `cay_${x.he}-${x.k}_5-nong-san`); return sd ? sd.sell : 20;
+}
+const tackleOwned = t => t.rod ? gear().rod >= t.rod : t.gear ? !!gear().own[t.k] : false;
+function seedShopInput(btn) {
+  const ss = S.ss, n = [SEEDS.length, TACKLE.length, sellRows().length][ss.tab];
+  if (btn === 'L1' || btn === 'R1') { ss.tab = (ss.tab + (btn === 'R1' ? 1 : 2)) % 3; ss.i = 0; keeper('think', 900, SHOP_SAY[ss.tab]); return; }
+  if (btn === 'B') return fadeTo(() => { S.mode = ss.back || 'farm'; });
+  if (!n) return;
+  if (btn === 'LEFT') ss.i = (ss.i + n - 1) % n;
+  if (btn === 'RIGHT') ss.i = (ss.i + 1) % n;
+  if (btn === 'UP') ss.i = Math.max(0, ss.i - 3);
+  if (btn === 'DOWN') ss.i = Math.min(n - 1, ss.i + 3);
+  if (['LEFT', 'RIGHT', 'UP', 'DOWN'].includes(btn)) keeper('think', 600);
+  if (btn !== 'A') return;
+  if (ss.tab === 1) {
+    const t = TACKLE[ss.i], g = gear();
+    if (t.rod && g.rod >= t.rod) return keeper('think', 1000, t.rod === g.rod ? 'Bạn đang dùng cần này rồi!' : 'Cần của bạn tốt hơn rồi mà!');
+    if (t.gear && g.own[t.k]) return keeper('think', 1000, 'Bạn có cái này rồi nha!');
+    if (S.coins < t.price) return keeper('think', 1200, 'Chưa đủ xu rồi bạn ơi!');
+    S.coins -= t.price;
+    if (t.rod) g.rod = t.rod; else if (t.bait) g.bait[t.k] = (g.bait[t.k] || 0) + 1; else g.own[t.k] = true;
+    keeper('give', 900, t.bait ? `${t.n} đây! Mỗi lần thả câu dùng 1` : `${t.n} của bạn đây!`); setTimeout(() => S.ss && keeper('thanks', 900), 900);
+  } else if (!ss.tab) {
+    const sd = SEEDS[ss.i];
+    if (S.coins < sd.price) return keeper('think', 1200, 'Chưa đủ xu rồi bạn ơi!');
+    S.coins -= sd.price; seedsOf(sd); S.seeds[seedKey(sd)]++; S.seed = ss.i;
+    keeper('give', 900, `Hạt ${sd.n} đây! Gieo ${sd.days} ngày là thu nhé`); setTimeout(() => S.ss && keeper('thanks', 900), 900);
+  } else {
+    const { b, i } = sellRows()[ss.i], price = sellPrice(b);
+    S.bag[i]--; S.coins += price;
+    if (!S.bag[i]) { S.items.splice(i, 1); S.bag.splice(i, 1); }
+    ss.i = Math.max(0, Math.min(ss.i, sellRows().length - 1));
+    keeper(price >= 40 ? 'big' : 'coin', 900, `${b.name} ngon quá! +${price} xu`); setTimeout(() => S.ss && keeper('thanks', 900), 900);
+  }
+}
+function drawSeedShop(now) {
+  const ss = S.ss;
+  ctx.drawImage(IMG.sn_nen, 0, 0);
+  // the keeper behind the counter; blinks now and then when nothing happens
+  const face = now < ss.faceT ? ss.face : (Math.floor(now / 2600) % 5 === 0 && now % 2600 < 160 ? 'blink' : 'idle');
+  const kp = IMG[KEEPER[face]]; if (kp) ctx.drawImage(kp, 150 - kp.width / 2, 268 - kp.height);
+  ctx.drawImage(IMG.sn_nen, 40, 262, 260, 68, 40, 262, 260, 68);     // the counter front hides the keeper's feet
+  // speech bubble
+  ctx.font = 'bold 14px Tahoma, sans-serif'; const bw = ctx.measureText(ss.say).width + 28;
+  ctx.fillStyle = '#fffaf0'; ctx.strokeStyle = '#3a2a1a'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.roundRect(54, 44, bw, 34, 10); ctx.fill(); ctx.stroke();
+  text(ss.say, 54 + bw / 2, 61, 14, '#3a2a1a', 'center', true);
+  // the panel on the right, the Mua / Bán tabs on top of it
+  ctx.fillStyle = '#e6d9bf'; ctx.strokeStyle = '#5f8fb0'; ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.roundRect(352, 42, 276, 410, 14); ctx.fill(); ctx.stroke();
+  // three tabs 78x32, 84 apart, on top of the panel (ui/man-hinh-mau/shop_do-cau.png)
+  SHOP_TABS.forEach((nm, t) => {
+    const x = 367 + t * 84, on = t === ss.tab;
+    ctx.fillStyle = on ? '#ffe2c8' : '#efe4cc'; ctx.strokeStyle = on ? '#e8a070' : '#7fb0d0'; ctx.lineWidth = on ? 3 : 2;
+    ctx.beginPath(); ctx.roundRect(x, on ? 20 : 24, 78, 32, 9); ctx.fill(); ctx.stroke();
+    text(nm, x + 39, on ? 37 : 41, 15, on ? '#8a4a20' : '#4a6a8a', 'center', true);
+  });
+  const rows = [SEEDS, TACKLE, sellRows()][ss.tab], top = Math.max(0, Math.floor(ss.i / 3) - 2) * 3;
+  rows.slice(top, top + 9).forEach((r, j) => {
+    const i = top + j, x = 372 + (j % 3) * 82, y = 64 + Math.floor(j / 3) * 96, on = i === ss.i;
+    ctx.drawImage(IMG[on ? 'sn_o-hang_chon' : 'sn_o-hang'], x, y);
+    const icon = ss.tab === 2 ? IMG['food_' + r.b.file] : ss.tab ? IMG['sn_' + r.k] : IMG[`sn_hat_${r.he}-${r.k}`];
+    if (icon) fit(icon, x + 29, y + 27, 40, 40);
+    ctx.drawImage(IMG['sn_the-gia'], x - 8, y + 56);
+    ctx.drawImage(IMG.sn_xu, x - 2, y + 61);
+    text(String(ss.tab === 2 ? sellPrice(r.b) : r.price), x + 50, y + 73, 14, '#3a2a1a', 'center', true);
+    if (ss.tab === 2) text('×' + S.bag[r.i], x + 54, y + 10, 12, '#3a2a1a', 'right', true);
+    else if (ss.tab === 1) {
+      if (tackleOwned(r)) text(r.rod === gear().rod ? 'đang dùng' : 'đã có', x + 29, y + 50, 11, '#2a6a2a', 'center', true);
+      else if (r.bait && gear().bait[r.k]) text('×' + gear().bait[r.k], x + 54, y + 10, 12, '#2a6a2a', 'right', true);
+    }
+    else if (seedsOf(r)) text('×' + seedsOf(r), x + 54, y + 10, 12, '#2a6a2a', 'right', true);
+  });
+  if (!rows.length) text('Chưa có nông sản hay cá để bán', 490, 200, 14, '#8a7a6a', 'center', true);
+  // what the chosen thing is, and the coins
+  ctx.strokeStyle = '#d8c8a8'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(366, 384); ctx.lineTo(614, 384); ctx.stroke();
+  const cur = rows[ss.i];
+  if (cur) {
+    if (ss.tab === 2) { text(cur.b.name, 370, 404, 16, '#3a2a1a', 'left', true); text(cur.b.effect, 370, 426, 12, '#7a6a5a', 'left', false); }
+    else if (ss.tab) { text(cur.n, 370, 404, 16, '#3a2a1a', 'left', true); text(cur.d, 370, 426, 12, '#7a6a5a', 'left', false); }
+    else { text('Hạt ' + cur.n.toLowerCase(), 370, 404, 16, '#3a2a1a', 'left', true);
+           text(`Hệ ${HE_NAME[cur.he]} · ${cur.days} ngày · bán ${cur.sell}`, 370, 426, 12, '#7a6a5a', 'left', false); }
+  }
+  const cs = S.coins.toLocaleString('en-US'); ctx.font = 'bold 15px Tahoma, sans-serif';
+  ctx.drawImage(IMG.sn_xu, 614 - ctx.measureText(cs).width - 30, 394); text(cs, 618, 405, 15, '#3a2a1a', 'right', true);
+  ctx.fillStyle = 'rgba(12,7,5,0.6)'; ctx.fillRect(0, 456, 640, 24);
+  text('Mũi tên: chọn · A: ' + (ss.tab === 2 ? 'bán' : 'mua') + ' · L1/R1: đổi tab · B: ' + ({ fish: 'về hồ câu', farm: 'về ruộng' }[ss.back] || 'quay lại'), 320, 468, 12, '#f0e4ce', 'center', false, 2);
+}
+
+// ---------- title screen ----------
+// welcome screen B: name plate x 131-508 y 49-130, buttons x 244-395 at y 368-391 (orange) and 410-432 (green)
+const TITLE_PET = [196, 150];      // where the cut-out upper body sits (TITLE_PET in build_evo_app.py)
+function drawTitleB(now) {
+  ctx.drawImage(IMG.title_b, 0, 0);
+  // the tiger breathes: its upper body rises up to 2 px and settles (only up, so the painted one stays covered)
+  const p = IMG.title_pet, lift = Math.round(1 + Math.sin(now / 420) * 1.2), [px, py] = TITLE_PET;
+  if (p && lift > 0) {
+    ctx.drawImage(p, 0, 0, p.width, p.height - 6, px, py - lift, p.width, p.height - 6);
+    ctx.drawImage(p, 0, p.height - 6, p.width, 6, px, py + p.height - 6 - lift, p.width, 6 + lift);   // stretch the belt rows
+  }
+  // the tail flame flickers and throws sparks; little hearts rise over the egg
+  for (let j = 0; j < 5; j++) {
+    const ph = (now / 700 + j / 5) % 1, im = IMG.hat_lua;
+    ctx.globalAlpha = 1 - ph;
+    ctx.drawImage(im, 220 + 8 * Math.sin(now / 160 + j * 2) - 6, 214 - ph * 46, 12, 12 * im.height / im.width);
+  }
+  for (let j = 0; j < 2; j++) {
+    const ph = (now / 1800 + j / 2) % 1, im = IMG[j ? 'tim_nho' : 'tim_vua'];
+    ctx.globalAlpha = Math.min(1, (1 - ph) * 2);
+    ctx.drawImage(im, 384 + j * 22 + 6 * Math.sin(now / 300 + j), 262 - ph * 70);
+  }
+  ctx.globalAlpha = 1;
+  const lg = IMG.logo_elemon;                                // the name plate: x 131-508, y 49-130
+  if (DATA.title_baked) {}                                   // MAN_CHAO_ELEMON has the logo drawn in
+  else if (lg) ctx.drawImage(lg, 320 - lg.width / 2, 90 - lg.height / 2 + Math.round(Math.sin(now / 600)));
+  else text('TINH LINH NGŨ HÀNH', 320, 82, 30, '#c0461c', 'center', true, 0);
+  [['Chơi mới', 379, '#7a3410'], ['Tiếp tục', 421, '#2f6a2a']].forEach(([t, cy, col], i) => {
+    const on = i === S.titleSel;
+    if (on) {
+      ctx.save(); ctx.strokeStyle = `rgba(255,255,255,${0.75 + 0.25 * Math.sin(now / 200)})`; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.roundRect(240, cy - 15, 160, 30, 13); ctx.stroke(); ctx.restore();
+      const c = IMG['con-tro']; ctx.drawImage(c, 214 + Math.round(4 * Math.sin(now / 160)), cy - c.height / 2);
+    }
+    text(t, 320, cy + 1, 16, i === 1 ? '#8aa088' : col, 'center', true);
+  });
+  if (Math.floor(now / 600) % 2) text('▲ ▼ chọn · A: bắt đầu', 320, 466, 12, '#ffffff', 'center', false, 3);
+}
+function drawTitle(now) {
+  if (IMG.title_b) return drawTitleB(now);
+  ctx.drawImage(IMG.title_bg, 0, 0);
+  const lg = IMG.logo, ly = 26 + Math.round(3 * Math.sin(now / 700)), py = ly + lg.height * 0.715;
+  ctx.drawImage(lg, 320 - lg.width / 2, ly);
+  text('TINH LINH NGŨ HÀNH', 320, py - 8, 26, '#ffe6a8', 'center', true, 5);         // on the logo's name plate
+  text('bản chơi thử', 320, py + 20, 13, '#f0d6a8', 'center', false, 3);
+  ['Chơi mới', 'Tiếp tục'].forEach((t, i) => {
+    const on = i === S.titleSel, b = IMG[i === 1 ? 'nut-menu_khoa' : on ? 'nut-menu_chon' : 'nut-menu_thuong'], y = 316 + i * 66;
+    ctx.drawImage(b, 320 - b.width / 2, y);
+    text(t, 320, y + b.height / 2, 17, i === 1 ? '#b8b0a8' : '#fff2d8', 'center', true, 3);
+    const c = IMG['con-tro'];
+    if (on) ctx.drawImage(c, 320 - b.width / 2 - 30 + Math.round(4 * Math.sin(now / 160)), y + b.height / 2 - c.height / 2);
+  });
+  if (Math.floor(now / 600) % 2) text('▲ ▼ chọn · A: bắt đầu', 320, 462, 13, '#f0e4ce', 'center', false, 3);
+}
+
+// ---------- new game: pick an egg (element), then the Lv 1 pet of that element ----------
+const EGG_LINE = { hoa: 'Nóng bỏng, bùng nổ', kim: 'Cứng cáp, sắc bén', moc: 'Hiền hòa, bền bỉ', thuy: 'Linh hoạt, thông minh',
+                   tho: 'Vững chãi, kiên nhẫn' };
+// plain panel and a grid of slots, like the shop (the swirling evolution backdrop was too busy)
+function pickBack() { ctx.fillStyle = '#180e0a'; ctx.fillRect(0, 0, 640, 480); ctx.drawImage(IMG['nen-menu_hoang-hon'] || IMG.shop_bg, 0, 40); }
+function slot(x, y, size, on) {
+  ctx.drawImage(IMG[on ? 'shelf_o_hang-chon' : 'shelf_o_hang'], x, y, size, size);
+  slotBack(x, y, size);
+}
+// the drawn part of a picture (frames carry empty space around the pet), measured once
+const BOX = new Map();
+function inked(im) {
+  if (BOX.has(im)) return BOX.get(im);
+  const c = document.createElement('canvas'); c.width = im.width; c.height = im.height;
+  const g = c.getContext('2d'); g.drawImage(im, 0, 0);
+  const a = g.getImageData(0, 0, c.width, c.height).data;
+  let x0 = c.width, y0 = c.height, x1 = -1, y1 = -1;
+  for (let y = 0; y < c.height; y++) for (let x = 0; x < c.width; x++)
+    if (a[(y * c.width + x) * 4 + 3] > 24) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+  const b = x1 < 0 ? [0, 0, im.width, im.height] : [x0, y0, x1 - x0 + 1, y1 - y0 + 1];
+  BOX.set(im, b); return b;
+}
+// a picture fitted into a slot: its drawn part scaled into maxW x maxH and centred on (cx, cy)
+function fit(im, cx, cy, maxW, maxH, dy = 0) {
+  const [bx, by, bw, bh] = inked(im), k = Math.min(maxW / bw, maxH / bh), w = bw * k, h = bh * k;
+  ctx.drawImage(im, bx, by, bw, bh, Math.round(cx - w / 2), Math.round(cy - h / 2 + dy), Math.round(w), Math.round(h));
+}
+function drawPickEgg(now) {
+  pickBack();
+  drawTop('Chọn trứng');
+  ELS.forEach((he, i) => {
+    const on = i === S.pickEl, x = 22 + i * 122, y = 92, size = 110;
+    slot(x, y, size, on);
+    fit(IMG[`no_${he}_1`], x + size / 2, y + size / 2, 72, 72, on ? -Math.round(3 * Math.abs(Math.sin(now / 220))) : 0);
+    text('Trứng ' + HE_NAME[he], x + size / 2, y + size + 18, 15, on ? '#ffe6a8' : '#b8a080', 'center', true, 3);
+  });
+  const he = ELS[S.pickEl], n = DATA.creatures.filter(c => c.element === he).length;
+  ctx.drawImage(IMG.shop_desc, 138, 300);
+  text('Trứng ' + HE_NAME[he], 160, 324, 17, '#ffd67a');
+  text(EGG_LINE[he], 160, 350, 14, '#f0e4ce', 'left', false);
+  text(`Có ${n} bé hệ ${HE_NAME[he]} · chọn bé ở bước sau`, 160, 372, 13, '#b8a080', 'left', false);
+  text('◀ ▶ chọn trứng · A: chọn · B: quay lại', 320, 440, 13, '#f0e4ce', 'center', true, 3);
+}
+// the pets of one element, facing us when they have front frames (only a few frames each are loaded here)
+const PICK_FRAMES = ['idle-0', 'front-idle', 'front-blink', 'front-happy', 'front-wave'];
+async function openPickPet(he) {
+  S.mode = 'pickPet'; S.pickPet = 0; S.pickReady = false;
+  S.pickList = DATA.creatures.filter(c => c.element === he).map(c => ({ ...c }));
+  const list = S.pickList;
+  await Promise.all(list.map(async c => {
+    c.j = await petData(c.id);
+    const b = c.j.stages.baby;
+    await Promise.all(PICK_FRAMES.filter(f => b.meta.frames.includes(f)).map(f => load(`pv/${c.id}/${f}`, `../pets/${b.dir}/${f}.png`)));
+  }));
+  if (S.pickList === list) S.pickReady = true;
+}
+function pickMove(fr) {
+  if (!fr.includes('front-idle')) return BOUNCE;
+  const k = [{ f: 'front-idle', ms: 500, br: -1 }, { f: 'front-idle', ms: 400, y: -1 }, { f: 'front-idle', ms: 300, y: 0 }];
+  if (fr.includes('front-blink')) k.push({ f: 'front-blink', ms: 130 }, { f: 'front-idle', ms: 500 });
+  if (fr.includes('front-happy')) k.push({ f: 'front-happy', ms: 160, br: -1 }, { f: 'front-happy', ms: 220, y: -6 }, { f: 'front-happy', ms: 420, y: 0 });
+  if (fr.includes('front-wave')) k.push({ f: 'front-wave', ms: 250, br: 1 }, { f: 'front-idle', ms: 200 }, { f: 'front-wave', ms: 250, br: 1 }, { f: 'front-idle', ms: 400 });
+  return { loop: true, keys: k };
+}
+function drawPickPet(now) {
+  pickBack();
+  const he = ELS[S.pickEl];
+  drawTop(`Chọn bé hệ ${HE_NAME[he]}`);
+  if (!S.pickReady) { text('Đang gọi các bé…', 320, 240, 18, '#ffe6a8', 'center', true, 4); return; }
+  const list = S.pickList, size = 104;
+  list.forEach((c, i) => {                                   // 4 slots a row
+    const b = c.j.stages.baby, on = i === S.pickPet, x = 46 + (i % 4) * 140, y = 60 + Math.floor(i / 4) * 140;
+    slot(x, y, size, on);
+    const s = on ? sample(pickMove(b.meta.frames), now) : { f: b.meta.frames.includes('front-idle') ? 'front-idle' : 'idle-0', y: 0 };
+    const im = IMG[`pv/${c.id}/${s.f}`] || IMG[`pv/${c.id}/idle-0`];
+    // all pets the same size in their slot, centred; the idle frame sets the scale so moves do not resize it
+    const base = IMG[`pv/${c.id}/${b.meta.frames.includes('front-idle') ? 'front-idle' : 'idle-0'}`] || im;
+    if (im && base) {
+      const [, , bw, bh] = inked(base), k = Math.min(70 / bw, 70 / bh), [ix, iy, iw, ih] = inked(im);
+      const w = iw * k, h = ih * k;
+      ctx.drawImage(im, ix, iy, iw, ih, Math.round(x + size / 2 - w / 2), Math.round(y + size / 2 + bh * k / 2 - h + (s.y || 0) * 0.8), Math.round(w), Math.round(h));
+    }
+    text(c.name, x + size / 2, y + size + 14, on ? 14 : 12, on ? '#ffe6a8' : '#b8a080', 'center', true, 3);
+  });
+  const c = list[S.pickPet];
+  ctx.drawImage(IMG.shop_desc, 138, 332);
+  text(c.name, 160, 354, 17, '#ffd67a');
+  text(`${c.j.stages.baby.name} · Lv 1 · hệ ${HE_NAME[he]}`, 160, 378, 14, '#f0e4ce', 'left', false);
+  text('Lên Nhi trở đi tùy cách nuôi (sẽ làm sau)', 160, 400, 13, '#b8a080', 'left', false);
+  text('◀ ▶ ▲ ▼ chọn bé · A: lấy trứng này · B: chọn trứng khác', 320, 452, 13, '#f0e4ce', 'center', true, 3);
+}
+
+// ---------- the egg: keep it warm (A) until it hatches ----------
+function drawEgg(now) {
+  ctx.drawImage(IMG.room, 0, 0);
+  ctx.fillStyle = 'rgba(0,0,0,0.35)'; ctx.fillRect(0, 0, 640, 480);
+  const e = S.egg, CX = 320, he = DATA.pet.element, K = 1.4;     // hatch frames are 120 px; drawn a bit bigger
+  if (!e.hatchT && e.taps >= 5 && PET_READY) e.hatchT = now;     // the pet's pictures may still be on their way
+  const F = n => IMG[`no_${he}_${n}`] || IMG['trung_0'];
+  const put = (im, ang = 0, a = 1) => {                          // frames sit on the floor by their bottom
+    const w = im.width * K, h = im.height * K;
+    ctx.save(); ctx.globalAlpha = a; ctx.translate(CX, FEET_Y + 14); ctx.rotate(ang);
+    ctx.drawImage(im, -w / 2, -h, w, h); ctx.restore();
+  };
+  if (!e.hatchT) {
+    // glowing egg, then cracking (2 taps), then cracked (4 taps); it rocks harder after each tap
+    const im = F(e.taps >= 4 ? 3 : e.taps >= 2 ? 2 : 1);
+    const shake = now - e.tapT < 400 ? 1 : 0.25, ang = Math.sin(now / 70) * 0.06 * shake * (1 + e.taps * 0.4);
+    put(im, ang);
+    text(`Một quả trứng ${HE_NAME[he]} đang ấm dần…`, CX, 92, 18, '#ffe6a8', 'center', true, 4);
+    text(`Bấm A để ủ trứng  (${e.taps}/5)`, CX, 420, 16, '#f0e4ce', 'center', true, 3);
+    return;
+  }
+  // burst, shards, two halves, bits; the light ring under the pet as it appears
+  const h = now - e.hatchT, k = Math.floor(h / 150);
+  // as in ui/man-hinh-mau/chao-doi_v2.png: the pet cheers among the shell halves, sparks around it
+  const fr = DATA.stages.baby.meta.frames, cheer = fr.includes('front-happy') ? { loop: true, keys: [
+    { f: 'front-happy', ms: 180, br: -1 }, { f: 'front-happy', ms: 220, y: -6 }, { f: 'front-happy', ms: 260, y: 0 },
+    { f: fr.includes('front-wave') ? 'front-wave' : 'front-happy', ms: 400 }] } : BOUNCE;
+  // back to front: the light ring, the two shell halves (behind the pet), the pet, the burst while it is on
+  if (h > 450 && h < 1300) put(F(8), 0, Math.max(0, 1 - (h - 450) / 850));
+  if (k >= 2) {                                               // the halves sit apart, either side of the pet
+    const sh = F(6), w = sh.width * 1.25, hh = sh.height * 1.25;
+    ctx.drawImage(sh, CX - w / 2, FEET_Y + 14 - hh, w, hh);
+  }
+  if (h > 450) drawPet('baby', sample(h > 1100 ? cheer : BOUNCE, now), CX, FEET_Y, Math.max(0, 1 - (h - 450) / 500), h < 1100 ? 0.8 : 0);
+  if (k < 2) put(F(4 + k));
+  const spark = { hoa: 'hat_lua', kim: 'hat_kim', moc: 'hat_la', thuy: 'hat_nuoc', tho: 'hat_dat' }[he];
+  if (h > 1100) for (let j = 0; j < 6; j++) {                // sparkles and bits of the pet's element around it
+    const a = j * 1.05 + now / 900, r = 96 + 10 * Math.sin(now / 300 + j);
+    ctx.globalAlpha = 0.6 + 0.4 * Math.sin(now / 200 + j);
+    ctx.drawImage(IMG[j % 2 ? 'lap-lanh' : spark], CX + Math.cos(a) * r - 10, FEET_Y - 60 + Math.sin(a) * r * 0.55 - 10, 20, 20);
+  }
+  ctx.globalAlpha = 1;
+  if (h > 300 && h < 800) { ctx.fillStyle = `rgba(255,255,240,${0.6 * (1 - Math.abs(h - 450) / 350)})`; ctx.fillRect(0, 0, 640, 480); }
+  if (h > 1000) {
+    // the wooden board drops in on its ropes and swings a little (as in ui/man-hinh-mau/chao-doi_khung-go.png)
+    const b = IMG.bang_go || IMG['bang-ron'], drop = ease((h - 1000) / 700), by = Math.round(-b.height + (b.height + 6) * drop);
+    const sw = Math.sin((h - 1000) / 260) * 0.03 * Math.max(0, 1 - (h - 1000) / 2500);
+    ctx.save(); ctx.translate(CX, 0); ctx.rotate(sw); ctx.drawImage(b, -b.width / 2, by);
+    if (IMG.bang_go) title('CHÚC MỪNG!', 0, by + b.height * 0.72, 32, '#6a3412', 0);
+    else title('CHÚC MỪNG!', 0, by + b.height * 0.58, 32, '#ffecaa', 5);
+    ctx.restore();
+    if (h > 1500) {
+      title(`${DATA.pet.name} đã chào đời!`, CX, 392, 32, '#fff2d8', 5);
+      text(`${DATA.creature_name} · Hệ ${HE_NAME[EL()]}`, CX, 420, 15, '#ffe0b0', 'center', true, 3);
+    }
+    if (h > 1800 && Math.floor(now / 450) % 2) text('A: vào phòng nuôi', CX, 456, 14, '#f0e4ce', 'center', true, 3);
+  }
+}
+
+// ---------- the end of the demo: the legend ----------
+function drawEnd(now) {
+  ctx.drawImage(IMG.nen, 0, 0);
+  ctx.fillStyle = 'rgba(0,0,0,0.3)'; ctx.fillRect(0, 0, 640, 480);
+  const t = now - S.endT, a = DATA.stages.legend.anims, mv = a.victory ? { ...a.victory, loop: true } : idleOf('legend');
+  drawPet('legend', sample(mv, t), 320, 372, 0, 0.5 + 0.3 * Math.sin(now / 300));
+  const b = IMG['bang-ron'], by = Math.round(-130 + 140 * ease(t / 700));
+  ctx.drawImage(b, 320 - b.width / 2, by);
+  title('HOÀN THÀNH DEMO', 320, by + b.height * 0.58, 32, '#ffecaa', 5);
+  if (t > 900) {
+    const secs = Math.round((S.endT - S.playT0) / 1000);
+    text(`${DATA.pet.name} đã thành ${DATA.creature_name} Huyền thoại · Lv ${S.level}`, 320, 404, 17, '#ffecaa', 'center', true, 4);
+    text(`Từ trứng tới Huyền thoại: ${Math.floor(secs / 60)} phút ${secs % 60} giây · ${S.acts} lần chăm sóc`, 320, 428, 13, '#f0d6a8', 'center', false, 3);
+  }
+  if (t > 1500 && Math.floor(now / 450) % 2) text('A: chơi tiếp với Huyền thoại · R: chơi lại từ đầu', 320, 458, 13, '#f0e4ce', 'center', true, 3);
+}
+
+// ---------- evolution ----------
+function inRange(ms, k) { return ms >= EVO[k][0] && ms < EVO[k][1]; }
+function frac(ms, k) { return (ms - EVO[k][0]) / (EVO[k][1] - EVO[k][0]); }
+function drawEvo(now) {
+  const ms = now - S.t0, CX = 320, FY = 330;
+  const bright = ms < EVO.calm[1] ? 0.45 - 0.25 * frac(ms, 'calm') : 0.2;
+  ctx.drawImage(IMG.nen, 0, 0);
+  ctx.fillStyle = `rgba(0,0,0,${bright})`; ctx.fillRect(0, 0, 640, 480);
+  for (const p of parts) {
+    const y = ((p.y - ms * p.v) % 420 + 420) % 420 + 30;
+    ctx.globalAlpha = 0.8; ctx.drawImage(IMG[p.img], p.x, y, 14, 14 * IMG[p.img].height / IMG[p.img].width); ctx.globalAlpha = 1;
+  }
+  const before = S.evoFrom, after = S.evoTo, idle = sample(BOUNCE, now);
+  if (ms < EVO.swirl[0]) drawPet(before, idle, CX, FY);
+  else if (inRange(ms, 'swirl')) {
+    const k = frac(ms, 'swirl'), box = drawPet(before, idle, CX, FY, 0.95 * k, 0.9);
+    const v = IMG[`xoay_${EL()}_${Math.floor(ms / 70) % 4}`], h = 70 + 70 * k, w = v.width * h / v.height * 1.6;
+    ctx.drawImage(v, CX - w / 2, box.y + box.h * 0.55 - h / 2, w, h);
+  } else if (inRange(ms, 'pillar')) {
+    drawPet(before, idle, CX, FY, 1, 1);
+    const c = IMG[Math.floor(ms / 60) % 2 ? 'cot-set' : 'cot-sang'], h = 420, w = c.width * h / c.height;
+    ctx.drawImage(c, CX - w / 2, FY + 30 - h, w, h);
+  } else if (inRange(ms, 'flash')) {
+    const n = IMG['no-sang'], s = 460;
+    ctx.drawImage(n, CX - s / 2, FY - 80 - s / 2, s, s);
+    ctx.fillStyle = `rgba(255,255,245,${0.5 + 0.5 * frac(ms, 'flash')})`; ctx.fillRect(0, 0, 640, 480);
+  } else {
+    const k = inRange(ms, 'reveal') ? 1 - frac(ms, 'reveal') : 0;
+    if (k > 0.4) {
+      const r = IMG['vong-song'], w = 120 + 300 * (1 - k), h = r.height * w / r.width;
+      ctx.drawImage(r, CX - w / 2, FY - 6 - h / 2, w, h);
+    }
+    drawPet(after, idle, CX, FY, 0.9 * k, k > 0 ? 0.8 : 0);
+    if (k > 0) { ctx.fillStyle = `rgba(255,255,245,${0.6 * k})`; ctx.fillRect(0, 0, 640, 480); }
+    if (ms >= EVO.banner[0]) {
+      const b = IMG['bang-ron'], by = Math.round(-130 + 150 * ease((ms - EVO.banner[0]) / T.banner));
+      ctx.drawImage(b, CX - b.width / 2, by);
+      if (ms > EVO.banner[0] + 250) title('TIẾN HÓA!', CX, by + b.height * 0.58, 32, '#ffecaa', 5);
+      if (ms > EVO.banner[0] + 550) {
+        text(`${DATA.creature_name}  →  ${DATA.stages[after].name}`, CX, FY + 40, 18, '#ffecaa', 'center', true, 4);
+        text(`Lv ${LV[after][0]}   ·   ${UNLOCK[after].replace('Hỏa', HE_NAME[EL()])}`, CX, FY + 66, 13, '#ffd28c', 'center', true, 3);
+      }
+      if (ms > EVO.banner[0] + 1100) {
+        S.waitA = true;
+        if (Math.floor(now / 450) % 2) text('A: tiếp tục', CX, 452, 14, '#f0e4ce', 'center', true, 3);
+      }
+    }
+  }
+}
+
+// ---------- input ----------
+function act(anim, extra = {}) { S.act = { anim, ...extra }; S.actT = performance.now(); }
+const has = anim => !!DATA.stages[S.stage].anims[anim];
+// the pet's most hated food (bag text says "món ghét"): it turns it down and keeps it in the bag
+const hated = () => HATED_BY[EL()];
+function comeHome() { S.mode = 'room'; S.walk = null; if (has('greet')) act('greet'); else if (has('wave')) act('wave', { loops: 2 }); }
+function press(btn) {
+  if (S.fade > 0) return;
+  const now = performance.now();
+  if (S.mode === 'title') {
+    if (btn === 'UP' || btn === 'DOWN') S.titleSel ^= 1;
+    if (btn === 'A' || btn === 'START') {
+      if (S.titleSel === 1) toast('Chưa có bản lưu');
+      else fadeTo(() => { S.mode = 'pickEgg'; S.pickEl = 0; });
+    }
+    return;
+  }
+  if (S.mode === 'pickEgg') {
+    if (btn === 'LEFT' || btn === 'UP') S.pickEl = (S.pickEl + 4) % 5;
+    if (btn === 'RIGHT' || btn === 'DOWN') S.pickEl = (S.pickEl + 1) % 5;
+    if (btn === 'B') fadeTo(() => { S.mode = 'title'; });
+    if (btn === 'A') openPickPet(ELS[S.pickEl]);
+    return;
+  }
+  if (S.mode === 'pickPet') {
+    const n = S.pickList.length;
+    if (btn === 'LEFT') S.pickPet = (S.pickPet + n - 1) % n;
+    if (btn === 'RIGHT') S.pickPet = (S.pickPet + 1) % n;
+    if (btn === 'UP' && S.pickPet >= 4) S.pickPet -= 4;
+    if (btn === 'DOWN' && S.pickPet + 4 < n) S.pickPet += 4;
+    if (btn === 'B') S.mode = 'pickEgg';
+    if (btn === 'A' && S.pickReady) {
+      const c = S.pickList[S.pickPet];
+      loadCreature(c.id);
+      fadeTo(() => { S.mode = 'egg'; S.egg = { taps: 0, tapT: 0, hatchT: 0 }; });
+    }
+    return;
+  }
+  if (S.mode === 'egg') {
+    if (btn !== 'A') return;
+    const e = S.egg;
+    if (!e.hatchT) { e.taps = Math.min(5, e.taps + 1); e.tapT = now; if (e.taps >= 5 && PET_READY) e.hatchT = now; }
+    else if (now - e.hatchT > 1800) fadeTo(() => {
+      const t = performance.now();
+      Object.assign(S, { mode: 'room', t0: t, playT0: t, nextPoop: t + 30000, bubble: 'bong_vui', nextWalk: t + 3500,
+                         lk: Object.fromEntries(ELS.map(h => [h, h === EL() ? 12 : 4])) });
+      if (has('greet')) act('greet');
+      toast(`Chào ${DATA.pet.name}! Chăm bé thật tốt nhé`);
+    });
+    return;
+  }
+  if (S.mode === 'bath') return;                             // the bath plays to its end
+  if (S.mode === 'act') return actInput(btn);
+  if (S.mode === 'fish') return fishInput(btn, now);
+  if (S.mode === 'farm') return farmInput(btn, now);
+  if (S.mode === 'seedShop') return seedShopInput(btn);
+  if (S.mode === 'cook') return cookInput(btn, performance.now());
+  if (S.mode === 'tui') return tuiInput(btn);
+  if (S.mode === 'school') return schoolInput(btn, performance.now());
+  if (S.mode === 'end') {
+    if (btn === 'A' && now - S.endT > 1500) fadeTo(() => { S.mode = 'room'; });
+    return;
+  }
+  if (S.mode === 'evo') {
+    if (S.waitA && btn === 'A')
+      fadeTo(() => {
+        const st = S.evoTo;
+        Object.assign(S, { mode: st === 'legend' ? 'end' : 'room', stage: st, level: LV[st][0], xp: 0, bubble: 'bong_tim',
+                           act: null, walk: null, px: 320, endT: performance.now(), faceUs: false, turnT: 0 });
+        if (st === 'teen') S.open[EL()] = true;
+        S.coins += 1000;
+        if (st === 'adult') { S.ngoc++; toast('Nhận 1 Ngọc Hồn (bản demo: thay cho đánh boss) · +1000 vàng'); }
+        else toast('Tiến hóa xong: +1000 vàng');
+      });
+    return;
+  }
+  if (S.mode === 'map') {
+    if (['UP', 'DOWN', 'LEFT', 'RIGHT'].includes(btn)) mapMove(btn);
+    if (btn === 'B') fadeTo(comeHome);
+    if (btn === 'A') {
+      const p = PL[S.mapSel];
+      if (p.kind === 'home') fadeTo(comeHome);
+      else if (p.kind === 'shop') fadeTo(() => { S.mode = 'shop'; S.tab = 0; S.item = 0; });
+      else if (p.kind === 'train') {
+        if (S.stage === 'baby') toast('Tiến hóa lên Nhi để mở Tập luyện');
+        else if (S.sick || S.need.nl < 25) toast(`${DATA.pet.name} ${S.sick ? 'đang ốm' : 'mệt quá'}, về nghỉ đã`);
+        else fadeTo(() => {
+          S.mode = 'room'; S.need.nl = Math.max(0, S.need.nl - 20); S.need.no = Math.max(0, S.need.no - 10);
+          act('train', { loops: 3 }); emote('bc_mo-hoi-nho'); gainExp(55); S.bubble = 'tt_khat'; toast('Tập ở Võ đường xong: EXP +55');
+        });
+      }
+      else if (p.kind === 'school') fadeTo(() => openSchool('map'));
+      else if (p.kind === 'region') toast(S.open[p.key] ? `${p.name}: đã mở (nội dung vùng làm sau)` : `${p.name}: đang khóa`);
+      else toast(`${p.name}: chưa làm`);
+    }
+    return;
+  }
+  if (S.mode === 'shop') {
+    const n = rowsOf(S.tab).length;
+    if (btn === 'LEFT' && S.item % 4) S.item--;
+    if (btn === 'RIGHT' && S.item % 4 < 3 && S.item + 1 < n) S.item++;
+    if (btn === 'UP' && S.item >= 4) S.item -= 4;
+    if (btn === 'DOWN' && S.item + 4 < n) S.item += 4;
+    if (btn === 'L1' || btn === 'R1') { S.tab = (S.tab + (btn === 'R1' ? 1 : SH.tabs.length - 1)) % SH.tabs.length; S.item = 0; }
+    if (btn === 'A') buy();
+    if (btn === 'X') toast('Bán: chưa làm');
+    if (btn === 'B') fadeTo(() => { S.mode = 'map'; });
+    return;
+  }
+  if (S.stats !== null) {                                     // the stats screen
+    if (S.stats === 2 && S.gemMode) return gemInput(btn);
+    if (S.stats === 2 && btn === 'A') { S.gemMode = 'sock'; return; }
+    if (['LEFT', 'UP', 'L1'].includes(btn)) S.stats = (S.stats + 3) % 4;
+    if (['RIGHT', 'DOWN', 'R1'].includes(btn)) S.stats = (S.stats + 1) % 4;
+    if (btn === 'B' || btn === 'SELECT') S.stats = null;
+    if (btn === 'A' && S.stats === 3) toast('Đổi tên: chưa làm');
+    return;
+  }
+  if (S.popupGoal === 1) {                                    // the evolve panel
+    if (btn === 'A') {
+      S.popupGoal = 0;
+      if (!conds().every(c => c[1])) return;
+      S.evoFrom = S.stage; S.evoTo = nextStage(); S.night = S.nightGoal = 0;
+      fadeTo(() => { S.mode = 'evo'; S.t0 = performance.now(); S.waitA = false; });
+    }
+    if (btn === 'B') S.popupGoal = 0;
+    return;
+  }
+  if (S.pickerGoal === 1) {                                   // the bag
+    const n = S.view.length;
+    if (btn === 'LEFT' || btn === 'UP') S.pick = (S.pick + n - 1) % n;
+    if (btn === 'RIGHT' || btn === 'DOWN') S.pick = (S.pick + 1) % n;
+    if (btn === 'B') S.pickerGoal = 0;
+    if (btn === 'A') {
+      const k = S.view[S.pick];
+      if (!S.bag[k]) { toast('Hết món này rồi'); return; }
+      const it = S.items[k], food = it.file;
+      if (it.use) { useItem(k); return; }
+      S.pick = k;                                              // below, S.pick is the item's own index
+      if (food === hated() && has('refuse')) {
+        S.pickerGoal = 0; S.need.vui = Math.max(0, S.need.vui - 10); S.bubble = 'bong_gian'; S.tim = Math.max(0, S.tim - 0.2);
+        act('refuse'); emote('bc_xi-khoi'); toast(`${DATA.pet.name} không chịu ăn ${S.items[S.pick].name}`); return;
+      }
+      S.bag[S.pick]--; S.pickerGoal = 0; S.bubble = food.startsWith(FOOD_PREFIX[EL()]) ? 'bong_tim' : 'bong_vui';
+      if (!S.bag[S.pick]) {                                   // the last one: it leaves the bag
+        S.items.splice(S.pick, 1); S.bag.splice(S.pick, 1); S.pick = Math.min(S.pick, Math.max(0, S.items.length - 1));
+      }
+      S.need.no = Math.min(100, S.need.no + 25); S.tim = Math.min(5, S.tim + 0.1); gainExp(25);
+      const he = HE_KEY[it.he]; if (he) S.lk[he] = Math.min(100, S.lk[he] + 6);       // food feeds its element's Linh khí
+      S.nextPoop = Math.min(S.nextPoop, now + 15000);
+      act('eat', { food, loops: 3 });
+      if (S.mess.length < 4) S.mess.push({ x: S.px + (S.left ? -1 : 1) * 64, y: FEET_Y + 14, img: 'san_vun-do-an' });
+    }
+    return;
+  }
+  if (S.night > 0.5 && btn !== 'A') return;
+  if (btn === 'LEFT' || btn === 'UP') S.cursor = (S.cursor + MENU.length - 1) % MENU.length;
+  if (btn === 'RIGHT' || btn === 'DOWN') S.cursor = (S.cursor + 1) % MENU.length;
+  if (btn === 'START') toast('Trang trí phòng: chưa làm');
+  if (btn === 'SELECT') { S.stats = 0; S.pickerGoal = 0; return; }
+  if (btn === 'L2') {                                        // demo: fast-forward a quarter of the stage
+    if (atCap()) { S.askedKey = null; return; }              // at the cap it opens the evolve panel again
+    if (S.stage === 'legend' && S.level >= LV.legend[1]) return toast('Đã đạt cấp tối đa');
+    gainExp(STAGE_EXP[S.stage] / 4); S.lk[EL()] = Math.min(100, S.lk[EL()] + 8); S.tim = Math.min(5, S.tim + 0.6);
+    toast(`Tua nhanh: Lv ${S.level}`); return;
+  }
+  if (btn === 'Y') {                                         // show off a move, if this stage has any
+    const a = DATA.stages[S.stage].anims, moves = ['punch', 'blast', 'attack', 'victory', 'run'].filter(m => a[m]);
+    if (!moves.length) { toast('Bậc này chưa có chiêu'); return; }
+    S.move = ((S.move || 0) + 1) % moves.length; act(moves[S.move], { loops: moves[S.move] === 'run' ? 3 : 2 }); return;
+  }
+  if (btn === 'X') {
+    S.pokes = (S.pokes || []).filter(t => now - t < 2500).concat(now);
+    if (S.pokes.length >= 4 && has('angry')) {
+      S.pokes = []; S.need.vui = Math.max(0, S.need.vui - 5); S.bubble = 'bong_gian'; act('angry', { loops: 2 }); emote('bc_gian');
+      S.tim = Math.max(0, S.tim - 0.3);
+      toast(`${DATA.pet.name} bực rồi, đừng vuốt nữa!`);
+    } else if (has('petted')) {
+      if (!S.act || S.act.anim !== 'petted') act('petted', { loops: 2 }); else S.actT = now;
+      S.need.vui = Math.min(100, S.need.vui + 3); S.bubble = 'bong_tim'; emote(Math.random() < 0.5 ? 'bc_tim' : 'bc_tim-nho'); S.tim = Math.min(5, S.tim + 0.08); gainExp(4);
+    } else toast('Bậc này chưa có động tác vuốt ve');
+    return;
+  }
+  if (['L1', 'R1', 'F'].includes(btn)) toast(`Nút ${btn}: chưa dùng ở màn này`);
+  if (btn === 'R2') {                                        // play with the pet
+    if (S.sick) { emote('bc_choang'); return toast(`${DATA.pet.name} đang ốm, không chơi được`); }
+    if (S.need.nl < 10) { emote('bc_mo-hoi'); return toast(`${DATA.pet.name} mệt quá, cho ngủ đã`); }
+    S.need.vui = Math.min(100, S.need.vui + 20); S.need.nl = Math.max(0, S.need.nl - 6); S.tim = Math.min(5, S.tim + 0.25);
+    S.playedT = now; S.bubble = 'bong_vui'; emote(Math.random() < 0.5 ? 'bc_not-nhac' : 'bc_not-nhac-doi'); act('happy', { loops: 2, toy: Math.floor(Math.random() * 3) }); gainExp(20); return;
+  }
+  if (btn !== 'A') return;
+  if (S.night > 0.5) {                                       // any A wakes it; a real nap gives EXP
+    S.nightGoal = 0; S.act = null; S.bubble = null;
+    if (now - S.sleepT > 4000) { gainExp(30); toast(`${DATA.pet.name} ngủ dậy khỏe re! EXP +30`); }
+    if (has('wake')) act('wake', { loops: 1 });
+    return;
+  }
+  switch (S.cursor) {
+    case 0: openBag('food'); break;
+    case 1:
+      S.sparkle = now; S.sweepT = now;
+      S.mess = [];
+      if (S.poops.length) { emote('bc_tim-nho'); S.poops = []; S.need.sach = Math.min(100, S.need.sach + 45); gainExp(15); toast('Dọn sạch phân rồi!'); }
+      else { S.need.sach = Math.min(100, S.need.sach + 25); gainExp(5); toast('Phòng sạch bong!'); }
+      break;
+    case 2: openBag('care'); break;
+    case 3: S.nightGoal = 1; S.bubble = null; S.sleepT = now; act('sleep', { hold: true }); break;
+    case 4: fadeTo(() => { S.mode = 'act'; S.actSel = 0; }); break;
+    case 5: fadeTo(openMap); break;
+  }
+}
+let fadeCb = null, fadeStart = 0;
+function fadeTo(cb) { fadeCb = cb; fadeStart = performance.now(); S.fade = 0.001; }
+function restart() { S = NEW(); fadeCb = null; }
+// R36S buttons: what each does here, and the PC key for it
+const BTN = [
+  ['UP', '▲ ▼ ◀ ▶', 'Di chuyển: nút menu, món ăn, địa điểm trên bản đồ, món ở chợ', 'Mũi tên'], ['DOWN'], ['LEFT'], ['RIGHT'],
+  ['A', 'A', 'Chọn, xác nhận, tiến hóa, đánh thức, vào địa điểm, mua, khảm ngọc (trang Thuộc tính)', 'Enter · Space · Z'],
+  ['B', 'B', 'Quay lại, đóng bảng, để sau (chợ → bản đồ → nhà)', 'Esc · X · Backspace'],
+  ['X', 'X', 'Vuốt ve pet (vuốt liền 4 lần là nó cáu) · gỡ ngọc ở trang Thuộc tính', 'C'], ['Y', 'Y', 'Khoe chiêu: đấm, chưởng, thắng (bậc lớn)', 'V'],
+  ['START', 'START', 'Màn tiêu đề: bắt đầu · trong phòng: trang trí (chưa làm)', 'S'], ['SELECT', 'SELECT', 'Mở / đóng màn chỉ số', 'Shift · E'],
+  ['L1', 'L1 · R1', 'Đổi trang ở màn chỉ số, đổi mục ở chợ, đổi hạt giống ở nông trại', 'Q · W'], ['R1'], ['L2', 'L2', 'Bản demo: tua nhanh ¼ giai đoạn; ở mốc cấp thì mở bảng tiến hóa', '1'], ['R2', 'R2', 'Chơi với pet (vui tăng)', '2'],
+  ['F', 'F', 'Chưa dùng (máy thật: phím hệ thống)', 'F']];
+const KEYS = { arrowup: 'UP', arrowdown: 'DOWN', arrowleft: 'LEFT', arrowright: 'RIGHT', enter: 'A', ' ': 'A', z: 'A',
+  escape: 'B', x: 'B', backspace: 'B', c: 'X', v: 'Y', s: 'START', shift: 'SELECT', e: 'SELECT', q: 'L1', w: 'R1', '1': 'L2',
+  '2': 'R2', f: 'F' };
+const legend = document.getElementById('legend');
+for (const [b, label, what, key] of BTN) if (label) legend.insertAdjacentHTML('beforeend',
+  `<tr data-row="${b}"><td>${label}</td><td>${what}</td><td class="key">${key}</td></tr>`);
+const ROW = { DOWN: 'UP', LEFT: 'UP', RIGHT: 'UP', R1: 'L1' };
+function hit(btn) {
+  for (const el of document.querySelectorAll(`[data-b="${btn}"], [data-row="${ROW[btn] || btn}"]`)) {
+    el.classList.add('on'); setTimeout(() => el.classList.remove('on'), 160);
+  }
+  document.getElementById('last').textContent = 'Vừa bấm: ' + btn;
+  press(btn);
+}
+const HELD = {};
+addEventListener('keyup', e => { const b = KEYS[e.key.toLowerCase()]; if (b) HELD[b] = false; });
+addEventListener('keydown', e => {
+  const k = e.key.toLowerCase();
+  if (KEYS[k]) { if (!e.repeat) hit(KEYS[k]); HELD[KEYS[k]] = true; e.preventDefault(); }
+  if (k === 'r') restart();
+});
+for (const el of document.querySelectorAll('[data-b]')) {
+  el.addEventListener('pointerdown', () => { hit(el.dataset.b); HELD[el.dataset.b] = true; });
+  for (const ev of ['pointerup', 'pointerleave']) el.addEventListener(ev, () => { HELD[el.dataset.b] = false; });
+}
+document.getElementById('btnR').onclick = restart;
+// a game pad plugged into the PC (standard layout: 0 bottom, 1 right, 2 left, 3 top)
+const PAD = { 0: 'A', 1: 'B', 2: 'X', 3: 'Y', 4: 'L1', 5: 'R1', 6: 'L2', 7: 'R2', 8: 'SELECT', 9: 'START',
+              12: 'UP', 13: 'DOWN', 14: 'LEFT', 15: 'RIGHT' };
+const padDown = {};
+function pollPad() {
+  for (const gp of navigator.getGamepads ? navigator.getGamepads() : []) {
+    if (!gp) continue;
+    for (const [i, name] of Object.entries(PAD)) {
+      const id = gp.index + ':' + i, down = !!(gp.buttons[i] && gp.buttons[i].pressed);
+      // a button already held when the pad is first seen (some virtual pads) counts only after a release
+      if (id in padDown && down && !padDown[id]) hit(name);
+      if (id in padDown && down !== padDown[id]) HELD[name] = down;
+      padDown[id] = down;
+    }
+  }
+}
+
+// ---------- loop ----------
+let last = 0;
+const step = (v, goal, dt, ms) => v + Math.sign(goal - v) * Math.min(Math.abs(goal - v), dt / ms);
+function frame(now) {
+  const dt = Math.min(50, now - last); last = now;
+  pollPad();
+  // reaching the top level of a stage opens the evolve panel (again once its conditions are all met)
+  if (S.mode === 'room' && S.stats === null && atCap() && S.popupGoal === 0 && S.pickerGoal === 0 && !S.act && S.fade === 0) {
+    const key = S.stage + conds().every(c => c[1]);
+    if (S.askedKey !== key) { S.askedKey = key; S.popupGoal = 1; }
+  }
+  if (S.mode === 'room' && S.stats === null && S.fade === 0) tickNeeds(dt, now);
+  S.popup = step(S.popup, S.popupGoal, dt, 300);
+  S.picker = step(S.picker, S.pickerGoal, dt, 220);
+  S.night = step(S.night, S.nightGoal, dt, 900);
+  if (S.night > 0.5) S.need.nl = Math.min(100, S.need.nl + dt / 120);
+  if (S.mode === 'act') drawAct(now); else if (S.mode === 'fish') drawFish(now, dt); else if (S.mode === 'farm') drawFarm(now, dt); else if (S.mode === 'seedShop') drawSeedShop(now); else if (S.mode === 'cook') drawCook(now); else if (S.mode === 'tui') drawTui(now); else if (S.mode === 'school') drawSchool(now);
+  else if (S.mode === 'title') drawTitle(now); else if (S.mode === 'egg') drawEgg(now);
+  else if (S.mode === 'pickEgg') drawPickEgg(now); else if (S.mode === 'pickPet') drawPickPet(now); else if (S.mode === 'end') drawEnd(now);
+  else if (S.mode === 'room' && S.stats !== null) drawStats(now); else if (S.mode === 'room') drawRoom(now);
+  else if (S.mode === 'bath') drawBath(now); else if (S.mode === 'map') drawMap(now, dt); else if (S.mode === 'shop') drawShop(now); else drawEvo(now);
+  if (S.toast && (S.stats !== null || ['map', 'shop', 'title', 'egg', 'end', 'bath', 'pickEgg', 'pickPet', 'act', 'fish', 'farm', 'seedShop', 'cook', 'tui', 'school'].includes(S.mode)) && now - S.toastT < 1800) { ctx.fillStyle = 'rgba(18,11,9,0.85)'; ctx.fillRect(140, 190, 360, 40); text(S.toast, 320, 210, 14, '#f0e4ce', 'center'); }
+  if (S.fade > 0) {
+    const t = (now - fadeStart) / 350;
+    if (t >= 1 && fadeCb) { fadeCb(); fadeCb = null; fadeStart = now; }
+    const a = fadeCb ? Math.min(1, t) : Math.max(0, 1 - (now - fadeStart) / 350);
+    if (!fadeCb && a <= 0) S.fade = 0;
+    ctx.fillStyle = `rgba(0,0,0,${a})`; ctx.fillRect(0, 0, 640, 480);
+  }
+  requestAnimationFrame(frame);
+}
+Promise.all(jobs).then(() => loadCreature('hoa-ho')).then(() => { S.t0 = performance.now(); requestAnimationFrame(frame); });
+</script></body></html>

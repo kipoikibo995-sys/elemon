@@ -1,0 +1,62 @@
+{
+ "01_iron-food-bowl.png": [
+  158,
+  582,
+  0.935
+ ],
+ "02_warm-stone-bed-with-red-blanket.png": [
+  62,
+  342,
+  0.85
+ ],
+ "03_anvil.png": [
+  908,
+  396,
+  0.75
+ ],
+ "04_small-furnace.png": [
+  1066,
+  150,
+  1.285
+ ],
+ "05_weapon-rack.png": [
+  288,
+  192,
+  0.615
+ ],
+ "06_red-banner.png": [
+  132,
+  170,
+  0.65
+ ],
+ "07_lava-lamp.png": [
+  1280,
+  64,
+  0.7
+ ],
+ "08_coal-bucket.png": [
+  92,
+  728,
+  0.77
+ ],
+ "09_red-rug.png": [
+  530,
+  694,
+  1.1
+ ],
+ "10_iron-training-dummy.png": [
+  1216,
+  544,
+  0.785
+ ],
+ "11_armor-stand.png": [
+  1354,
+  630,
+  0.47
+ ],
+ "12_fire-crystal-pedestal.png": [
+  806,
+  396,
+  0.47
+ ]
+}

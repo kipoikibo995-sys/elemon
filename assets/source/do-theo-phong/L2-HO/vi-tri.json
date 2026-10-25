@@ -1,0 +1,62 @@
+{
+ "05_red-banner.png": [
+  53,
+  155,
+  1.0
+ ],
+ "03_small-brazier.png": [
+  810,
+  250,
+  0.85
+ ],
+ "12_fire-pattern-wall-hanging.png": [
+  1222,
+  204,
+  1.0
+ ],
+ "11_iron-poker-rack.png": [
+  932,
+  317,
+  0.85
+ ],
+ "02_hay-bed-with-red-cloth.png": [
+  45,
+  371,
+  0.9
+ ],
+ "06_firewood-pile.png": [
+  575,
+  354,
+  0.85
+ ],
+ "07_charcoal-bucket.png": [
+  1122,
+  365,
+  0.85
+ ],
+ "08_ember-lamp.png": [
+  5,
+  533,
+  0.85
+ ],
+ "09_red-cloth-rug.png": [
+  578,
+  666,
+  1.0
+ ],
+ "10_clay-pot.png": [
+  1317,
+  470,
+  0.85
+ ],
+ "04_wooden-stool.png": [
+  434,
+  475,
+  0.8
+ ],
+ "01_clay-food-bowl.png": [
+  416,
+  711,
+  1.0
+ ]
+}

@@ -1,0 +1,62 @@
+{
+ "12_metal-bookshelf.png": [
+  706,
+  265,
+  0.92
+ ],
+ "08_steel-training-dummy.png": [
+  968,
+  294,
+  0.9
+ ],
+ "04_tool-bench.png": [
+  448,
+  307,
+  0.88
+ ],
+ "10_robot-arm-decor.png": [
+  1167,
+  337,
+  0.9
+ ],
+ "06_metal-crates.png": [
+  9,
+  527,
+  0.7
+ ],
+ "02_padded-metal-cot.png": [
+  68,
+  406,
+  0.9
+ ],
+ "05_crystal-lamp.png": [
+  1348,
+  442,
+  0.8
+ ],
+ "03_gear-clock.png": [
+  52,
+  271,
+  1.0
+ ],
+ "09_small-anvil.png": [
+  376,
+  486,
+  0.62
+ ],
+ "11_glowing-crystal-cluster.png": [
+  1299,
+  551,
+  0.75
+ ],
+ "07_silver-rug.png": [
+  565,
+  694,
+  1.0
+ ],
+ "01_steel-food-bowl.png": [
+  406,
+  713,
+  1.0
+ ]
+}

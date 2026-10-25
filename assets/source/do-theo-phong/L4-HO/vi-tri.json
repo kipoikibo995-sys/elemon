@@ -1,0 +1,62 @@
+{
+ "09_fire-throne.png": [
+  683,
+  283,
+  0.75
+ ],
+ "04_dragon-statue.png": [
+  923,
+  257,
+  0.85
+ ],
+ "10_dragon-banner.png": [
+  30,
+  163,
+  1.0
+ ],
+ "11_golden-lantern.png": [
+  475,
+  40,
+  1.0
+ ],
+ "08_golden-training-dummy.png": [
+  502,
+  289,
+  0.82
+ ],
+ "03_sacred-flame-brazier.png": [
+  1167,
+  303,
+  0.85
+ ],
+ "12_phoenix-egg-pedestal.png": [
+  5,
+  468,
+  0.75
+ ],
+ "02_royal-red-bed.png": [
+  81,
+  347,
+  0.9
+ ],
+ "05_golden-incense-burner.png": [
+  1267,
+  513,
+  0.72
+ ],
+ "06_treasure-chest.png": [
+  398,
+  470,
+  0.6
+ ],
+ "07_royal-red-dragon-carpet.png": [
+  544,
+  638,
+  1.0
+ ],
+ "01_ornate-gold-food-bowl.png": [
+  380,
+  675,
+  1.0
+ ]
+}

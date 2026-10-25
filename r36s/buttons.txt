@@ -1,0 +1,14 @@
+# HoLua button map for pads with an SDL game controller mapping (R36S and friends).
+# One "action=button" per line; delete the # of a line to change it. SDL button names:
+#   a b x y leftshoulder rightshoulder back start dpup dpdown dpleft dpright leftstick rightstick
+# Default: A does the chosen move, B held = run, X / Y previous / next pet, L1 / R1 previous / next room,
+# SELECT (back) day/night, START music on/off, SELECT + START quits.
+# If A and B are the wrong way round, try:   act=b   run=a
+#act=a
+#run=b
+#prev_pet=x
+#next_pet=y
+#prev_room=leftshoulder
+#next_room=rightshoulder
+#night=back
+#music=start

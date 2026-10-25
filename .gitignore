@@ -1,0 +1,32 @@
+# Elemon (HoLua) - only sources go to git; everything the scripts can make again stays on this PC.
+
+# builds and packages (scripts/build_*.py, r36s_pak.py, packaging/)
+/build/
+/dist/
+
+# cut frames (scripts/build_assets.py makes them again from assets/source/tinh-linh)
+/assets/creatures/
+/assets/creatures-640/
+
+# checks and old leftovers
+/assets/_kiemtra/
+/assets/_cu_khong-ref/
+**/_to_delete/
+
+# generated preview pages and pictures (preview_*.py, build_evo_app.py); hand-made test pages stay
+/preview/pets
+/preview/hoa/
+/preview/kim/
+/preview/moc/
+/preview/thuy/
+/preview/tho/
+/preview/phong/
+/preview/phong-do/
+/preview/phong-tong-hop/
+
+# python / editor / OS
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db
+desktop.ini

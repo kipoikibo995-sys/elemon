@@ -1,0 +1,62 @@
+{
+ "06_hanging-herb-bundle.png": [
+  70,
+  191,
+  1.0
+ ],
+ "03_potted-sapling.png": [
+  900,
+  353,
+  0.8
+ ],
+ "12_vine-wall-hanging.png": [
+  1222,
+  214,
+  1.0
+ ],
+ "08_bamboo-shelf.png": [
+  1045,
+  381,
+  0.85
+ ],
+ "10_flower-pot.png": [
+  484,
+  391,
+  0.85
+ ],
+ "05_woven-basket.png": [
+  1294,
+  448,
+  0.8
+ ],
+ "02_leaf-mat-bed.png": [
+  41,
+  455,
+  0.9
+ ],
+ "09_green-woven-rug.png": [
+  556,
+  658,
+  1.0
+ ],
+ "07_mushroom-cluster.png": [
+  0,
+  578,
+  0.85
+ ],
+ "04_tree-stump-stool.png": [
+  1285,
+  609,
+  0.8
+ ],
+ "11_log-bench.png": [
+  665,
+  488,
+  0.6
+ ],
+ "01_wooden-food-bowl.png": [
+  406,
+  704,
+  1.0
+ ]
+}

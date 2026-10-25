@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HoLua PocketGo trực tiếp</title>
+<!-- Live view of the packed PocketGo files (build/pak/, format at the top of scripts/pocketgo_pak.py),
+     drawn the way the device draws them. Serve the HoLua folder over http, then open
+     /preview/pocketgo/xem-truc-tiep.html -->
+<style>
+  :root { --bg: #17130f; --panel: #241d17; --text: #f3e6d0; --dim: #b7a68c; --accent: #ffb347; --line: #3a3027; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.4 "Segoe UI", system-ui, sans-serif; }
+  main { display: flex; gap: 16px; padding: 16px; flex-wrap: wrap; align-items: flex-start; }
+  canvas { image-rendering: pixelated; background: #000; border: 1px solid var(--line); max-width: 100%; }
+  .side { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 12px; width: 300px; }
+  label { display: block; color: var(--dim); margin: 8px 0 2px; }
+  select, button { font: inherit; background: #31271f; color: var(--text); border: 1px solid var(--line); border-radius: 6px; padding: 4px 8px; }
+  select { width: 100%; }
+  .moves { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+  .moves button.on { border-color: var(--accent); color: var(--accent); }
+  .row { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+  .info { color: var(--dim); margin-top: 10px; font-size: 13px; white-space: pre-line; }
+  kbd { background: #31271f; border: 1px solid var(--line); border-radius: 4px; padding: 0 4px; }
+</style>
+</head>
+<body>
+<main>
+  <canvas id="screen" width="320" height="240"></canvas>
+  <div class="side">
+    <label>Phòng</label><select id="room"></select>
+    <label>Pet</label><select id="pet"></select>
+    <label>Động tác</label><div class="moves" id="moves"></div>
+    <div class="row">
+      <button id="night">Đêm</button>
+      <button id="zoom">Phóng ×3</button>
+    </div>
+    <div class="info">Phím: <kbd>←</kbd> <kbd>→</kbd> đi, giữ <kbd>Shift</kbd> chạy · <kbd>↑</kbd> <kbd>↓</kbd> dời chân lên/xuống · <kbd>N</kbd> ngày/đêm</div>
+    <div class="info" id="stats"></div>
+  </div>
+</main>
+<script>
+const PAK = '../../build/pak/';
+const STEP = 33;
+const STAGES = { egg: 'Trứng', baby: 'Con', child: 'Nhi', teen: 'Thiếu niên', adult: 'Trưởng thành',
+  legend: 'Huyền thoại', adult4: 'Trưởng thành 4 chân', legend4: 'Huyền thoại 4 chân' };
+const LABELS = { idle: 'Đứng thở', punch: 'Đấm', blast: 'Chiêu', hit: 'Trúng đòn', faint: 'Gục ngã', victory: 'Thắng',
+  eat: 'Ăn', happy: 'Vui nhảy', tired: 'Mệt', sick: 'Ốm', sleep: 'Ngủ', wake: 'Thức dậy', walk: 'Đi', shake: 'Lắc',
+  hatch: 'Nở', run: 'Chạy', attack: 'Đòn hệ' };
+// feet y and floor edges (screen px) per room, as in scripts/preview_*.py; others start at the default
+const FLOOR = { 'L1-HO_hang-da': [165, 30, 290], 'L3-HO': [175, 30, 295], 'L2-TH': [180, 20, 300],
+  'L3-KI': [185, 25, 290], 'L4-MO': [182, 50, 285] };
+const FLOOR_DEFAULT = [180, 30, 290];
+
+// ---------------------------------------------------------------- reading the paks
+const u565 = v => [((v >> 11) & 31) * 255 / 31 | 0, ((v >> 5) & 63) * 255 / 63 | 0, (v & 31) * 255 / 31 | 0];
+
+function palette(dv, p, n) {
+  const pal = [[0, 0, 0]];
+  for (let i = 0; i < n; i++) pal.push(u565(dv.getUint16(p + 2 * i, true)));
+  return pal;
+}
+
+function rows(bytes, p, w, h) {                  // sprite rows -> Uint8Array of indices, 0 = see-through
+  const idx = new Uint8Array(w * h);
+  for (let y = 0; y < h; y++) {
+    let x = 0;
+    while (x < w) {
+      const n = bytes[p++];
+      if (n < 0x80) { for (let k = 0; k <= n; k++) idx[y * w + x++] = bytes[p++] + 1; }
+      else if (n < 0xC0) x += n - 0x7F;
+      else { const v = bytes[p++] + 1; for (let k = 0; k < n - 0xBD; k++) idx[y * w + x++] = v; }
+    }
+  }
+  return idx;
+}
+
+function name(bytes, p) {
+  const n = bytes[p];
+  return [new TextDecoder().decode(bytes.subarray(p + 1, p + 1 + n)), p + 1 + n];
+}
+
+function readRoom(buf) {
+  const dv = new DataView(buf), b = new Uint8Array(buf);
+  const ncol = b[5], nit = dv.getUint16(6, true), bgl = dv.getUint32(8, true);
+  const bg = new Array(320 * 240);
+  let p = 12, i = 0;
+  while (i < 320 * 240) {
+    const n = b[p++];
+    if (n < 0x80) { for (let k = 0; k <= n; k++) { bg[i++] = u565(dv.getUint16(p, true)); p += 2; } }
+    else { const c = u565(dv.getUint16(p, true)); p += 2; for (let k = 0; k < n - 0x7E; k++) bg[i++] = c; }
+  }
+  p = 12 + bgl;
+  const pal = palette(dv, p, ncol); p += 2 * ncol;
+  const items = [];
+  for (let k = 0; k < nit; k++) {
+    let nm; [nm, p] = name(b, p);
+    const x = dv.getInt16(p, true), y = dv.getInt16(p + 2, true), floor = dv.getInt16(p + 4, true);
+    const w = dv.getUint16(p + 6, true), h = dv.getUint16(p + 8, true), ln = dv.getUint32(p + 10, true);
+    p += 14;
+    items.push({ name: nm, x, y, floor, w, h, idx: rows(b, p, w, h) });
+    p += ln;
+  }
+  return { bg, pal, items, bytes: buf.byteLength };
+}
+
+function readPet(buf) {
+  const dv = new DataView(buf), b = new Uint8Array(buf);
+  const ncol = b[5], nfr = dv.getUint16(6, true);
+  const cw = dv.getUint16(8, true), ax = dv.getUint16(12, true), ay = dv.getUint16(14, true);
+  let p = 16;
+  const pal = palette(dv, p, ncol); p += 2 * ncol;
+  const frames = {};
+  for (let k = 0; k < nfr; k++) {
+    let nm; [nm, p] = name(b, p);
+    const dx = dv.getInt16(p, true), x = dv.getUint16(p + 2, true), y = dv.getUint16(p + 4, true);
+    const w = dv.getUint16(p + 6, true), h = dv.getUint16(p + 8, true), ln = dv.getUint32(p + 10, true);
+    p += 14;
+    frames[nm] = { dx, x, y, w, h, idx: rows(b, p, w, h) };
+    p += ln;
+  }
+  return { cw, ax, ay, pal, frames, bytes: buf.byteLength };
+}
+
+// ---------------------------------------------------------------- colours drawn on the device
+let NIGHT = null;
+function nightColour([r, g, b]) {
+  const dark = [r, g, b].map((v, i) => v * NIGHT['rgb'[i]][0] + NIGHT['rgb'[i]][1]);
+  const [lo, span, sat, satSpan] = NIGHT.glow;
+  const hi = Math.max(r, g, b), mn = Math.min(r, g, b);
+  const keep = Math.min(1, Math.max(0, (hi - lo) / span)) * Math.min(1, Math.max(0, (hi - mn - sat) / satSpan));
+  return dark.map((d, i) => Math.max(0, Math.min(255, d + ([r, g, b][i] - d) * keep)) | 0);
+}
+const to565 = ([r, g, b]) => [(r >> 3) * 255 / 31 | 0, (g >> 2) * 255 / 63 | 0, (b >> 3) * 255 / 31 | 0];
+const flashColour = c => c.map(v => v + ((255 - v) * 3 >> 2));
+
+// ---------------------------------------------------------------- motion (scripts/preview_anims.py samples)
+const ease = t => 0.5 - 0.5 * Math.cos(Math.PI * t);
+function samples(anim) {
+  let prev = { x: 0, y: 0 };
+  const out = [];
+  for (const key of anim.keys) {
+    const goal = { x: key.x ?? prev.x, y: key.y ?? prev.y };
+    const steps = Math.max(1, Math.round(key.ms / STEP));
+    for (let i = 0; i < steps; i++) {
+      const t = ease((i + 1) / steps);
+      out.push({ f: key.f, x: prev.x + (goal.x - prev.x) * t, y: prev.y + (goal.y - prev.y) * t,
+                 shake: key.shake || 0, flash: i === 0 ? (key.flash || 0) : 0 });
+    }
+    prev = goal;
+  }
+  return out;
+}
+
+// ---------------------------------------------------------------- state
+const $ = id => document.getElementById(id);
+const cv = $('screen'), ctx = cv.getContext('2d');
+const img = ctx.createImageData(320, 240);
+let room = null, pet = null, anims = null, roomName = '', move = 'idle', smp = [], tick = 0;
+let night = false, zoom = 2, feet = 180, edges = [30, 290], px = 160, left = false, keys = {};
+let luts = null;
+
+function buildLuts() {
+  const t = c => to565(night ? nightColour(c) : c);
+  luts = {
+    bg: room.bg.map(t),
+    room: room.pal.map(t),
+    pet: pet.pal.map(t),
+    flash: pet.pal.map(c => to565(flashColour(night ? nightColour(c) : c))),
+  };
+}
+
+function reach(base) {                         // how far the body reaches from the feet, either way
+  const names = Object.keys(pet.frames).filter(n => n.startsWith(base + '-'));
+  let r = 0;
+  for (const n of names.length ? names : Object.keys(pet.frames)) {
+    const f = pet.frames[n];
+    r = Math.max(r, pet.ax - f.dx - f.x, f.x + f.w - pet.ax + f.dx);
+  }
+  return r;
+}
+
+function blit(data, idx, w, h, lut, x0, y0, flip) {
+  for (let y = 0; y < h; y++) {
+    const sy = y0 + y;
+    if (sy < 0 || sy >= 240) continue;
+    for (let x = 0; x < w; x++) {
+      const v = idx[y * w + (flip ? w - 1 - x : x)];
+      if (!v) continue;
+      const sx = x0 + x;
+      if (sx < 0 || sx >= 320) continue;
+      const c = lut[v], o = (sy * 320 + sx) * 4;
+      data[o] = c[0]; data[o + 1] = c[1]; data[o + 2] = c[2]; data[o + 3] = 255;
+    }
+  }
+}
+
+function draw(s, walking) {
+  const d = img.data;
+  for (let i = 0; i < 320 * 240; i++) {
+    const c = luts.bg[i];
+    d[i * 4] = c[0]; d[i * 4 + 1] = c[1]; d[i * 4 + 2] = c[2]; d[i * 4 + 3] = 255;
+  }
+  const fr = pet.frames[s.f] || pet.frames[Object.keys(pet.frames)[0]];
+  const jx = s.shake ? Math.round((Math.random() * 2 - 1) * s.shake) : 0;
+  const jy = s.shake ? Math.round((Math.random() * 2 - 1) * s.shake) >> 1 : 0;
+  const x = Math.round(px + (walking ? 0 : (left ? -s.x : s.x))) + jx;
+  const things = [...room.items, { floor: feet, pet: true }].sort((a, b) => a.floor - b.floor);
+  for (const it of things) {
+    if (!it.pet) { blit(d, it.idx, it.w, it.h, luts.room, it.x, it.y, false); continue; }
+    // top-left from the canvas anchor moved by the frame's align dx, mirrored when facing left
+    const sx = left ? x - (pet.cw - pet.ax) - fr.dx + (pet.cw - fr.x - fr.w) : x - pet.ax + fr.dx + fr.x;
+    const sy = feet - pet.ay + Math.round(s.y) + jy + fr.y;
+    blit(d, fr.idx, fr.w, fr.h, s.flash ? luts.flash : luts.pet, sx, sy, left);
+  }
+  ctx.putImageData(img, 0, 0);
+}
+
+function frameLoop() {
+  const run = keys.Shift && anims.run, dir = (keys.ArrowRight ? 1 : 0) - (keys.ArrowLeft ? 1 : 0);
+  let s;
+  if (dir) {
+    const base = run ? 'run' : 'walk';
+    const cycle = anims[base] ? anims[base]._smp : smp;
+    s = cycle[tick % cycle.length];
+    left = dir < 0;
+    const r = reach(base), lo = edges[0] + r, hi = edges[1] - r;
+    px += dir * (run ? 110 : 34) * STEP / 1000;
+    px = lo > hi ? (edges[0] + edges[1]) / 2 : Math.min(hi, Math.max(lo, px));
+  } else {
+    if (tick >= smp.length) {
+      if (anims[move].loop) tick = 0;
+      else { setMove('idle'); }
+    }
+    s = smp[Math.min(tick, smp.length - 1)];
+  }
+  draw(s, !!dir);
+  tick++;
+  $('stats').textContent =
+    `${roomName}: ${(room.bytes / 1024).toFixed(0)} KB · ${room.items.length} đồ\n` +
+    `pet: ${(pet.bytes / 1024).toFixed(0)} KB · ${Object.keys(pet.frames).length} khung\n` +
+    `RAM cảnh này ≈ ${((room.bytes + pet.bytes + 320 * 240 * 2) / 1024).toFixed(0)} KB\n` +
+    `chân: x ${Math.round(px)}, y ${feet} · mép sàn ${edges[0]}–${edges[1]}`;
+}
+
+function setMove(m) {
+  move = m; smp = anims[m]._smp; tick = 0;
+  for (const b of $('moves').children) b.classList.toggle('on', b.dataset.m === m);
+}
+
+async function loadRoom(r) {
+  room = readRoom(await (await fetch(PAK + 'phong/' + r + '.pak')).arrayBuffer());
+  roomName = r;
+  const [y, a, b] = FLOOR[r] || FLOOR_DEFAULT;
+  feet = y; edges = [a, b]; px = (a + b) / 2;
+  if (pet) buildLuts();
+}
+
+async function loadPet(key) {
+  const info = INDEX.paks[key];
+  pet = readPet(await (await fetch(PAK + key)).arrayBuffer());
+  anims = await (await fetch(`../../assets/creatures/${info.element}/${info.creature}/${info.stage}/anims.json`)).json();
+  delete anims._doc;
+  for (const a of Object.values(anims)) a._smp = samples(a);
+  $('moves').innerHTML = '';
+  for (const m of Object.keys(anims).filter(m => m !== 'walk' && m !== 'run')) {
+    const b = document.createElement('button');
+    b.textContent = LABELS[m] || m; b.dataset.m = m;
+    b.onclick = () => setMove(m);
+    $('moves').appendChild(b);
+  }
+  setMove(anims.idle ? 'idle' : Object.keys(anims)[0]);
+  buildLuts();
+}
+
+let INDEX;
+(async () => {
+  INDEX = await (await fetch(PAK + 'danh-sach.json')).json();
+  NIGHT = INDEX.night;
+  const rooms = Object.keys(INDEX.paks).filter(k => k.startsWith('phong/')).map(k => k.slice(6, -4));
+  $('room').innerHTML = rooms.map(r => `<option>${r}</option>`).join('');
+  const pets = Object.entries(INDEX.paks).filter(([k]) => k.startsWith('pet/'));
+  $('pet').innerHTML = pets.map(([k, v]) => `<option value="${k}">${v.creature} · ${STAGES[v.stage] || v.stage}</option>`).join('');
+  $('room').value = 'L1-HO_hang-da';
+  $('pet').value = 'pet/hoa-ho_adult4.pak';
+  await loadRoom($('room').value);
+  await loadPet($('pet').value);
+  $('room').onchange = e => loadRoom(e.target.value);
+  $('pet').onchange = e => loadPet(e.target.value);
+  $('night').onclick = () => { night = !night; $('night').textContent = night ? 'Ngày' : 'Đêm'; buildLuts(); };
+  $('zoom').onclick = () => { zoom = zoom === 2 ? 3 : 2; $('zoom').textContent = zoom === 2 ? 'Phóng ×3' : 'Phóng ×2';
+                              cv.style.width = 320 * zoom + 'px'; };
+  cv.style.width = 320 * zoom + 'px';
+  addEventListener('keydown', e => {
+    keys[e.key] = true; keys.Shift = e.shiftKey;
+    if (e.key === 'ArrowUp') feet--;
+    if (e.key === 'ArrowDown') feet++;
+    if (e.key === 'n' || e.key === 'N') $('night').click();
+    if (e.key.startsWith('Arrow')) e.preventDefault();
+  });
+  addEventListener('keyup', e => { keys[e.key] = false; keys.Shift = e.shiftKey; });
+  setInterval(frameLoop, STEP);
+})();
+</script>
+</body>
+</html>

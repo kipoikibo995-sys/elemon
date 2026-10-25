@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>Hào quang Huyền thoại</title>
+<style>
+  body { margin: 0; background: #1b1424; color: #ddd; font: 14px sans-serif; display: flex; flex-direction: column; align-items: center; }
+  canvas { image-rendering: pixelated; margin-top: 12px; border: 2px solid #333; max-width: 98vw; }
+  p { margin: 6px; color: #aaa; }
+</style></head>
+<body>
+<canvas id="c" width="1040" height="660"></canvas>
+<p>Hàng trên: bản đang dùng (hào quang đứng yên). Hàng dưới: thêm lớp hào quang động phía sau, 6 khung lặp, 100 ms/khung.</p>
+<script>
+// Bản thử riêng để duyệt hào quang động (scripts/aura_anim.py), không phải trang game.
+const ctx = document.getElementById('c').getContext('2d');
+ctx.imageSmoothingEnabled = false;
+const PETS = ['hoa-ho', 'kim-te', 'moc-hung', 'thuy-sa', 'tho-nguu'], N = 6, K = 0.62;
+const IMG = {};
+const load = src => new Promise(r => { const i = new Image(); i.onload = () => r(i); i.src = src; });
+(async () => {
+  for (const p of PETS) {
+    IMG[p + '_goc'] = await load(`img/${p}_goc.png`);
+    for (let i = 0; i < N; i++) IMG[`${p}_${i}`] = await load(`img/${p}_${i}.png`);
+  }
+  requestAnimationFrame(draw);
+})();
+function draw(t) {
+  ctx.fillStyle = '#2a1f33'; ctx.fillRect(0, 0, 1040, 660);
+  ctx.fillStyle = '#3a2c44'; ctx.fillRect(0, 300, 1040, 30); ctx.fillRect(0, 630, 1040, 30);
+  const f = Math.floor(t / 100) % N;
+  PETS.forEach((p, i) => {
+    const cx = 104 + i * 208;
+    const a = IMG[p + '_goc'], b = IMG[`${p}_${f}`];
+    // both stand on the same floor; the animated one has 24 px of padding on the sides and top, 4 below
+    ctx.drawImage(a, cx - a.width * K / 2, 300 - a.height * K, a.width * K, a.height * K);
+    ctx.drawImage(b, cx - b.width * K / 2, 630 - (b.height - 4) * K, b.width * K, b.height * K);
+  });
+  requestAnimationFrame(draw);
+}
+</script>
+</body></html>

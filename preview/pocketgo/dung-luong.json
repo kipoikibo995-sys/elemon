@@ -1,0 +1,22 @@
+{
+ "L1-HO_hang-da + hoa-ho/adult4": {
+  "room_pak_kb": 146,
+  "pet_pak_kb": 146,
+  "ram_kb": 442
+ },
+ "L2-TH + thuy-sa/child": {
+  "room_pak_kb": 139,
+  "pet_pak_kb": 53,
+  "ram_kb": 343
+ },
+ "L3-KI + kim-ung/teen": {
+  "room_pak_kb": 143,
+  "pet_pak_kb": 76,
+  "ram_kb": 369
+ },
+ "L4-MO + moc-loc/legend": {
+  "room_pak_kb": 159,
+  "pet_pak_kb": 127,
+  "ram_kb": 436
+ }
+}

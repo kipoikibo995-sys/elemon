@@ -1,0 +1,386 @@
+[
+ {
+  "file": "Hoa_1_roasted-chili-pepper.png",
+  "he": "Hoa",
+  "tier": 1,
+  "name": "roasted chili pepper",
+  "w": 303,
+  "h": 253
+ },
+ {
+  "file": "Hoa_2_grilled-meat-skewer.png",
+  "he": "Hoa",
+  "tier": 2,
+  "name": "grilled meat skewer",
+  "w": 331,
+  "h": 261
+ },
+ {
+  "file": "Hoa_3_fire-apple.png",
+  "he": "Hoa",
+  "tier": 3,
+  "name": "fire apple",
+  "w": 265,
+  "h": 325
+ },
+ {
+  "file": "Hoa_4_spicy-lava-bun.png",
+  "he": "Hoa",
+  "tier": 4,
+  "name": "spicy lava bun",
+  "w": 309,
+  "h": 317
+ },
+ {
+  "file": "Hoa_5_charcoal-baked-sweet-potato.png",
+  "he": "Hoa",
+  "tier": 5,
+  "name": "charcoal-baked sweet potato",
+  "w": 336,
+  "h": 274
+ },
+ {
+  "file": "Hoa_6_flaming-dragon-fruit.png",
+  "he": "Hoa",
+  "tier": 6,
+  "name": "flaming dragon fruit",
+  "w": 349,
+  "h": 362
+ },
+ {
+  "file": "Hoa_7_phoenix-egg-omelette.png",
+  "he": "Hoa",
+  "tier": 7,
+  "name": "phoenix egg omelette",
+  "w": 376,
+  "h": 262
+ },
+ {
+  "file": "Hoa_8_molten-core-gem-candy.png",
+  "he": "Hoa",
+  "tier": 8,
+  "name": "molten core gem candy",
+  "w": 304,
+  "h": 280
+ },
+ {
+  "file": "Kim_1_iron-crunch-biscuit.png",
+  "he": "Kim",
+  "tier": 1,
+  "name": "iron-crunch biscuit",
+  "w": 314,
+  "h": 247
+ },
+ {
+  "file": "Kim_2_silver-fish.png",
+  "he": "Kim",
+  "tier": 2,
+  "name": "silver fish",
+  "w": 369,
+  "h": 232
+ },
+ {
+  "file": "Kim_3_steel-walnut.png",
+  "he": "Kim",
+  "tier": 3,
+  "name": "steel walnut",
+  "w": 267,
+  "h": 246
+ },
+ {
+  "file": "Kim_4_crystal-rock-candy.png",
+  "he": "Kim",
+  "tier": 4,
+  "name": "crystal rock candy",
+  "w": 301,
+  "h": 295
+ },
+ {
+  "file": "Kim_5_mineral-salt-lick.png",
+  "he": "Kim",
+  "tier": 5,
+  "name": "mineral salt lick",
+  "w": 303,
+  "h": 288
+ },
+ {
+  "file": "Kim_6_golden-pear.png",
+  "he": "Kim",
+  "tier": 6,
+  "name": "golden pear",
+  "w": 299,
+  "h": 334
+ },
+ {
+  "file": "Kim_7_star-metal-mooncake.png",
+  "he": "Kim",
+  "tier": 7,
+  "name": "star-metal mooncake",
+  "w": 324,
+  "h": 277
+ },
+ {
+  "file": "Kim_8_diamond-berry.png",
+  "he": "Kim",
+  "tier": 8,
+  "name": "diamond berry",
+  "w": 307,
+  "h": 313
+ },
+ {
+  "file": "Moc_1_green-leaf-bundle.png",
+  "he": "Moc",
+  "tier": 1,
+  "name": "green leaf bundle",
+  "w": 308,
+  "h": 288
+ },
+ {
+  "file": "Moc_2_acorn.png",
+  "he": "Moc",
+  "tier": 2,
+  "name": "acorn",
+  "w": 200,
+  "h": 247
+ },
+ {
+  "file": "Moc_3_honey-mushroom.png",
+  "he": "Moc",
+  "tier": 3,
+  "name": "honey mushroom",
+  "w": 282,
+  "h": 272
+ },
+ {
+  "file": "Moc_4_bamboo-shoot.png",
+  "he": "Moc",
+  "tier": 4,
+  "name": "bamboo shoot",
+  "w": 225,
+  "h": 326
+ },
+ {
+  "file": "Moc_5_forest-berry-basket.png",
+  "he": "Moc",
+  "tier": 5,
+  "name": "forest berry basket",
+  "w": 357,
+  "h": 299
+ },
+ {
+  "file": "Moc_6_jade-melon-slice.png",
+  "he": "Moc",
+  "tier": 6,
+  "name": "jade melon slice",
+  "w": 332,
+  "h": 244
+ },
+ {
+  "file": "Moc_7_spirit-lotus-seed.png",
+  "he": "Moc",
+  "tier": 7,
+  "name": "spirit lotus seed",
+  "w": 305,
+  "h": 242
+ },
+ {
+  "file": "Moc_8_world-tree-fruit.png",
+  "he": "Moc",
+  "tier": 8,
+  "name": "world-tree fruit",
+  "w": 343,
+  "h": 335
+ },
+ {
+  "file": "Thuy_1_fresh-fish.png",
+  "he": "Thuy",
+  "tier": 1,
+  "name": "fresh fish",
+  "w": 333,
+  "h": 238
+ },
+ {
+  "file": "Thuy_2_seaweed-roll.png",
+  "he": "Thuy",
+  "tier": 2,
+  "name": "seaweed roll",
+  "w": 284,
+  "h": 238
+ },
+ {
+  "file": "Thuy_3_clam-with-pearl.png",
+  "he": "Thuy",
+  "tier": 3,
+  "name": "clam with pearl",
+  "w": 303,
+  "h": 291
+ },
+ {
+  "file": "Thuy_4_blue-jelly.png",
+  "he": "Thuy",
+  "tier": 4,
+  "name": "blue jelly",
+  "w": 301,
+  "h": 238
+ },
+ {
+  "file": "Thuy_5_ice-dumpling.png",
+  "he": "Thuy",
+  "tier": 5,
+  "name": "ice dumpling",
+  "w": 312,
+  "h": 254
+ },
+ {
+  "file": "Thuy_6_coral-shrimp.png",
+  "he": "Thuy",
+  "tier": 6,
+  "name": "coral shrimp",
+  "w": 345,
+  "h": 302
+ },
+ {
+  "file": "Thuy_7_moon-water-bottle.png",
+  "he": "Thuy",
+  "tier": 7,
+  "name": "moon water bottle",
+  "w": 303,
+  "h": 339
+ },
+ {
+  "file": "Thuy_8_sea-dragon-scale.png",
+  "he": "Thuy",
+  "tier": 8,
+  "name": "sea-dragon scale",
+  "w": 299,
+  "h": 308
+ },
+ {
+  "file": "Tho_1_roasted-corn.png",
+  "he": "Tho",
+  "tier": 1,
+  "name": "roasted corn",
+  "w": 330,
+  "h": 272
+ },
+ {
+  "file": "Tho_2_clay-baked-potato.png",
+  "he": "Tho",
+  "tier": 2,
+  "name": "clay-baked potato",
+  "w": 298,
+  "h": 251
+ },
+ {
+  "file": "Tho_3_peanut-sack.png",
+  "he": "Tho",
+  "tier": 3,
+  "name": "peanut sack",
+  "w": 350,
+  "h": 293
+ },
+ {
+  "file": "Tho_4_yellow-pumpkin.png",
+  "he": "Tho",
+  "tier": 4,
+  "name": "yellow pumpkin",
+  "w": 307,
+  "h": 283
+ },
+ {
+  "file": "Tho_5_honeycomb.png",
+  "he": "Tho",
+  "tier": 5,
+  "name": "honeycomb",
+  "w": 297,
+  "h": 307
+ },
+ {
+  "file": "Tho_6_sand-date-fruit.png",
+  "he": "Tho",
+  "tier": 6,
+  "name": "sand date fruit",
+  "w": 367,
+  "h": 262
+ },
+ {
+  "file": "Tho_7_golden-rice-ball.png",
+  "he": "Tho",
+  "tier": 7,
+  "name": "golden rice ball",
+  "w": 306,
+  "h": 284
+ },
+ {
+  "file": "Tho_8_mountain-ginseng.png",
+  "he": "Tho",
+  "tier": 8,
+  "name": "mountain ginseng",
+  "w": 367,
+  "h": 350
+ },
+ {
+  "file": "DacBiet_1_healing-medicine-bottle.png",
+  "he": "DacBiet",
+  "tier": 1,
+  "name": "healing medicine bottle",
+  "w": 171,
+  "h": 266
+ },
+ {
+  "file": "DacBiet_2_herbal-pill.png",
+  "he": "DacBiet",
+  "tier": 2,
+  "name": "herbal pill",
+  "w": 272,
+  "h": 205
+ },
+ {
+  "file": "DacBiet_3_vitamin-candy.png",
+  "he": "DacBiet",
+  "tier": 3,
+  "name": "vitamin candy",
+  "w": 330,
+  "h": 213
+ },
+ {
+  "file": "DacBiet_4_energy-drink.png",
+  "he": "DacBiet",
+  "tier": 4,
+  "name": "energy drink",
+  "w": 173,
+  "h": 278
+ },
+ {
+  "file": "DacBiet_5_soap-bubble-bath.png",
+  "he": "DacBiet",
+  "tier": 5,
+  "name": "soap bubble bath",
+  "w": 296,
+  "h": 288
+ },
+ {
+  "file": "DacBiet_6_toy-ball.png",
+  "he": "DacBiet",
+  "tier": 6,
+  "name": "toy ball",
+  "w": 266,
+  "h": 265
+ },
+ {
+  "file": "DacBiet_7_evolution-stone.png",
+  "he": "DacBiet",
+  "tier": 7,
+  "name": "evolution stone",
+  "w": 249,
+  "h": 283
+ },
+ {
+  "file": "DacBiet_8_spirit-soul-gem.png",
+  "he": "DacBiet",
+  "tier": 8,
+  "name": "spirit soul gem",
+  "w": 300,
+  "h": 331
+ }
+]

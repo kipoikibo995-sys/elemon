@@ -1,0 +1,8 @@
+Đoạn nháp có sẵn trong ô nhập ChatGPT (cuộc trò chuyện mới) lúc 2026-10-23 ~22:10, lưu lại trước khi thay bằng lời nhắc tạo Viêm Long:
+
+Row 1: Run x4 (full run cycle)
+Row 2: Jump: crouch, rise, peak, land
+Row 3: Dash: lean, dash with fire trail, dash, stop
+Row 4: Basic attack x4: windup, lunge, fiery claw swipe, recover
+Row 5: Special skill x4: gather fire, roar, fireball blast, finish
+Row 6: Guard, Hurt, Knocked out, Victory pose

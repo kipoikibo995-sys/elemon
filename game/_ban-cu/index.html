@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HoLua</title>
+<style>
+  body { margin: 0; background: #14110f; color: #f0e4ce; font: 14px "Segoe UI", sans-serif; display: flex; gap: 22px;
+         padding: 14px; justify-content: center; align-items: flex-start; flex-wrap: wrap; }
+  canvas { width: 960px; max-width: 100%; aspect-ratio: 4 / 3; image-rendering: pixelated; background: #000;
+           border-radius: 8px; box-shadow: 0 10px 30px #000a; }
+  .side { max-width: 320px; }
+  .side h3 { margin: 4px 0 8px; color: #ffd36e; font-size: 16px; }
+  table { border-collapse: collapse; font-size: 13px; }
+  td { padding: 4px 6px; border-bottom: 1px solid #2c2622; vertical-align: top; }
+  td:first-child { font-weight: bold; white-space: nowrap; color: #ffd36e; }
+  button { margin-top: 12px; font: bold 13px "Segoe UI", sans-serif; border-radius: 8px; border: 2px solid #8a6a3a;
+           background: #3a2618; color: #f6dfb0; padding: 7px 12px; cursor: pointer; }
+  .note { color: #a08a6e; margin-top: 10px; }
+</style></head><body>
+<canvas id="c" width="640" height="480"></canvas>
+<div class="side">
+  <h3>HoLua · phím trên PC</h3>
+  <table>
+    <tr><td>Mũi tên</td><td>Di chuyển, chọn</td></tr>
+    <tr><td>Enter · Z</td><td>A: chọn, dùng, mua</td></tr>
+    <tr><td>Esc · X</td><td>B: quay lại</td></tr>
+    <tr><td>C</td><td>X: vuốt ve · gỡ ngọc</td></tr>
+    <tr><td>V</td><td>Y: khoe chiêu</td></tr>
+    <tr><td>2</td><td>R2: chơi với pet</td></tr>
+    <tr><td>Shift · E</td><td>SELECT: màn chỉ số</td></tr>
+    <tr><td>Q · W</td><td>L1 · R1: đổi trang, đổi mục chợ</td></tr>
+  </table>
+  <button id="reset">Xóa lưu, chơi lại từ đầu</button>
+  <p class="note">Game tự lưu. Chỉ số giảm theo giờ thật, cả khi tắt trang.</p>
+</div>
+<script data-browser-only>
+// sounds in a browser: the same files as the handheld (sfx/, nhac/); on the R36S r36s/js/shim.js makes SOUND
+window.SOUND = (() => {
+  const cache = {}; let song = null;
+  return {
+    sfx(name, vol) {
+      const a = (cache[name] = cache[name] || new Audio(`sfx/${name}.wav`)).cloneNode();
+      a.volume = Math.min(1, vol / 256); a.play().catch(() => {});
+    },
+    music(name) {
+      if (song) { song.pause(); song = null; }
+      if (!name) return;
+      song = new Audio(`nhac/${name}.wav`); song.loop = true; song.volume = 0.5; song.play().catch(() => {});
+    },
+  };
+})();
+document.getElementById('reset').onclick = () => { localStorage.removeItem('holua-save'); location.reload(); };
+</script>
+<script src="data.js"></script>
+<script src="js/rules.js"></script>
+<script src="js/game.js"></script>
+</body></html>

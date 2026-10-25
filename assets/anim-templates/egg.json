@@ -1,0 +1,11 @@
+{
+  "_doc": "Motion for egg sheets (4x2: glow x4, crack-0 crack-1 burst shell). Same key format as adult.json.",
+  "idle":   {"loop": true,  "keys": [{"f": "egg-0", "ms": 300}, {"f": "egg-1", "ms": 300},
+                                     {"f": "egg-2", "ms": 300}, {"f": "egg-3", "ms": 300}]},
+  "shake":  {"loop": true,  "keys": [{"f": "egg-0", "ms": 600}, {"f": "egg-1", "ms": 90, "x": -2},
+                                     {"f": "egg-1", "ms": 90, "x": 2}, {"f": "egg-2", "ms": 90, "x": -2},
+                                     {"f": "egg-2", "ms": 90, "x": 0}, {"f": "egg-3", "ms": 600}]},
+  "hatch":  {"loop": false, "keys": [{"f": "egg-0", "ms": 400}, {"f": "crack-0", "ms": 500, "shake": 1},
+                                     {"f": "crack-1", "ms": 600, "shake": 2}, {"f": "burst", "ms": 80, "flash": 1},
+                                     {"f": "burst", "ms": 500, "shake": 3}, {"f": "shell", "ms": 1200}]}
+}

@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>Huyền thoại – sét vàng</title>
+<style>
+  body { margin: 0; background: #1b1424; color: #ddd; font: 14px sans-serif; display: flex; flex-direction: column; align-items: center; }
+  canvas { image-rendering: pixelated; margin-top: 12px; border: 2px solid #333; max-width: 98vw; }
+  p { margin: 6px; color: #aaa; } b { color: #ffcf6e; }
+</style></head>
+<body>
+<canvas id="c" width="1040" height="620"></canvas>
+<p><b>Hàng 1</b>: Huyền thoại đang dùng (viền lửa bám người). <b>Hàng 2</b>: cùng hình, bỏ viền lửa, sét vàng chớp quanh người từ dưới chân lên đỉnh đầu, mỗi lượt nhanh chậm, nhiều ít, trái phải khác nhau và nghỉ ngẫu nhiên; thỉnh thoảng có tia lẻ. Thủy Sa giữ viền sáng cũ vì bỏ viền làm đứt cổ tay.</p>
+<p>Sét là ảnh vẽ sẵn (assets/source/tinh-linh/huyen-thoai-fx/set-vang_tia-manh.png, 12 tia); trang chỉ đặt chỗ và phát từng khung.</p>
+<script>
+// Bản thử riêng để duyệt sét vàng quanh Huyền thoại, không phải trang game.
+const ctx = document.getElementById('c').getContext('2d');
+ctx.imageSmoothingEnabled = false;
+const PETS = ['hoa-ho', 'kim-te', 'moc-hung', 'thuy-sa', 'tho-nguu'], K = 0.62;
+const IMG = {};
+const load = src => new Promise((r, no) => { const i = new Image(); i.onload = () => r(i); i.onerror = no; i.src = src; });
+function trim(c) {               // crop a canvas to its drawn pixels
+  const x = c.getContext('2d'), p = x.getImageData(0, 0, c.width, c.height).data;
+  let x0 = c.width, y0 = c.height, x1 = 0, y1 = 0;
+  for (let i = 3; i < p.length; i += 4) if (p[i]) { const k = (i - 3) / 4, px = k % c.width, py = (k / c.width) | 0; x0 = Math.min(x0, px); x1 = Math.max(x1, px); y0 = Math.min(y0, py); y1 = Math.max(y1, py); }
+  const o = document.createElement('canvas'); o.width = Math.max(1, x1 - x0 + 1); o.height = Math.max(1, y1 - y0 + 1);
+  o.getContext('2d').drawImage(c, x0, y0, o.width, o.height, 0, 0, o.width, o.height); return o;
+}
+function edge(c) {               // points just inside the outline: where the sparks crackle
+  const x = c.getContext('2d'), p = x.getImageData(0, 0, c.width, c.height).data, pts = [];
+  const a = (px, py) => px >= 0 && py >= 0 && px < c.width && py < c.height && p[(py * c.width + px) * 4 + 3] > 0;
+  for (let y = 0; y < c.height * 0.92; y += 4) for (let xx = 0; xx < c.width; xx += 4)
+    if (a(xx, y) && (!a(xx - 8, y) || !a(xx + 8, y) || !a(xx, y - 8))) pts.push([xx, y]);
+  return pts;
+}
+function toCanvas(img) { const c = document.createElement('canvas'); c.width = img.width; c.height = img.height; c.getContext('2d').drawImage(img, 0, 0); return c; }
+function cells(img, cols, rows) {   // magenta-keyed cells, each trimmed
+  const out = [], cw = img.width / cols, ch = img.height / rows;
+  for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
+    const t = document.createElement('canvas'); t.width = Math.round(cw); t.height = Math.round(ch);
+    const x = t.getContext('2d'); x.drawImage(img, c * cw, r * ch, cw, ch, 0, 0, t.width, t.height);
+    const d = x.getImageData(0, 0, t.width, t.height), p = d.data;
+    for (let i = 0; i < p.length; i += 4) if (p[i] > 170 && p[i + 1] < 110 && p[i + 2] > 170) p[i + 3] = 0;
+    x.putImageData(d, 0, 0); out.push(trim(t));
+  }
+  return out;
+}
+(async () => {
+  for (const p of PETS) {
+    IMG[p + '_lg'] = trim(toCanvas(await load(`img/${p}_lg.png`)));
+    IMG[p + '_moi'] = trim(toCanvas(await load(`img/${p}_moi.png`)));
+  }
+  IMG.tia = [];                                                  // thin sparks, 12 per sheet
+  for (const f of ['set-vang_tia-manh', ...[2, 3, 4, 5, 6, 7].map(n => 'set-vang_tia-manh-' + n)])
+    try { IMG.tia.push(...cells(await load(`img/${f}.png`), 4, 3)); } catch (e) {}
+  for (const p of PETS) IMG[p + '_edge'] = edge(IMG[p + '_moi']);
+  requestAnimationFrame(draw);
+})();
+// Sparks climb the pet from the feet to the head, but nothing repeats: each climb has its own speed, its own
+// number of rungs and starts after a random pause; each rung lights 0-2 sparks on a random side, and now and then
+// a lone spark flickers somewhere on the outline between climbs.
+const LIFE_MIN = 220, LIFE_MAX = 420;
+const rnd = (a, b) => a + Math.random() * (b - a);
+function put(c, x, y, h, flip) {
+  const w = c.width * h / c.height;
+  ctx.save(); ctx.translate(Math.round(x), Math.round(y)); if (flip) ctx.scale(-1, 1);
+  ctx.drawImage(c, -w / 2, -h / 2, w, h); ctx.restore();
+}
+const live = PETS.map(() => []), climbs = PETS.map(() => ({ next: rnd(0, 1500), rungs: [] }));
+function spark(i, frac, side, now) {                       // one spark on the outline at height frac (0 feet, 1 head)
+  const pts = IMG[PETS[i] + '_edge'], b = IMG[PETS[i] + '_moi'];
+  const y0 = b.height * (1 - frac), band = b.height * 0.07;
+  let row = pts.filter(([x, y]) => Math.abs(y - y0) < band && (side < 0 || (side === 0) === (x < b.width / 2)));
+  if (!row.length) row = pts.filter(([, y]) => Math.abs(y - y0) < band * 2);
+  if (!row.length) return;
+  const [ex, ey] = row[(Math.random() * row.length) | 0];
+  live[i].push({ ex, ey, t0: now, life: rnd(LIFE_MIN, LIFE_MAX), swap: rnd(90, 200), size: rnd(0.13, 0.21),
+                 a: (Math.random() * IMG.tia.length) | 0, b: (Math.random() * IMG.tia.length) | 0, flip: ex < b.width / 2 });
+}
+function climb(i, now) {
+  const c = climbs[i];
+  if (now > c.next && !c.rungs.length) {                    // plan a new climb: random rungs, random speed
+    const n = 4 + ((Math.random() * 6) | 0), dur = rnd(600, 1500), start = rnd(0, 0.25);
+    for (let r = 0; r < n; r++) c.rungs.push({ at: now + dur * r / n + rnd(-40, 40), frac: start + (0.95 - start) * (r + rnd(0.2, 0.8)) / n });
+    c.next = now + dur + rnd(400, 2200);
+  }
+  while (c.rungs.length && now >= c.rungs[0].at) {
+    const r = c.rungs.shift(), k = Math.random();
+    if (k < 0.15) continue;                                  // a gap in the climb
+    if (k < 0.6) spark(i, r.frac, Math.random() < 0.5 ? 0 : 1, now);
+    else { spark(i, r.frac, 0, now); spark(i, r.frac + rnd(-0.03, 0.05), 1, now); }
+  }
+  if (Math.random() < 0.012) spark(i, rnd(0.1, 0.9), -1, now);   // a stray spark between climbs
+  const L = live[i];
+  for (let n = L.length - 1; n >= 0; n--) if (now - L[n].t0 > L[n].life) L.splice(n, 1);
+}
+function draw(now) {
+  ctx.fillStyle = '#2a1f33'; ctx.fillRect(0, 0, 1040, 620);
+  [270, 590].forEach(y => { ctx.fillStyle = '#3a2c44'; ctx.fillRect(0, y, 1040, 30); });
+  PETS.forEach((p, i) => {
+    const cx = 104 + i * 208, lg = IMG[p + '_lg'];
+    ctx.drawImage(lg, cx - lg.width * K / 2, 270 - lg.height * K, lg.width * K, lg.height * K);
+    const b = IMG[p + '_moi'], k = K * 1.05, w = b.width * k, h = b.height * k, feet = 590;
+    ctx.drawImage(b, cx - w / 2, feet - h, w, h);
+    climb(i, now);
+    for (const sp of live[i]) {
+      const c = IMG.tia[Math.floor((now - sp.t0) / sp.swap) % 2 ? sp.b : sp.a];
+      put(c, cx - w / 2 + sp.ex * k, feet - h + sp.ey * k, h * sp.size, sp.flip);
+    }
+  });
+  requestAnimationFrame(draw);
+}
+</script>
+</body></html>

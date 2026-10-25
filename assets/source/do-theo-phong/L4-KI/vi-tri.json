@@ -1,0 +1,62 @@
+{
+ "09_diamond-throne.png": [
+  715,
+  188,
+  0.85
+ ],
+ "02_royal-crystal-bed.png": [
+  68,
+  257,
+  0.85
+ ],
+ "12_silver-mirror.png": [
+  950,
+  198,
+  0.85
+ ],
+ "10_crystal-banner.png": [
+  50,
+  145,
+  1.0
+ ],
+ "04_diamond-lamp.png": [
+  484,
+  40,
+  1.0
+ ],
+ "05_silver-knight-statue.png": [
+  529,
+  222,
+  0.85
+ ],
+ "03_sword-altar.png": [
+  1136,
+  229,
+  0.85
+ ],
+ "08_crystal-training-dummy.png": [
+  9,
+  437,
+  0.72
+ ],
+ "11_floating-diamond-pedestal.png": [
+  1303,
+  370,
+  0.8
+ ],
+ "06_crystal-chest.png": [
+  367,
+  457,
+  0.6
+ ],
+ "07_white-blue-carpet.png": [
+  569,
+  682,
+  1.0
+ ],
+ "01_ornate-silver-food-bowl.png": [
+  389,
+  689,
+  1.0
+ ]
+}

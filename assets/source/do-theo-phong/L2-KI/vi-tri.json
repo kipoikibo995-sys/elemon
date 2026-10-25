@@ -1,0 +1,62 @@
+{
+ "04_pickaxe-rack.png": [
+  36,
+  199,
+  1.0
+ ],
+ "05_small-ore-cart.png": [
+  701,
+  373,
+  0.85
+ ],
+ "10_wall-shelf-with-tools.png": [
+  1165,
+  253,
+  1.0
+ ],
+ "11_anvil-block.png": [
+  937,
+  400,
+  0.85
+ ],
+ "02_simple-cot.png": [
+  50,
+  440,
+  0.9
+ ],
+ "12_iron-wall-lamp.png": [
+  286,
+  278,
+  1.0
+ ],
+ "08_tool-crate.png": [
+  480,
+  412,
+  0.85
+ ],
+ "03_oil-lantern.png": [
+  1145,
+  423,
+  0.85
+ ],
+ "07_silver-ore-rock.png": [
+  5,
+  583,
+  0.8
+ ],
+ "09_grey-wool-rug.png": [
+  592,
+  670,
+  1.0
+ ],
+ "06_metal-bucket.png": [
+  1317,
+  518,
+  0.85
+ ],
+ "01_tin-food-bowl.png": [
+  408,
+  720,
+  1.0
+ ]
+}

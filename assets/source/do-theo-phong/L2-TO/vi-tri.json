@@ -1,0 +1,62 @@
+{
+ "10_tribal-wall-hanging.png": [
+  44,
+  171,
+  1.0
+ ],
+ "08_clay-oven.png": [
+  941,
+  325,
+  0.85
+ ],
+ "05_cactus-pot.png": [
+  765,
+  347,
+  0.85
+ ],
+ "06_grain-sack.png": [
+  0,
+  515,
+  0.75
+ ],
+ "03_clay-water-jar.png": [
+  1281,
+  427,
+  0.85
+ ],
+ "02_straw-mat-bed.png": [
+  18,
+  444,
+  0.85
+ ],
+ "11_small-rock-garden.png": [
+  149,
+  608,
+  0.6
+ ],
+ "04_stone-stool.png": [
+  1294,
+  603,
+  0.7
+ ],
+ "07_woven-sand-rug.png": [
+  558,
+  660,
+  1.0
+ ],
+ "12_oil-lamp.png": [
+  398,
+  517,
+  0.7
+ ],
+ "09_stone-shelf.png": [
+  502,
+  454,
+  0.7
+ ],
+ "01_clay-food-bowl.png": [
+  394,
+  704,
+  1.0
+ ]
+}

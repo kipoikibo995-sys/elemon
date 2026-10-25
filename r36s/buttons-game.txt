@@ -1,0 +1,16 @@
+# Elemon button map for pads with an SDL game controller mapping (R36S and friends).
+# One "button=pad button" per line; delete the # of a line to change it. The left side is the game's button,
+# the right side an SDL name:  a b x y leftshoulder rightshoulder lefttrigger righttrigger back start
+#                              dpup dpdown dpleft dpright leftstick rightstick
+# The default keeps the printed names. SELECT + START held together quits.
+# If A and B are the wrong way round, try:   A=b   B=a   X=y   Y=x
+#A=a
+#B=b
+#X=x
+#Y=y
+#L1=leftshoulder
+#R1=rightshoulder
+#L2=lefttrigger
+#R2=righttrigger
+#SELECT=back
+#START=start

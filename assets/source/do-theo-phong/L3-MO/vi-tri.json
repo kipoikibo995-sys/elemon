@@ -1,0 +1,62 @@
+{
+ "02_leaf-hammock-bed.png": [
+  68,
+  304,
+  0.9
+ ],
+ "04_bookshelf.png": [
+  561,
+  278,
+  0.85
+ ],
+ "08_log-training-dummy.png": [
+  769,
+  281,
+  0.85
+ ],
+ "10_bird-house.png": [
+  412,
+  308,
+  0.85
+ ],
+ "05_potted-plant.png": [
+  959,
+  334,
+  0.8
+ ],
+ "12_fern-in-carved-pot.png": [
+  0,
+  518,
+  0.75
+ ],
+ "09_flower-pots.png": [
+  1167,
+  371,
+  0.8
+ ],
+ "03_hanging-lantern.png": [
+  498,
+  40,
+  1.0
+ ],
+ "11_tea-table.png": [
+  1258,
+  557,
+  0.65
+ ],
+ "06_mushroom-stool.png": [
+  1145,
+  604,
+  0.65
+ ],
+ "07_woven-green-rug.png": [
+  544,
+  669,
+  1.0
+ ],
+ "01_carved-wooden-food-bowl.png": [
+  368,
+  670,
+  1.0
+ ]
+}

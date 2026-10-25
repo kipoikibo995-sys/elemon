@@ -1,0 +1,234 @@
+{
+ "khung_panel": [
+  320,
+  159
+ ],
+ "khung_vach-chia": [
+  24,
+  150
+ ],
+ "tab_thuong": [
+  150,
+  44
+ ],
+ "tab_chon": [
+  150,
+  44
+ ],
+ "tab_cham-do": [
+  150,
+  46
+ ],
+ "nut_L": [
+  22,
+  21
+ ],
+ "nut_R": [
+  22,
+  21
+ ],
+ "nut_A": [
+  22,
+  22
+ ],
+ "nut_B": [
+  22,
+  22
+ ],
+ "thanh_khung": [
+  240,
+  22
+ ],
+ "thanh_fill_cam": [
+  240,
+  18
+ ],
+ "thanh_fill_hong": [
+  240,
+  18
+ ],
+ "thanh_fill_xanh-duong": [
+  240,
+  18
+ ],
+ "thanh_fill_xanh-reu": [
+  240,
+  18
+ ],
+ "thanh_fill_do": [
+  240,
+  18
+ ],
+ "thanh_fill_vang": [
+  240,
+  18
+ ],
+ "thanh_fill_tim": [
+  240,
+  18
+ ],
+ "thanh_fill_ngoc": [
+  240,
+  18
+ ],
+ "icon_no": [
+  24,
+  23
+ ],
+ "icon_vui": [
+  24,
+  23
+ ],
+ "icon_sach": [
+  24,
+  23
+ ],
+ "icon_nang-luong": [
+  24,
+  23
+ ],
+ "icon_suc-khoe": [
+  24,
+  23
+ ],
+ "icon_suc-manh": [
+  24,
+  23
+ ],
+ "icon_nhanh-nhen": [
+  24,
+  23
+ ],
+ "icon_ben-bi": [
+  24,
+  23
+ ],
+ "icon_thong-minh": [
+  24,
+  23
+ ],
+ "icon_tri-tue": [
+  24,
+  23
+ ],
+ "icon_tinh-than": [
+  24,
+  23
+ ],
+ "icon_tim-day": [
+  24,
+  23
+ ],
+ "icon_tim-nua": [
+  24,
+  23
+ ],
+ "icon_tim-rong": [
+  24,
+  23
+ ],
+ "icon_tien": [
+  24,
+  23
+ ],
+ "icon_nha": [
+  24,
+  23
+ ],
+ "linh-khi_ngu-giac": [
+  220,
+  195
+ ],
+ "he_hoa": [
+  24,
+  17
+ ],
+ "he_kim": [
+  24,
+  16
+ ],
+ "he_moc": [
+  24,
+  16
+ ],
+ "he_thuy": [
+  24,
+  17
+ ],
+ "he_tho": [
+  24,
+  17
+ ],
+ "tinh-cach_hieu-chien": [
+  24,
+  26
+ ],
+ "tinh-cach_diem-tinh": [
+  24,
+  27
+ ],
+ "tinh-cach_luoi": [
+  24,
+  27
+ ],
+ "tinh-cach_ham-an": [
+  24,
+  26
+ ],
+ "tinh-cach_kieu-hanh": [
+  24,
+  26
+ ],
+ "tinh-cach_hien-lanh": [
+  24,
+  26
+ ],
+ "tinh-cach_to-mo": [
+  24,
+  26
+ ],
+ "tinh-cach_hieu-dong": [
+  24,
+  26
+ ],
+ "the-trang_thanh": [
+  100,
+  11
+ ],
+ "the-trang_kim": [
+  6,
+  16
+ ],
+ "level_huy-hieu": [
+  40,
+  40
+ ],
+ "the-thong-tin": [
+  170,
+  54
+ ],
+ "be-dung_hoa": [
+  130,
+  107
+ ],
+ "be-dung_kim": [
+  130,
+  92
+ ],
+ "be-dung_moc": [
+  130,
+  101
+ ],
+ "be-dung_thuy": [
+  130,
+  93
+ ],
+ "be-dung_tho": [
+  130,
+  104
+ ],
+ "be-dung_trung-tinh": [
+  130,
+  84
+ ]
+}

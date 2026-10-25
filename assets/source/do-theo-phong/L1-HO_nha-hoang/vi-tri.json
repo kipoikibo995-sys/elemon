@@ -1,0 +1,62 @@
+{
+ "10_cobweb-wall-hanging.png": [
+  95,
+  150,
+  0.85
+ ],
+ "02_torn-blanket-hay-bed.png": [
+  50,
+  330,
+  0.82
+ ],
+ "08_potted-weed.png": [
+  500,
+  330,
+  0.8
+ ],
+ "06_dusty-shelf.png": [
+  1125,
+  246,
+  1.0
+ ],
+ "03_cracked-lantern.png": [
+  1290,
+  388,
+  1.0
+ ],
+ "09_old-training-post.png": [
+  1020,
+  300,
+  0.85
+ ],
+ "04_broken-chair.png": [
+  1150,
+  470,
+  0.9
+ ],
+ "12_old-sack.png": [
+  1220,
+  640,
+  0.85
+ ],
+ "05_wooden-bucket.png": [
+  445,
+  455,
+  0.7
+ ],
+ "11_broken-plank-pile.png": [
+  -90,
+  700,
+  0.75
+ ],
+ "07_small-rag-rug.png": [
+  560,
+  690,
+  1.0
+ ],
+ "01_old-wooden-bowl.png": [
+  420,
+  650,
+  0.9
+ ]
+}
