@@ -13,7 +13,7 @@ có khung viền, nhìn từ trên xuống thay vì nhìn ngang, hoặc đườn
 ---
 
 ## Việc 1 — Vùng Hỏa · Núi lửa
-- [ ]
+- [x] (1448x1086)
 - **Lưu thành / Đích:** `assets/source/nen/vung/VUNG_hoa.png`
 - **Lời nhắc:**
 ```
@@ -21,7 +21,7 @@ Create an image. Pixel art background for a handheld pet game, 4:3 landscape 144
 ```
 
 ## Việc 2 — Vùng Kim · Núi pha lê
-- [ ]
+- [x] (1448x1086)
 - **Lưu thành / Đích:** `assets/source/nen/vung/VUNG_kim.png`
 - **Lời nhắc:**
 ```
@@ -29,7 +29,7 @@ Create an image. Pixel art background for a handheld pet game, 4:3 landscape 144
 ```
 
 ## Việc 3 — Vùng Mộc · Rừng cổ thụ
-- [ ]
+- [x] (1448x1086)
 - **Lưu thành / Đích:** `assets/source/nen/vung/VUNG_moc.png`
 - **Lời nhắc:**
 ```
@@ -37,7 +37,7 @@ Create an image. Pixel art background for a handheld pet game, 4:3 landscape 144
 ```
 
 ## Việc 4 — Vùng Thổ · Hẻm vực
-- [ ]
+- [x] (1448x1086)
 - **Lưu thành / Đích:** `assets/source/nen/vung/VUNG_tho.png`
 - **Lời nhắc:**
 ```
@@ -45,7 +45,7 @@ Create an image. Pixel art background for a handheld pet game, 4:3 landscape 144
 ```
 
 ## Việc 5 — Vùng Thủy · Hồ thác
-- [ ]
+- [x] (1448x1086)
 - **Lưu thành / Đích:** `assets/source/nen/vung/VUNG_thuy.png`
 - **Lời nhắc:**
 ```
