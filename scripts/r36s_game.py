@@ -31,7 +31,7 @@ GAME = os.path.join(DIST, 'elemon')
 FONTS = {0: os.path.join(ROOT, 'assets', 'font', 'DejaVuSans.ttf'), 1: os.path.join(ROOT, 'assets', 'font', 'DejaVuSans-Bold.ttf')}
 # DejaVu is about 11 % wider than the Tahoma the pages are laid out with: glyphs are narrowed to match
 NARROW = 0.89
-SIZES = [*range(10, 31), 32]       # what the pages ask for (big titles: 32)
+SIZES = [*range(9, 31), 32]        # what the pages ask for (big titles: 32, the arena's small labels: 9)
 
 
 def picture(src, dst):
@@ -153,6 +153,11 @@ def main():
     if demo:                                     # the demo has no sound of its own: hooked on from outside
         shutil.copy(os.path.join(ROOT, 'r36s', 'js', 'am-thanh.js'), os.path.join(GAME, 'js'))
         load.append('js/am-thanh.js')
+    # Solo đối kháng: the arena's sheets cut ahead of time, its HUD, arenas and sounds (solo_r36s.py), read before solo.js
+    if 'js/solo.js' in load:
+        import solo_r36s
+        print('Solo đối kháng:', solo_r36s.build(GAME), 'sheet đã cắt sẵn')
+        load.insert(load.index('js/solo.js'), 'js/solo-cuts.js')
     with open(os.path.join(GAME, 'js', 'load.txt'), 'w', encoding='utf-8', newline='\n') as fh:
         fh.write('\n'.join(load) + '\n')
     text = ''.join(open(os.path.join(GAME, p), encoding='utf-8').read() for p in load)

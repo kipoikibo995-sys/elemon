@@ -43,7 +43,7 @@
   globalThis.requestAnimationFrame = cb => raf0(() => cb(performance.now()));
 
   // ---------- the save ----------
-  let SAVE = null, loading = false, pending = null, newAsk = 0, savedAt = -1e9, saveKey = '', poolNote = -1e9;
+  let SAVE = null, loading = false, pending = null, newAsk = 0, savedAt = -1e9, saveKey = '', poolDry = false;
   try { const t = localStorage.getItem(KEY); if (t) { SAVE = JSON.parse(t); if (!SAVE || !SAVE.S || !SAVE.pet) SAVE = null; } }
   catch (e) { SAVE = null; }
   if (SAVE) S.titleSel = 1;
@@ -121,8 +121,11 @@
     fillPool();
     const g = Math.max(0, Math.min(n, S.pool));
     S.pool -= g;
-    if (g < n && real() - poolNote > 20e3) {                      // after the demo's own toast of this action
-      poolNote = real();
+    // said once when the pool runs dry, and again only after it has refilled a quarter (before, every 20 s it was
+    // dry, over the toast of whatever was just done: petting, the farm, a punch in Võ đường...)
+    if (S.pool >= rate() * POOL_HOLD * 0.25) poolDry = false;
+    if (g < n && !poolDry) {                                       // after the demo's own toast of this action
+      poolDry = true;
       setTimeout(() => toast(`${DATA.pet.name} học đủ rồi, nghỉ chút nhé (EXP hồi theo giờ)`), 0);
     }
     return gain0(g);
@@ -194,6 +197,10 @@
       for (const d of h.items) if (isPlaced(h, d.id) && (d.floor > FEET_Y + LAYER_SLACK) === front) ctx.drawImage(IMG[d.img], d.x, d.y);
     };
 
+  // ---------- the world map: every region open (the user, 25/10; their fights come with the combat rules) ----------
+  const REGIONS = typeof PL !== 'undefined' ? PL.filter(p => p.kind === 'region').map(p => p.key) : [];
+  const openRegions = () => { if (S.open) for (const k of REGIONS) S.open[k] = true; };
+
   // ---------- every frame ----------
   const frame0 = frame;
   let mode0 = S.mode, failed = '';
@@ -201,6 +208,7 @@
     const dt = lastNow === null ? 0 : Math.min(50, Math.max(0, now - lastNow));
     lastNow = now; ticked = false; farmed = false;
     const asleep = S.night > 0.5, nl = S.need ? S.need.nl : 0;
+    openRegions();
     if (!S.real && ['pickEgg', 'pickPet', 'egg'].includes(S.mode)) S.coins = START.coins;   // shown while picking
     // a slip in one frame of the demo must not freeze the game: the next frame is asked for again (logged once)
     try { frame0(now); }

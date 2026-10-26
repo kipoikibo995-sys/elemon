@@ -59,6 +59,26 @@ class CanvasRenderingContext2D {
   get strokeStyle() { return this._s.ss; }
   set strokeStyle(v) { this._s.ss = v; this._s.stroke = v instanceof CanvasGradient ? v : __rgba(v); }
   createLinearGradient() { return new CanvasGradient(); }
+  createPattern(im) {
+    const g = new CanvasGradient();
+    try {
+      const w = im.width || 1, h = im.height || 1, b = __cv.pixels(im.__id, 0, 0, w, h), d = new Uint8Array(b);
+      // a 2x2-block checker (one solid colour on see-through, as the Solo arena's dimming): drawn as that checker
+      if (w === 4 && h === 4) {
+        const at = (x, y) => d.subarray((y * 4 + x) * 4, (y * 4 + x) * 4 + 4), A = at(0, 0), B = at(2, 0);
+        const same = (p, q) => p[0] === q[0] && p[1] === q[1] && p[2] === q[2] && p[3] === q[3];
+        if (A[3] === 255 && B[3] === 0 && [[1, 0], [0, 1], [1, 1], [2, 2], [3, 3]].every(([x, y]) => same(at(x, y), A)) &&
+            [[3, 0], [0, 2], [1, 3]].every(([x, y]) => at(x, y)[3] === 0)) {
+          g.__checker = 2; g.__solid = __rgba(`rgb(${A[0]},${A[1]},${A[2]})`);
+        }
+      }
+      let r = 0, gg = 0, bl = 0, a = 0;
+      for (let i = 0; i < d.length; i += 4) { r += d[i]; gg += d[i + 1]; bl += d[i + 2]; a += d[i + 3]; }
+      const n = d.length / 4 || 1;
+      g.addColorStop(0, `rgba(${Math.round(r / n)},${Math.round(gg / n)},${Math.round(bl / n)},${(a / n / 255).toFixed(3)})`);
+    } catch (e) { g.addColorStop(0, 'rgba(0,0,0,0.3)'); }
+    return g;
+  }
   createRadialGradient() { return new CanvasGradient(); }
   get lineWidth() { return this._s.lw; } set lineWidth(v) { this._s.lw = +v; }
   get globalAlpha() { return this._s.alpha; } set globalAlpha(v) { this._s.alpha = Math.max(0, Math.min(1, +v)); }
@@ -66,7 +86,8 @@ class CanvasRenderingContext2D {
   get font() { return this._s.font; }
   set font(v) {
     const m = /(\d+(?:\.\d+)?)px/.exec(v);
-    this._s.font = v; this._s.size = m ? Math.round(+m[1]) : 10; this._s.bold = /bold|[6-9]00/.test(v) ? 1 : 0;
+    const px = m ? Math.round(+m[1]) : 10;
+    this._s.font = v; this._s.size = px < 9 ? 9 : px > 31 ? 32 : px === 31 ? 30 : px; this._s.bold = /bold|[6-9]00/.test(v) ? 1 : 0;
   }
   get textAlign() { return this._s.align; } set textAlign(v) { this._s.align = v; }
   get textBaseline() { return this._s.base; } set textBaseline(v) { this._s.base = v; }
@@ -76,7 +97,8 @@ class CanvasRenderingContext2D {
   get filter() { return this._s.filter; }
   set filter(v) {
     const amount = name => { const m = new RegExp(name + '\\(\\s*([\\d.]+)(%?)\\s*\\)').exec(v); return m ? +m[1] / (m[2] ? 100 : 1) : 1; };
-    this._s.filter = v; this._s.bright = amount('brightness'); this._s.sat = amount('saturate');
+    const grey = /grayscale\(/.test(v) ? amount('grayscale') : 0;
+    this._s.filter = v; this._s.bright = amount('brightness'); this._s.sat = amount('saturate') * (1 - Math.min(1, grey));
   }
   save() { this._stack.push({ ...this._s, m: [...this._s.m] }); }
   restore() { if (this._stack.length) this._s = this._stack.pop(); }
@@ -117,7 +139,9 @@ class CanvasRenderingContext2D {
     const s = this._s, m = s.m;
     if (w < 0) { x += w; w = -w; } if (h < 0) { y += h; h = -h; }
     if (s.clip) { const r = this._clipped(0, 0, 1, 1, x, y, w, h); if (!r) return; [x, y, w, h] = r.slice(4); }
-    __cv.fillRect(this.canvas.__id, x, y, w, h, m[0], m[1], m[2], m[3], m[4], m[5], __col(s.fill), s.alpha, __OPS[s.op]);
+    const f = s.fill;
+    if (f && f.__checker) return __cv.fillRect(this.canvas.__id, x, y, w, h, m[0], m[1], m[2], m[3], m[4], m[5], __col(f.__solid), s.alpha, __OPS[s.op], f.__checker);
+    __cv.fillRect(this.canvas.__id, x, y, w, h, m[0], m[1], m[2], m[3], m[4], m[5], __col(f), s.alpha, __OPS[s.op]);
   }
   clearRect(x, y, w, h) {
     const s = this._s, m = s.m;
@@ -130,6 +154,8 @@ class CanvasRenderingContext2D {
     else { sx = a; sy = b; sw = c; sh = d; dx = e; dy = f; dw = g; dh = h; }
     const s = this._s, m = s.m;
     if (s.clip) { const r = this._clipped(sx, sy, sw, sh, dx, dy, dw, dh); if (!r) return; [sx, sy, sw, sh, dx, dy, dw, dh] = r; }
+    const k = im.__k;
+    if (k) { sx /= k; sy /= k; sw /= k; sh /= k; }               // stored at 1/k of the size the page uses
     __cv.drawImage(this.canvas.__id, im.__id, sx, sy, sw, sh, dx, dy, dw, dh, m[0], m[1], m[2], m[3], m[4], m[5],
                    s.alpha, __OPS[s.op], s.blur > 0 ? s.shadow : 0, s.blur, s.bright, s.sat);
   }
@@ -139,6 +165,24 @@ class CanvasRenderingContext2D {
   closePath() { if (this._poly) this._poly.closed = true; this._poly = null; }
   moveTo(x, y) { this._poly = [x, y]; this._path.push(this._poly); }
   lineTo(x, y) { if (!this._poly) this.moveTo(x, y); else this._poly.push(x, y); }
+  // arcTo: the corner from the current point towards (x1, y1) then (x2, y2), rounded with radius r (short lines)
+  arcTo(x1, y1, x2, y2, r) {
+    if (!this._poly) this.moveTo(x1, y1);
+    const p = this._poly, x0 = p[p.length - 2], y0 = p[p.length - 1];
+    let ax = x0 - x1, ay = y0 - y1, bx = x2 - x1, by = y2 - y1;
+    const la = Math.hypot(ax, ay), lb = Math.hypot(bx, by);
+    if (!la || !lb || !r) { p.push(x1, y1); return; }
+    ax /= la; ay /= la; bx /= lb; by /= lb;
+    const th = Math.acos(Math.max(-1, Math.min(1, ax * bx + ay * by)));
+    if (th < 1e-3 || Math.PI - th < 1e-3) { p.push(x1, y1); return; }
+    const d = r / Math.tan(th / 2), tx = x1 + ax * d, ty = y1 + ay * d, ux = x1 + bx * d, uy = y1 + by * d;
+    let mx = ax + bx, my = ay + by; const lm = Math.hypot(mx, my); mx /= lm; my /= lm;
+    const cx = x1 + mx * r / Math.sin(th / 2), cy = y1 + my * r / Math.sin(th / 2);
+    let a0 = Math.atan2(ty - cy, tx - cx), a1 = Math.atan2(uy - cy, ux - cx), da = a1 - a0;
+    while (da > Math.PI) da -= 2 * Math.PI; while (da < -Math.PI) da += 2 * Math.PI;
+    p.push(tx, ty);
+    for (let i = 1; i <= 4; i++) { const t = a0 + da * i / 4; p.push(cx + r * Math.cos(t), cy + r * Math.sin(t)); }
+  }
   quadraticCurveTo(cx, cy, x, y) {
     if (!this._poly) this.moveTo(cx, cy);
     const p = this._poly, x0 = p[p.length - 2], y0 = p[p.length - 1];
@@ -156,6 +200,7 @@ class CanvasRenderingContext2D {
              u * u * u * y0 + 3 * u * u * t * ay + 3 * u * t * t * by + t * t * t * y);
     }
   }
+  strokeRect(x, y, w, h) { const keep = this._path, poly = this._poly; this.beginPath(); this.rect(x, y, w, h); this.stroke(); this._path = keep; this._poly = poly; }
   rect(x, y, w, h) {
     const p = [x, y, x + w, y, x + w, y + h, x, y + h];
     p.closed = true; p.rect = [x, y, w, h];
@@ -199,6 +244,11 @@ class CanvasRenderingContext2D {
     const b = __cv.pixels(this.canvas.__id, x, y, w, h);
     return { width: w, height: h, data: b ? new Uint8ClampedArray(b) : new Uint8ClampedArray(w * h * 4) };
   }
+  putImageData(d, x, y) {
+    const a = d.data, buf = a.byteOffset === 0 && a.byteLength === a.buffer.byteLength ? a.buffer : a.slice().buffer;
+    __cv.put(this.canvas.__id, x | 0, y | 0, d.width, d.height, buf);
+  }
+  createImageData(w, h) { return { width: w, height: h, data: new Uint8ClampedArray(w * h * 4) }; }
   measureText(t) { return { width: __cv.measure(String(t), this._s.size, this._s.bold) }; }
 }
 
@@ -267,6 +317,20 @@ globalThis.localStorage = {
 };
 // the game's sounds (in a browser, index.html makes these with <audio>)
 globalThis.SOUND = { sfx: (name, vol) => __cv.sfx(name, vol), music: name => __cv.music(name || '') };
+
+// URLSearchParams (Solo đối kháng reads its pets and bot level from a query string)
+if (typeof URLSearchParams === 'undefined') globalThis.URLSearchParams = class {
+  constructor(q = '') {
+    this._p = String(q).replace(/^\?/, '').split('&').filter(Boolean).map(kv => {
+      const i = kv.indexOf('='); return i < 0 ? [decodeURIComponent(kv), ''] : [decodeURIComponent(kv.slice(0, i)), decodeURIComponent(kv.slice(i + 1))];
+    });
+  }
+  get(k) { const e = this._p.find(p => p[0] === k); return e ? e[1] : null; }
+  has(k) { return this._p.some(p => p[0] === k); }
+  set(k, v) { this.delete(k); this._p.push([k, String(v)]); }
+  delete(k) { this._p = this._p.filter(p => p[0] !== k); }
+  toString() { return this._p.map(([k, v]) => encodeURIComponent(k) + '=' + encodeURIComponent(v)).join('&'); }
+};
 
 // QuickJS prints numbers without grouping: the page asks for 'en-US' (10,000)
 Number.prototype.toLocaleString = function () {

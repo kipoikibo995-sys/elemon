@@ -4,19 +4,196 @@
   body { margin: 0; background: #111; color: #ddd; font: 14px sans-serif; display: flex; flex-direction: column; align-items: center; }
   canvas { image-rendering: pixelated; margin-top: 12px; border: 2px solid #333; width: 960px; height: 720px; }
   p { margin: 6px; color: #aaa; } b { color: #ffcf6e; }
+  /* &r36s: the arena as the R36S handheld shows it: 640x480 pixels 1:1 in the console's body, colours cut to RGB565 */
+  body.r36s { background: #1b1d22; }
+  body.r36s > p, body.r36s #help { display: none; }
+  .r36s-body { margin-top: 18px; width: 720px; padding: 34px 40px 40px; border-radius: 28px 28px 70px 28px; background: linear-gradient(#3a3d45, #2a2c32);
+               box-shadow: 0 12px 40px #000a, inset 0 2px 0 #fff2; display: flex; flex-direction: column; align-items: center; }
+  .r36s-bezel { background: #0b0c0f; padding: 20px 28px 26px; border-radius: 12px; box-shadow: inset 0 0 0 2px #000; }
+  body.r36s canvas { width: 640px; height: 480px; margin: 0; border: 0; display: block; }
+  .r36s-brand { color: #8a8f99; font: bold 12px sans-serif; letter-spacing: 3px; margin-top: 8px; text-align: center; }
+  .r36s-pad { display: flex; justify-content: space-between; width: 100%; margin-top: 26px; color: #c9ccd3; font: 12px sans-serif; }
+  .r36s-dpad, .r36s-abxy { position: relative; width: 150px; height: 150px; }
+  .r36s-dpad i { position: absolute; background: #15161a; border-radius: 6px; }
+  .r36s-abxy i { position: absolute; width: 44px; height: 44px; border-radius: 50%; background: #15161a; color: #ddd; font: bold 14px/44px sans-serif; text-align: center; font-style: normal; }
+  .r36s-abxy small, .r36s-dpad small { position: absolute; font-size: 10px; color: #ffcf6e; white-space: nowrap; }
+  .r36s-mid { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; font-size: 11px; color: #9aa0aa; }
+  .r36s-mid b { display: inline-block; background: #15161a; border-radius: 9px; padding: 3px 12px; color: #ddd; }
 </style></head>
 <body>
 <canvas id="c" width="640" height="480"></canvas>
 <div id="help"></div>
 <p><b>Di chuyển</b> WASD / mũi tên · <b>Shift</b> lướt (0.2 giây miễn thương) · <b>Giữ</b> chiêu ngắm: hiện phễu, mũi tên tự quét (vẫn chạy được), <b>thả</b> khi mũi tên gần đối thủ là chiêu tự bắt thẳng vào nó. · <b>I</b> (chiêu cuối) chỉ dùng được khi thanh năng lượng đầy: đánh trúng hay bị đánh đều nạp.</p>
 <p><b>V</b> đổi đối thủ (Hổ → Thủy Long → Mộc Hùng → … → Dung Nham Vệ; hoặc thêm <b>&amp;vs=viem</b> vào địa chỉ) · <b>T</b> đổi hệ bot Hổ. Khắc: Kim &gt; Mộc &gt; Thổ &gt; Thủy &gt; Hỏa &gt; Kim, đánh hệ bị khắc ×1.5. · <b>Enter</b> đấu lại · <b>0 / 1 / 2 / 3</b> bot Tập (đứng chịu đòn, không đánh) / Dễ / Vừa / Khó (đổi xong đấu lại ngay).</p>
-<p>Đổi pet (thêm vào địa chỉ): <b>?thuy</b> Thủy Long · <b>?moc</b> Mộc Hùng (<b>&amp;teen</b> Lv3) · <b>?tho</b> Thổ Ngưu · <b>?kim</b> Tinh Kim Hiệp · <b>?hoa</b> Hỏa Hổ · <b>?quy</b> Hỏa Quy · <b>?cao</b> Hỏa Hồ · <b>?viem</b> Viêm Long · <b>?dung</b> Dung Nham Vệ · <b>?linh</b> Hỏa Linh · <b>?duong</b> Mộc Đường · <b>?reu</b> Rêu Linh · <b>?tru</b> Mộc Trư · <b>?loc</b> Mộc Lộc · <b>?nhan</b> Thụ Nhân · <b>?diep</b> Diệp Linh · <b>?sa</b> Thủy Sa · <b>?giai</b> Thủy Giải · <b>?chien</b> Thủy Chiến · <b>?bao</b> Bão Thủy · <b>?giao</b> Thủy Giao · <b>?nhi</b> Hỏa Hổ Nhi bộ cũ · không thêm gì: Hỏa Hổ trưởng thành.</p>
+<p>Đổi pet (thêm vào địa chỉ): <b>?thuy</b> Thủy Long · <b>?moc</b> Mộc Hùng (<b>&amp;teen</b> Lv3) · <b>?tho</b> Thổ Ngưu · <b>?kim</b> Tinh Kim Hiệp · <b>?hoa</b> Hỏa Hổ · <b>?quy</b> Hỏa Quy · <b>?cao</b> Hỏa Hồ · <b>?viem</b> Viêm Long · <b>?dung</b> Dung Nham Vệ · <b>?linh</b> Hỏa Linh · <b>?duong</b> Mộc Đường · <b>?reu</b> Rêu Linh · <b>?tru</b> Mộc Trư · <b>?loc</b> Mộc Lộc · <b>?nhan</b> Thụ Nhân · <b>?diep</b> Diệp Linh · <b>?sa</b> Thủy Sa · <b>?giai</b> Thủy Giải · <b>?chien</b> Thủy Chiến · <b>?bao</b> Bão Thủy · <b>?giao</b> Thủy Giao · <b>?tuong</b> Thổ Tượng · <b>?tich</b> Thổ Tích · <b>?thach</b> Thạch Nhân · <b>?thanh</b> Thành Trì · <b>?tholong</b> Thổ Long · <b>?kimte</b> Kim Tê · <b>?kimgiap</b> Kim Giáp · <b>?kimung</b> Kim Ưng · <b>?kimthach</b> Kim Thạch Nhân · <b>?liemdao</b> Liêm Đao · <b>?nhi</b> Hỏa Hổ Nhi bộ cũ · không thêm gì: Hỏa Hổ trưởng thành.</p>
 <script>
 // Bản thử riêng để duyệt khung đấu trường và cảm giác đánh; hình cắt thẳng từ sheet nguồn (nền magenta) ngay trên trình duyệt.
 // Hai bên dùng cùng một bộ luật (Fighter); bot chỉ khác ở chỗ não của nó bấm nút thay người.
 const cv = document.getElementById('c'), ctx = cv.getContext('2d');
 ctx.imageSmoothingEnabled = false;
 const load = src => new Promise(r => { const i = new Image(); i.onload = () => r(i); i.src = src; });
+// Skill sounds (sfx/<element>_<kind>.ogg, made by scripts/make_skill_sfx.py): one set per element. danh = basic attack,
+// ban = shot, trung = hit lands, nang = heavy hit, vung = area / burst, luot = dash / leap, khien = guard / buff, gong = ult charge, ult = ult lands.
+// M mutes the sounds and the music. The browser only lets sound start after a key press, so the context resumes on the first key.
+const SFX_EL = ['hoa', 'moc', 'thuy', 'tho', 'kim'], SFX_KIND = ['danh', 'ban', 'trung', 'vung', 'luot', 'khien', 'gong', 'ult', 'nang'];
+const SFX_KL = { sa: ['luot', 'vung'], gi: ['ban', 'khien'], ch: ['luot', 'khien'], bt: ['ban', 'luot'], ga: ['vung', 'luot'],
+  tt: ['ban', 'vung'], tc: ['ban', 'luot'], ta: ['ban', 'khien'], tr: ['khien', 'vung'], tl: ['ban', 'vung'],
+  kt: ['ban', 'luot'], kg: ['ban', 'khien'], ku: ['vung', 'luot'], kn: ['vung', 'vung'], ld: ['ban', 'luot'],
+  md: ['luot', 'khien'], mt: ['luot', 'vung'], ml: ['ban', 'khien'], tn: ['ban', 'khien'], dl: ['ban', 'vung'], rl: ['vung', 'ban'],
+  quy: ['luot', 'vung'], hoa: ['luot', 'vung'], vl: ['luot', 'ban'] };   // which kind K and L sound like; the rest: ban, vung
+let actx = null, sfxBuf = {}, sfxOn = true, sfxLast = {}, musicGain = null, fightSaid = false, sfxLoopGain = {}, sfxBus = null;
+// a pet's own cry (dau = hurt yelp, nga = knocked out), if it has a set
+// a landing / stomp / slam: the element's heavy thump (with its blast on top for the big ones), whether or not it hits
+function sfxLand(f, big) { sfx(f.el, 'nang', big ? 1 : 0.85); if (big) sfx(f.el, 'vung', 0.7); }
+// An ultimate's blast waits for its first blow (in hit) instead of playing on the key. ULT_LAND: when each pet's ult
+// first does damage (game ms after the key; measured with _sim.js, the foe 70 px in front); if it misses, the blast
+// plays then anyway (sfxLoops)
+const ULT_LAND = { thuy: 1200, moc: 1140, tho: 1250, kim: 950, hoa: 1240, quy: 1300, cao: 900, vl: 1150, dn: 900, md: 900, rl: 1900,
+  mt: 940, ml: 1640, dl: 1100, sa: 1200, gi: 1900, ch: 1900, bt: 1100, ga: 3200, tt: 1390, tc: 1340, ta: 1050, tr: 1800, tl: 1400,
+  kt: 1200, kg: 920, ku: 2700, kn: 2760, ld: 1870 };
+// a blow landing: the attacker's own impact (trung, or nang for heavy ones), else its element's
+function sfxHit(by, kind, vol) {
+  const pt = by.bot ? BOTPET : PET, own = pt && sfxBuf['pet:' + pt.dir + '_' + kind];
+  if (own) sfxPlay('pet:' + pt.dir + '_' + kind + (by.bot ? 'B' : 'P'), own, vol); else sfx(by.el, kind, vol);
+}
+function sfxPet(f, k, vol = 1) {
+  const pt = f.bot ? BOTPET : PET, buf = pt && sfxBuf['pet:' + pt.dir + '_' + k];
+  if (buf) sfxPlay('pet:' + pt.dir + '_' + k + (f.bot ? 'B' : 'P'), buf, vol);
+}
+// Lasting effects each have their own looping sound (sfx/<name>.ogg): lava bubbling, mud squelching, the earth cracking,
+// stone grinding, water swirling, mist, roots creaking, crystals humming; burns and fire trails crackle; an ult in progress
+// hums with its element. Faded in while the effect is on the field, out when it is gone (sfxLoops, every frame).
+const LOOP_VOL = 0.38;
+const FIELD_LOOP = { lava: 'loop_lava', trail: 'hoa_loop', zone: 'loop_lua-lon', mud: 'loop_bun', fissure: 'tho_loop', trench: 'tho_loop',
+  wall: 'loop_da', glyph: 'kim_loop', pillar: 'kim_loop', whirl: 'loop_xoay', vortex: 'loop_xoay', mist: 'loop_suong' };
+const LOOPS = ['hoa_loop', 'moc_loop', 'thuy_loop', 'tho_loop', 'kim_loop', 'loop_lava', 'loop_lua-lon', 'loop_bun', 'loop_da', 'loop_xoay', 'loop_suong', 'loop_re'];
+function sfxLoops() {
+  for (const f of [P, B]) if (f && f.ultBoom && now >= f.ultBoom) { f.ultBoom = 0; sfxSkill(f, 'ult', 'ult', f.bot ? 0.7 : 1); }
+  if (!actx || !sfxLoopGain.hoa_loop) return;
+  const on = {}, add = (k, v) => { on[k] = Math.min(1, (on[k] || 0) + v); };
+  for (const fl of fields) if (FIELD_LOOP[fl.kind]) add(FIELD_LOOP[fl.kind], fl.kind === 'trail' ? 0.25 : 0.7);
+  for (const u of ults) if (u.by && now - u.t0 > 900) add(u.by.el + '_loop', 1);
+  if (scorch.length) add('hoa_loop', 0.6);                               // burning ground
+  for (const f of [P, B]) { if (now < f.burnUntil) add('hoa_loop', 0.7); if (now < f.rootUntil) add('loop_re', 0.9); }
+  for (const k of LOOPS) if (sfxLoopGain[k]) sfxLoopGain[k].gain.setTargetAtTime(sfxOn && !over ? (on[k] || 0) * LOOP_VOL : 0, actx.currentTime, 0.15);
+}
+const MUSIC_VOL = 0.2, MUSIC = ['chien-dau.ogg', 'chien-dau-boss.ogg'];
+async function sfxInit() {
+  if (actx) { if (actx.state === 'suspended') actx.resume(); return; }
+  actx = new (window.AudioContext || window.webkitAudioContext)();
+  // skill sounds go through a louder bus with a compressor, so they stand out over the music without clipping
+  sfxBus = actx.createGain(); sfxBus.gain.value = 1.5;
+  const comp = actx.createDynamicsCompressor(); comp.threshold.value = -14; comp.ratio.value = 6; comp.attack.value = 0.003; comp.release.value = 0.2;
+  sfxBus.connect(comp).connect(actx.destination);
+  // battle music: two CC0 orchestral tracks (assets/am-thanh/nhac/_cc0/NGUON.txt) take turns, round and round
+  musicGain = actx.createGain(); musicGain.gain.value = sfxOn ? MUSIC_VOL : 0; musicGain.connect(actx.destination);
+  Promise.all(MUSIC.map(f => fetch('sfx/' + f).then(r => r.arrayBuffer()).then(b => actx.decodeAudioData(b)).catch(() => null)))
+    .then(bufs => { bufs = bufs.filter(Boolean); let i = 0;
+      const next = () => { if (!bufs.length) return; const src = actx.createBufferSource(); src.buffer = bufs[i++ % bufs.length];
+        src.connect(musicGain); src.onended = next; src.start(); };
+      next(); });
+  for (const el of SFX_EL) for (const k of SFX_KIND)
+    fetch('sfx/' + el + '_' + k + '.ogg').then(r => r.arrayBuffer()).then(b => actx.decodeAudioData(b)).then(a => { sfxBuf[el + '_' + k] = a; }).catch(() => {});
+  // the lasting-effect loops, all silent until sfxLoops turns one up
+  for (const el of LOOPS) {
+    const g = actx.createGain(); g.gain.value = 0; g.connect(actx.destination); sfxLoopGain[el] = g;
+    fetch('sfx/' + el + '.ogg').then(r => r.arrayBuffer()).then(b => actx.decodeAudioData(b)).then(a => {
+      const src = actx.createBufferSource(); src.buffer = a; src.loop = true; src.connect(g); src.start();
+    }).catch(() => {});
+  }
+  for (const k of ['fight', 'ko'])            // the announcer, at the start and the end of a round
+    fetch('sfx/' + k + '.ogg').then(r => r.arrayBuffer()).then(b => actx.decodeAudioData(b)).then(a => { sfxBuf[k] = a; }).catch(() => {});
+  // the two pets on the field also get their own set, with their own cry: sfx/pet/<dir>_{j,k,l,gong,ult,dau,nga,trung,nang}.ogg
+  for (const pt of [PET, BOTPET]) if (pt) for (const k of ['j', 'k', 'l', 'gong', 'ult', 'dau', 'nga', 'trung', 'nang'])
+    fetch('sfx/pet/' + pt.dir + '_' + k + '.ogg').then(r => r.arrayBuffer()).then(b => actx.decodeAudioData(b)).then(a => { sfxBuf['pet:' + pt.dir + '_' + k] = a; }).catch(() => {});
+}
+// ---------- Skill traits and combos ----------
+// Every pet's J, K and L carry one trait, drawn at random once per pet (seeded by its name, so it never changes) from a
+// points budget so every pet gets the same total: J only gets a light one (it is spammed), K and L share the rest.
+// A hit applies its skill's trait; a hit landing on a foe that already carries certain traits sets off a combo.
+const TRAITS = {
+  uot:    { n: 'Ướt', c: '#6ad0ff', pt: 2 },  cham: { n: 'Chậm', c: '#a0c0ff', pt: 2 },  dau: { n: 'Đánh dấu', c: '#ff70d0', pt: 2 },
+  bong:   { n: 'Bỏng', c: '#ff8a3a', pt: 3 }, troi: { n: 'Trói', c: '#a8e04a', pt: 3 },  vo: { n: 'Vỡ giáp', c: '#d8d8d8', pt: 3 },
+  choang: { n: 'Choáng', c: '#ffe08a', pt: 4 }, hat: { n: 'Hất tung', c: '#ffc070', pt: 4 },
+};
+// Balance: per pet, how hard it hits (KIT_POWER) and how much of a hit it takes (KIT_DEF). Tuned 25/10/2026 by a
+// bot-vs-bot round robin (_sim.js: every pet against every other, 6 games a pair, both sides, bot level Vừa, traits on):
+// every pet now wins 43-58% (it was 9-96%); re-tuned after K / L aiming, the stone-ring arena and harder-to-dodge
+// ultimates, 10 games a pair. Re-run _sim.js and re-tune whenever a kit changes.
+const KIT_POWER = { thuy: 1.56, moc: 1.25, tho: 0.75, kim: 0.9, hoa: 0.96, quy: 0.76, cao: 1.03, vl: 1.52, dn: 0.58, hl: 0.62, md: 1.28, rl: 1.46, mt: 1.12, ml: 2.09, tn: 1.39, dl: 0.92, sa: 1.58, gi: 1.05, ch: 1.02, bt: 0.65, ga: 0.62, tt: 1.29, tc: 2.12, ta: 1.16, tr: 1.46, tl: 1.21, kt: 1.39, kg: 1.64, ku: 1.01, kn: 1.75, ld: 1 };
+const KIT_DEF = { thuy: 1, moc: 0.97, tho: 0.97, kim: 0.99, hoa: 1.04, quy: 0.99, cao: 0.95, vl: 1, dn: 1.52, hl: 1.04, md: 0.99, rl: 1, mt: 0.96, ml: 1.01, tn: 1, dl: 1, sa: 1, gi: 0.96, ch: 1.04, bt: 0.98, ga: 0.99, tt: 1.01, tc: 0.82, ta: 0.99, tr: 1, tl: 0.95, kt: 1.02, kg: 0.99, ku: 0.96, kn: 0.76, ld: 0.98 };
+const TRAIT_BUDGET = 8, TRAIT_LIGHT = ['uot', 'cham', 'dau'];
+function traitsFor(name) {
+  let seed = 0; for (const ch of name) seed = (seed * 31 + ch.charCodeAt(0)) >>> 0;
+  const rnd = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
+  const all = Object.keys(TRAITS), j = TRAIT_LIGHT[Math.floor(rnd() * 3)], left = TRAIT_BUDGET - TRAITS[j].pt;
+  for (;;) {                                    // K and L: two different traits whose points fill the rest of the budget
+    const k = all[Math.floor(rnd() * all.length)], l = all[Math.floor(rnd() * all.length)];
+    if (k !== l && k !== j && l !== j && TRAITS[k].pt + TRAITS[l].pt === left) return { j, k, l };
+  }
+}
+const traitsOf = f => { const pt = PETS[f.kit]; return traitsFor(pt ? pt.dir : 'bot-' + f.el); };   // by kit: the same pet always has the same traits
+const COMBO_CD = 900;   // one combo per target per 0.9 s
+// called by hit() before the damage lands: combos first (they read the traits already on the foe), then this hit's trait
+function traitHit(f, dmg, big, by, kind = '') {
+  const soft = kind === 'ultTick' || kind === 'burn' || kind === 'spin' || kind === 'breath' || kind === 'zone';
+  if (!by || by === f || soft || f.hp <= 0) return dmg;
+  if (now < f.brokenUntil) dmg *= 1.15;                                       // armor broken: everything hurts more
+  if (now - (f.comboT || -1e9) > COMBO_CD) {
+    let c = null;
+    if (now < f.wetUntil && by.el === 'kim') { c = ['Giật điện!', '#a0f0ff']; dmg += 6; f.stunUntil = Math.max(f.stunUntil, now + 400); f.wetUntil = 0; }
+    else if (now < f.wetUntil && by.el === 'hoa') { c = ['Hơi nước!', '#e0f0ff']; dmg += 5; f.wetUntil = 0; }
+    else if (now < f.burnUntil && by.el === 'moc') { c = ['Bùng cháy!', '#ff6a2a']; dmg += 8; f.burnUntil = 0; }
+    else if (now < f.burnUntil && by.el === 'thuy') { c = ['Dập lửa!', '#9ad8ff']; dmg += 4; f.burnUntil = 0; f.wetUntil = now + 3000; }
+    else if (now < f.slowUntil && by.el === 'tho' && !(now < f.rootUntil)) { c = ['Lún đất!', '#c8a070']; root(f, by, 600); }
+    else if ((now < f.stunUntil || now < f.rootUntil) && big) { c = ['Đập mạnh!', '#ffe08a']; dmg *= 1.4; }
+    else if (f.launchT && now - f.launchT < LAUNCH_MS + 150) { c = ['Trên không!', '#ffc070']; dmg += 4; }
+    if (now < f.markedUntil) { c = c || ['Bể dấu!', '#ff70d0']; dmg *= 1.3; f.markedUntil = 0; }
+    if (c) { f.comboT = now; say(f, c[0], c[1]); fxs.push({ kind: 'comboFlash', x: f.x, y: mid(f), col: c[1], t0: now }); }
+  }
+  // this hit's own trait: the skill it came from is the attacker's current act, or its last J/K/L if a shot is still flying
+  const key = ['j', 'k', 'l'].includes(by.act) ? by.act : now - (by.castT || -1e9) < 2500 ? by.lastKey : null;
+  if (!key || kind.startsWith('ult')) return dmg;
+  const t = traitsOf(by)[key], fresh = n => { if (n) say(f, TRAITS[t].n, TRAITS[t].c); };
+  if (t === 'uot') { fresh(now >= f.wetUntil); f.wetUntil = now + 3000; f.slowUntil = Math.max(f.slowUntil, now + 600); }
+  else if (t === 'cham') { fresh(now >= f.slowUntil); f.slowUntil = Math.max(f.slowUntil, now + 1500); }
+  else if (t === 'dau') { fresh(now >= f.markedUntil); f.markedUntil = now + 4000; }
+  else if (t === 'vo') { fresh(now >= f.brokenUntil); f.brokenUntil = now + 3000; }
+  else if (t === 'bong') burn(f, by);
+  else if (t === 'troi') { if (!(now < f.rootUntil)) root(f, by, 800); }
+  else if (t === 'choang') { if (now >= f.stunUntil) { f.stunUntil = now + 450; f.aiming = null; if (f.act !== 'i') f.act = null; say(f, 'Choáng!', TRAITS.choang.c); } }
+  else if (t === 'hat') { if (f.hp > dmg && now >= f.stunUntil) launch(f); }
+  return dmg;
+}
+// the traits a fighter carries now, as little coloured tags over its head
+function drawStatus(f) {
+  const tags = [];
+  if (now < f.wetUntil) tags.push('uot'); if (now < f.burnUntil) tags.push('bong'); if (now < f.markedUntil) tags.push('dau');
+  if (now < f.brokenUntil) tags.push('vo'); if (now < f.slowUntil) tags.push('cham'); if (now < f.rootUntil) tags.push('troi');
+  if (!tags.length) return;
+  ctx.font = 'bold 9px sans-serif'; ctx.textAlign = 'center';
+  const w = tags.map(t => ctx.measureText(TRAITS[t].n).width + 6), total = w.reduce((a, b) => a + b, 0) + (tags.length - 1) * 2;
+  let x = f.x - total / 2; const y = f.y - f.h - 14 - (f.z || 0);
+  tags.forEach((t, i) => {
+    ctx.fillStyle = 'rgba(0,0,0,.6)'; ctx.fillRect(x, y - 9, w[i], 12);
+    ctx.fillStyle = TRAITS[t].c; ctx.fillText(TRAITS[t].n, x + w[i] / 2, y); x += w[i] + 2;
+  });
+}
+// a pet's own sound for this skill if it has one, else its element's
+function sfxSkill(f, k, kind, vol) {
+  const pt = f.bot ? BOTPET : PET, own = pt && sfxBuf['pet:' + pt.dir + '_' + k];
+  if (own) sfxPlay('pet:' + pt.dir + '_' + k, own, vol); else sfx(f.el, kind, vol);
+}
+function sfx(el, kind, vol = 1) {
+  const name = (SFX_EL.includes(el) ? el : 'hoa') + '_' + kind;
+  sfxPlay(name, sfxBuf[name], vol);
+}
+function sfxPlay(name, buf, vol) {
+  if (!sfxOn || !actx || !buf || real - (sfxLast[name] || -1e9) < 60) return;   // the same sound twice in 60 ms: once
+  sfxLast[name] = real;
+  const src = actx.createBufferSource(), g = actx.createGain();
+  src.buffer = buf; g.gain.value = vol; src.connect(g).connect(sfxBus); src.start();
+}
 
 // Painted sheets are only roughly on their grid: a big frame (a cloud, a splash) often spills past its cell. So every
 // cut line is moved to the emptiest line near the nominal grid line (a magenta gap between frames when there is one),
@@ -162,6 +339,29 @@ PETS.dn = { dir: 'dung-nham-ve', kit: 'dn', el: 'hoa', name: 'Dung Nham Vệ Nhi
             banner: ['#3a1206', '#8a2a0a', '#ffd36e'], chip: '#3a1a0a', flash: ['#ffd36e', '#ffe08a'],
             skills: [['j', 'Húc'], ['k', 'Lăn'], ['l', 'Lửa Thân'], ['i', 'Phân Thân']] };
 const QS = location.search.replace(/[?&]vs=[^&]*/, '');   // the player's pet; &vs=<pet> picks the bot's
+// &r36s: show the arena the way the R36S handheld would: the 640x480 canvas at 1:1 inside a drawing of the console,
+// every frame's colours cut to the screen's RGB565 (see rgb565 below), the buttons labelled with what they do
+const R36S = /[?&]r36s(&|$)/.test(location.search);
+if (R36S) {
+  document.body.classList.add('r36s');
+  const shell = document.createElement('div'); shell.className = 'r36s-body';
+  shell.innerHTML = '<div class="r36s-bezel"></div><div class="r36s-brand">R36S · 3.5" 640×480</div>' +
+    '<div class="r36s-pad"><div class="r36s-dpad"><i style="left:55px;top:10px;width:40px;height:130px"></i><i style="left:10px;top:55px;width:130px;height:40px"></i>' +
+    '<small style="left:30px;top:142px">D-pad: đi (WASD)</small></div>' +
+    '<div class="r36s-mid"><span><b>SELECT</b> &nbsp; <b>START</b></span><span>START: đấu lại (Enter)</span><span>R1: lướt (Shift)</span></div>' +
+    '<div class="r36s-abxy"><i style="left:53px;top:0">X</i><i style="left:0;top:53px">Y</i><i style="left:106px;top:53px">A</i><i style="left:53px;top:106px">B</i>' +
+    '<small style="left:46px;top:-14px">X = L</small><small style="left:-30px;top:64px">Y = I</small><small style="left:152px;top:64px">A = J</small><small style="left:46px;top:152px">B = K</small></div></div>';
+  document.body.insertBefore(shell, document.body.firstChild);
+  shell.querySelector('.r36s-bezel').appendChild(document.getElementById('c'));
+}
+// the R36S screen is 16-bit: 5 bits red, 6 green, 5 blue; round every pixel of the finished frame to that
+const LUT5 = new Uint8Array(256), LUT6 = new Uint8Array(256);   // 8-bit level -> nearest 5-bit / 6-bit level, back in 8 bits
+for (let v = 0; v < 256; v++) { LUT5[v] = Math.round(Math.round(v / 255 * 31) * 255 / 31); LUT6[v] = Math.round(Math.round(v / 255 * 63) * 255 / 63); }
+function rgb565() {
+  const im = ctx.getImageData(0, 0, 640, 480), d = im.data, n = d.length;
+  for (let i = 0; i < n; i += 4) { d[i] = LUT5[d[i]]; d[i + 1] = LUT6[d[i + 1]]; d[i + 2] = LUT5[d[i + 2]]; }
+  ctx.putImageData(im, 0, 0);
+}
 PETS.hl = { dir: 'hoa-linh', kit: 'hl', el: 'hoa', name: 'Hỏa Linh Nhi', col: '#ffb030', ult: 'HỎA LINH ĐỊA MẠCH',
             banner: ['#5a1606', '#b8400e', '#ffe08a'], chip: '#4a1e0a', flash: ['#ffe08a', '#ffd36e'],
             skills: [['j', 'Cầu Lửa'], ['k', 'Ấn Lửa'], ['l', 'Giáp Cầu'], ['i', 'Địa Mạch']] };
@@ -198,10 +398,40 @@ PETS.bt = { dir: 'bao-thuy', kit: 'bt', el: 'thuy', name: 'Bão Thủy Nhi', col
 PETS.ga = { dir: 'thuy-giao', kit: 'ga', el: 'thuy', name: 'Thủy Giao Nhi', col: '#3ac0e0', ult: 'GIAO LONG XUẤT HẢI',
             banner: ['#061a30', '#0e4a7a', '#c0f4ff'], chip: '#0a2240', flash: ['#c0f4ff', '#ffffff'],
             skills: [['j', 'Thủy Tiễn'], ['k', 'Vòng Xoáy'], ['l', 'Hóa Sương'], ['i', 'Giao Long']] };
-const PET = /[?&]sa\b|[?&]sa$/.test(QS) ? PETS.sa : /giai/.test(QS) ? PETS.gi : /chien/.test(QS) ? PETS.ch : /bao/.test(QS) ? PETS.bt : /giao/.test(QS) ? PETS.ga : /loc|[?&]ml/.test(QS) ? PETS.ml : /nhan|[?&]tn/.test(QS) ? PETS.tn : /diep|[?&]dl/.test(QS) ? PETS.dl : /tru|[?&]mt/.test(QS) ? PETS.mt : /reu|[?&]rl/.test(QS) ? PETS.rl : /duong|[?&]md/.test(QS) ? PETS.md : /linh|[?&]hl/.test(QS) ? PETS.hl : /dung|[?&]dn/.test(QS) ? PETS.dn : /viem|[?&]vl/.test(QS) ? PETS.vl : /cao/.test(QS) ? PETS.cao : /quy/.test(QS) ? PETS.quy : /hoa/.test(QS) ? PETS.hoa : /kim/.test(QS) ? PETS.kim : /thuy/.test(QS) ? PETS.thuy : /moc/.test(QS) ? PETS.moc : /tho/.test(QS) ? PETS.tho : null;
+PETS.tt = { dir: 'tho-tuong', kit: 'tt', el: 'tho', name: 'Thổ Tượng Nhi', col: '#c89a60', ult: 'VOI CHIẾN MA MÚT',
+            banner: ['#3a2410', '#8a5a2a', '#ffe8b0'], chip: '#3a2814', flash: ['#ffe8b0', '#ffffff'],
+            skills: [['j', 'Vung Chùy'], ['k', 'Phun Bùn'], ['l', 'Dậm Đất'], ['i', 'Ma Mút']] };
+PETS.tc = { dir: 'tho-tich', kit: 'tc', el: 'tho', name: 'Thổ Tích Nhi', col: '#f0a040', ult: 'MƯA THIÊN THẠCH',
+            banner: ['#2a1030', '#8a3a1a', '#ffd080'], chip: '#3a1a14', flash: ['#ffd080', '#ffffff'],
+            skills: [['j', 'Quất Đuôi'], ['k', 'Đá Nảy'], ['l', 'Lột Xác'], ['i', 'Thiên Thạch']] };
+PETS.ta = { dir: 'thach-nhan', kit: 'ta', el: 'tho', name: 'Thạch Nhân Nhi', col: '#c8b080', ult: 'NÚI LỞ',
+            banner: ['#2a2a1a', '#6a6a3a', '#f0f0c0'], chip: '#2e2e1c', flash: ['#f0f0c0', '#ffffff'],
+            skills: [['j', 'Đấm Đá'], ['k', 'Lăn Tảng'], ['l', 'Giáp Đá'], ['i', 'Núi Lở']] };
+PETS.tr = { dir: 'thanh-tri', kit: 'tr', el: 'tho', name: 'Thành Trì Nhi', col: '#d07040', ult: 'THÀNH LŨY',
+            banner: ['#3a1a10', '#8a3a20', '#ffe0a0'], chip: '#3a2014', flash: ['#ffe0a0', '#ffffff'],
+            skills: [['j', 'Khiên Đập'], ['k', 'Dựng Tường'], ['l', 'Tháp Pháo'], ['i', 'Thành Lũy']] };
+PETS.tl = { dir: 'tho-long', kit: 'tl', el: 'tho', name: 'Thổ Long Nhi', col: '#d0a060', ult: 'LONG QUYỂN SA',
+            banner: ['#3a2410', '#9a5a20', '#ffe0a0'], chip: '#3a2814', flash: ['#ffe0a0', '#ffffff'],
+            skills: [['j', 'Phun Cát'], ['k', 'Gai Đất'], ['l', 'Địa Chấn'], ['i', 'Long Quyển']] };
+PETS.kt = { dir: 'kim-te', kit: 'kt', el: 'kim', name: 'Kim Tê Nhi', col: '#a8d8f0', ult: 'VẠN CHÂM GIÁNG',
+            banner: ['#102030', '#3a6a8a', '#e0f4ff'], chip: '#1a2a38', flash: ['#e0f4ff', '#ffffff'],
+            skills: [['j', 'Húc Sừng'], ['k', 'Xòe Kim'], ['l', 'Nhảy Húc'], ['i', 'Vạn Châm']] };
+PETS.kg = { dir: 'kim-giap', kit: 'kg', el: 'kim', name: 'Kim Giáp Nhi', col: '#c0c8d8', ult: 'CẦU THÉP PHÁ THÀNH',
+            banner: ['#1a1e28', '#5a6478', '#f0f4ff'], chip: '#22262e', flash: ['#f0f4ff', '#ffffff'],
+            skills: [['j', 'Cào Thép'], ['k', 'Bắn Vảy'], ['l', 'Cuộn Giáp'], ['i', 'Cầu Thép']] };
+PETS.ku = { dir: 'kim-ung', kit: 'ku', el: 'kim', name: 'Kim Ưng Nhi', col: '#e0e8f8', ult: 'THIẾT ƯNG VỒ MỒI',
+            banner: ['#10182a', '#4a5a8a', '#f0f4ff'], chip: '#1a2030', flash: ['#f0f4ff', '#ffffff'],
+            skills: [['j', 'Lông Thép'], ['k', 'Cuồng Phong'], ['l', 'Bổ Nhào'], ['i', 'Thiết Ưng']] };
+PETS.kn = { dir: 'kim-thach-nhan', kit: 'kn', el: 'kim', name: 'Kim Thạch Nhân Nhi', col: '#80e0f0', ult: 'NGỤC PHA LÊ',
+            banner: ['#0a2030', '#2a7a9a', '#e0ffff'], chip: '#142a34', flash: ['#e0ffff', '#ffffff'],
+            skills: [['j', 'Đấm Pha Lê'], ['k', 'Gai Pha Lê'], ['l', 'Trụ Pha Lê'], ['i', 'Ngục Pha Lê']] };
+PETS.ld = { dir: 'liem-dao', kit: 'ld', el: 'kim', name: 'Liêm Đao Nhi', col: '#b0d0ff', ult: 'TÀN NGUYỆT TRẢM',
+            banner: ['#0a1030', '#3a4a9a', '#e0e8ff'], chip: '#141a34', flash: ['#e0e8ff', '#ffffff'],
+            skills: [['j', 'Chém Liềm'], ['k', 'Liềm Bay'], ['l', 'Ảnh Bộ'], ['i', 'Tàn Nguyệt']] };
+const PET = /kimte/.test(QS) ? PETS.kt : /kimgiap/.test(QS) ? PETS.kg : /kimung/.test(QS) ? PETS.ku : /kimthach/.test(QS) ? PETS.kn : /liemdao/.test(QS) ? PETS.ld : /tuong/.test(QS) ? PETS.tt : /tich/.test(QS) ? PETS.tc : /thach/.test(QS) ? PETS.ta : /thanh/.test(QS) ? PETS.tr : /tholong/.test(QS) ? PETS.tl : /[?&]sa\b|[?&]sa$/.test(QS) ? PETS.sa : /giai/.test(QS) ? PETS.gi : /chien/.test(QS) ? PETS.ch : /bao/.test(QS) ? PETS.bt : /giao/.test(QS) ? PETS.ga : /loc|[?&]ml/.test(QS) ? PETS.ml : /nhan|[?&]tn/.test(QS) ? PETS.tn : /diep|[?&]dl/.test(QS) ? PETS.dl : /tru|[?&]mt/.test(QS) ? PETS.mt : /reu|[?&]rl/.test(QS) ? PETS.rl : /duong|[?&]md/.test(QS) ? PETS.md : /linh|[?&]hl/.test(QS) ? PETS.hl : /dung|[?&]dn/.test(QS) ? PETS.dn : /viem|[?&]vl/.test(QS) ? PETS.vl : /cao/.test(QS) ? PETS.cao : /quy/.test(QS) ? PETS.quy : /hoa/.test(QS) ? PETS.hoa : /kim/.test(QS) ? PETS.kim : /thuy/.test(QS) ? PETS.thuy : /moc/.test(QS) ? PETS.moc : /tho/.test(QS) ? PETS.tho : null;
 // the bot: the tiger (recoloured by element with T) or, with &vs=<pet> (V cycles), any pet fighting with its own kit
-const VS_KEYS = ['', 'thuy', 'moc', 'tho', 'kim', 'hoa', 'quy', 'cao', 'viem', 'dung', 'linh', 'duong', 'reu', 'tru', 'loc', 'nhan', 'diep', 'sa', 'giai', 'chien', 'bao', 'giao'];
-const VS_PET = { thuy: 'thuy', moc: 'moc', tho: 'tho', kim: 'kim', hoa: 'hoa', quy: 'quy', cao: 'cao', viem: 'vl', dung: 'dn', linh: 'hl', duong: 'md', reu: 'rl', tru: 'mt', loc: 'ml', nhan: 'tn', diep: 'dl', sa: 'sa', giai: 'gi', chien: 'ch', bao: 'bt', giao: 'ga' };
+const VS_KEYS = ['', 'thuy', 'moc', 'tho', 'kim', 'hoa', 'quy', 'cao', 'viem', 'dung', 'linh', 'duong', 'reu', 'tru', 'loc', 'nhan', 'diep', 'sa', 'giai', 'chien', 'bao', 'giao', 'tuong', 'tich', 'thach', 'thanh', 'tholong', 'kimte', 'kimgiap', 'kimung', 'kimthach', 'liemdao'];
+const VS_PET = { thuy: 'thuy', moc: 'moc', tho: 'tho', kim: 'kim', hoa: 'hoa', quy: 'quy', cao: 'cao', viem: 'vl', dung: 'dn', linh: 'hl', duong: 'md', reu: 'rl', tru: 'mt', loc: 'ml', nhan: 'tn', diep: 'dl', sa: 'sa', giai: 'gi', chien: 'ch', bao: 'bt', giao: 'ga', tuong: 'tt', tich: 'tc', thach: 'ta', thanh: 'tr', tholong: 'tl', kimte: 'kt', kimgiap: 'kg', kimung: 'ku', kimthach: 'kn', liemdao: 'ld' };
 const VS = new URLSearchParams(location.search).get('vs') || '';
 const BOTPET = PETS[VS_PET[VS]] || null;
 const WB = {};   // the bot pet's sheets
@@ -216,6 +446,16 @@ const HELP = {
   kim: 'Mọi chiêu đều <b>giữ để tụ</b>: <b>J</b> bấm nhanh = đấm 6, giữ tối đa 0.8 giây = đấm tụ lực tới 18 · <b>giữ K</b> gồng rồi thả = tia sét theo mũi tên (tụ càng lâu càng dài, càng đau) · <b>giữ L</b> gồng (đi chậm) rồi thả = nổ sét quanh mình, tụ đầy 1.5 giây thì choáng · <b>I</b> Lôi Bạo (không ngắm: 3 đợt sóng sét bay ra 8 hướng, đợt cuối choáng)',
   hoa: '<b>J</b> Trảo Lửa liên hoàn (bấm liên tiếp ra 3 nhát, nhát 3 gây <b>Đốt</b>) · <b>giữ K</b> Hổ Vồ (nhảy vồ theo mũi tên, đáp nổ + để lại vũng lửa) · <b>L</b> Hỏa Nộ (4 giây bốc lửa: chạy nhanh hơn, mọi đòn đều gây Đốt) · <b>giữ I</b> Thiên Hỏa Hổ Vương (mỗi đòn thêm Đốt). <b>Đốt</b>: mất 2 máu mỗi 0.5 giây trong 2 giây.',
   rl: '<b>Triệu hồi</b> · <b>J</b> Đập Rêu (cận chiến) · <b>K</b> Gieo Nấm (gieo một cây nấm rêu dưới chân, tối đa 3 cây, sống 9 giây; nấm tự bắn bào tử vào đối thủ đến gần; đối thủ giẫm lên là bẹp) · <b>L</b> Rêu Dính (ném cục rêu dính tự bay đuổi theo đối thủ, lướt né được; trúng thì <b>kéo</b> đối thủ về phía mình và làm chậm, lôi vào giữa đám nấm) · <b>I</b> Quái Rêu Thức Giấc (không ngắm: sân thành đầm, quái rêu khổng lồ trồi lên đuổi đối thủ 5 giây, 3 lần đập tay có vòng báo trước, cuối cùng há miệng nuốt rồi nhả kèm <b>choáng</b>; lướt né được)',
+  kt: '<b>Đấu sĩ</b> · <b>J</b> Húc Sừng (cận chiến) · <b>K</b> Xòe Kim (bờm bắn 8 cây kim thép tỏa ra mọi phía) · <b>L</b> Nhảy Húc (nhảy về phía trước, đáp sừng xuống gây sát thương quanh chỗ đáp) · <b>I</b> Vạn Châm Giáng (không ngắm: vòng phù chú dưới chân đối thủ, mưa kim thép trút xuống, rồi sừng thép khổng lồ trồi lên hất tung; chạy khỏi vòng là né)',
+  kg: '<b>Đỡ đòn</b> · <b>J</b> Cào Thép (cận chiến) · <b>K</b> Bắn Vảy (3 vảy thép tỏa hình quạt) · <b>L</b> Cuộn Giáp (1.5 giây cuộn tròn: đòn đánh chỉ còn 20%, đạn trúng bị dội ngược) · <b>I</b> Cầu Thép Phá Thành (không ngắm: hóa quả cầu thép khổng lồ lăn đuổi theo đối thủ, trúng thì hất tung; lướt né được)',
+  ku: '<b>Xạ thủ bay</b> · <b>J</b> Lông Thép (phóng lông vũ thép) · <b>K</b> Cuồng Phong (vỗ cánh tạo luồng gió hình nón đẩy văng) · <b>L</b> Bổ Nhào (lao bổ xuống chỗ phía trước, gây sát thương vùng) · <b>I</b> Thiết Ưng Vồ Mồi (không ngắm: bóng đại bàng lượn bám theo đối thủ, vòng ngắm khóa lại rồi đại bàng thép khổng lồ bổ xuống; chạy khỏi vòng là né)',
+  kn: '<b>Pháp sư pha lê</b> · <b>J</b> Đấm Pha Lê (cận chiến) · <b>K</b> Gai Pha Lê (ký hiệu báo dưới chân đối thủ, 0.5 giây sau gai pha lê trồi lên, trúng thì <b>chậm</b>) · <b>L</b> Trụ Pha Lê (dựng trụ phía trước, 2 giây sau nổ ra 6 mảnh bay tứ phía) · <b>I</b> Ngục Pha Lê (không ngắm: làn sóng gai pha lê chạy về phía đối thủ, trúng thì bị nhốt trong ngục 1.8 giây rồi ngục vỡ tung)',
+  ld: '<b>Sát thủ</b> · <b>J</b> Chém Liềm (cận chiến nhanh) · <b>K</b> Liềm Bay (ném liềm đuôi như boomerang, bay đi rồi quay về, trúng được 2 lần) · <b>L</b> Ảnh Bộ (biến mất, hiện ra sau lưng đối thủ và chém chữ X) · <b>I</b> Tàn Nguyệt Trảm (không ngắm: vạch đỏ báo trên hàng của đối thủ, rồi lưỡi trăng khuyết khổng lồ quét ngang qua rồi quét về; né khỏi hàng là thoát)',
+  tt: '<b>Đấu sĩ</b> · <b>Nội tại Da Dày</b>: không bị đẩy lùi bởi đòn thường · <b>J</b> Vung Chùy (cận chiến, nặng) · <b>K</b> Phun Bùn (vòi phun bùn phía trước: đối thủ trúng bị <b>chậm</b>, để lại vũng bùn làm chậm 3 giây) · <b>L</b> Dậm Đất (giơ chân dậm xuống, đối thủ ở gần bị <b>choáng</b>) · <b>I</b> Voi Chiến Ma Mút (không ngắm: voi ma mút khổng lồ từ mép sân lao ngang qua theo hàng của đối thủ, húc trúng thì hất tung bằng ngà; lướt né được)',
+  tc: '<b>Lém lỉnh</b> · <b>J</b> Quất Đuôi (cận chiến nhanh) · <b>K</b> Đá Nảy (ném hòn đá nảy dội tường 3 lần, trúng đối thủ thì bật ngược lại, trúng được nhiều lần) · <b>L</b> Lột Xác (bỏ lại xác lột làm mồi nhử, tàng hình vụt đi 1.5 giây; bot mất dấu) · <b>I</b> Mưa Thiên Thạch (không ngắm: 6 thiên thạch nhỏ lần lượt rơi đúng chỗ đối thủ, có vòng báo, rồi 1 thiên thạch khổng lồ giáng xuống gây <b>choáng</b>; chạy khỏi vòng là né)',
+  ta: '<b>Đỡ đòn</b> · <b>J</b> Đấm Đá (cận chiến) · <b>K</b> Lăn Tảng (ném tảng đá lăn trên mặt đất, trúng thì văng xa) · <b>L</b> Giáp Đá (5 giây, 3 viên đá bay quanh người: mỗi đòn đánh trúng chỉ còn 30%, viên đá bay ngược vào kẻ đánh) · <b>I</b> Núi Lở (không ngắm: dậm 3 lần, mỗi lần một vòng trụ đá trồi lan ra từ chỗ đứng; lướt qua vòng là né, vòng cuối gây <b>choáng</b>)',
+  tr: '<b>Pháo đài</b> · <b>J</b> Khiên Đập (cận chiến, đẩy văng) · <b>K</b> Dựng Tường (bức tường đá phía trước 4 giây: chặn đạn và chặn đường đối thủ) · <b>L</b> Tháp Pháo (đặt tháp pháo dưới chân 5 giây, tự bắn đá vào đối thủ đến gần) · <b>I</b> Thành Lũy (không ngắm: tường thành trồi lên vây quanh đối thủ nhốt lại, rồi máy bắn đá nã 3 viên vào trong, viên cuối <b>choáng</b>)',
+  tl: '<b>Pháp sư đất</b> · <b>J</b> Phun Cát (luồng cát ngắn phía trước) · <b>K</b> Gai Đất (hàng gai đá trồi chạy thẳng theo hướng nhìn) · <b>L</b> Địa Chấn (quất đuôi tạo khe nứt phía trước 2.5 giây: đứng trên bị <b>chậm</b>) · <b>I</b> Long Quyển Sa (không ngắm: rồng đất bay vút lên, đá rơi khắp quanh đối thủ có vòng báo, rồi rồng lao xuống đúng chỗ đối thủ tạo hố lớn, trúng thì <b>choáng</b>)',
   sa: '<b>Sát thủ săn mồi</b> · <b>Nội tại Mùi Máu</b>: đối thủ dưới 40% máu thì Thủy Sa chạy nhanh hơn, cắn ×1.3, vây đỏ hiện trên đầu đối thủ · <b>J</b> Cắn (cận chiến) · <b>K</b> Lặn (chìm xuống 1.2 giây, chỉ còn cái vây rẽ nước, không bị đánh trúng, bơi nhanh; hết giờ trồi lên đớp, đứng gần là bị <b>hất tung</b>) · <b>L</b> Xoáy Nước (xoáy nước quanh chỗ đứng 2.5 giây: hút đối thủ vào, ở giữa mất máu dần) · <b>I</b> Hàm Cá Mập (không ngắm: sân thành biển, vây khổng lồ lượn quanh đối thủ, rồi bóng đen hiện dưới chân nó và cá mập khổng lồ phóng lên đớp, trúng thì <b>choáng</b>; chạy khỏi bóng là né)',
   gi: '<b>Đỡ đòn và phản</b> · <b>J</b> Kẹp Càng (cận chiến) · <b>K</b> Gai Vỏ (bắn 3 gai xòe hình quạt) · <b>L</b> Thủ Mai (1.5 giây rụt vào mai, đứng yên; đòn đánh tới từ phía trước bị chặn hết, kẻ đánh bị tia nước bắn ngược: mất máu và <b>choáng</b>) · <b>I</b> Càng Thần (không ngắm: càng cua khổng lồ trồi lên đuổi theo, kẹp đối thủ nhấc bổng rồi đập xuống 3 lần, lần cuối <b>choáng</b>; lướt né được lúc càng sắp kẹp)',
   ch: '<b>Đấu sĩ combo</b> · <b>J</b> Chém Nước (bấm liên tiếp ra 3 nhát, nhát 3 phóng thêm sóng kiếm bay xa) · <b>K</b> Cưỡi Sóng (lướt trên con sóng, lái nhẹ được, trúng thì cuốn đối thủ trôi theo rồi hất văng) · <b>L</b> Thủy Thuẫn (khiên nước đỡ trọn 2 đòn, rồi nổ tung <b>đẩy văng</b> đối thủ ở gần) · <b>I</b> Thủy Kiếm Trận (không ngắm: 6 thanh kiếm nước rơi xuống cắm thành vòng quanh chỗ đối thủ, ở trong bị <b>trói</b>, rồi cột nước phụt lên giữa vòng, trúng thì <b>choáng</b>)',
@@ -236,6 +476,10 @@ const PET_TITLE = PET ? PET.name + (PET_STAGE === 'teen' ? ' (Thiếu niên)' : 
 document.title = 'Đấu trường thử – ' + PET_TITLE;
 document.getElementById('help').innerHTML = '<p>Đang chơi <b>' + PET_TITLE + '</b>: ' + (PET ? HELP[PET.kit]
   : '<b>J</b> Trảo Lửa (cận chiến: áp sát rồi bấm là vồ) · <b>giữ K</b> Hổ Gầm · <b>L</b> Hỏa Thuẫn · <b>giữ I</b> Hổ Vương. Đòn cuối Hổ Vương hoặc 2 phát Hổ Gầm liền nhau làm <b>choáng</b> 0.6 giây.') + '</p>';
+{ const t = traitsFor(PET ? PET.dir : 'hoa-ho'), tag = k => '<b style="color:' + TRAITS[t[k]].c + '">' + TRAITS[t[k]].n + '</b>';
+  document.getElementById('help').innerHTML += '<p><b>Đặc tính chiêu</b> (trúng là gắn lên đối thủ): J ' + tag('j') + ' · K ' + tag('k') + ' · L ' + tag('l') +
+    '. <b>Combo</b>: Ướt + đòn Kim = <b>Giật điện</b> (choáng) · Ướt + Hỏa = <b>Hơi nước</b> · Bỏng + Mộc = <b>Bùng cháy</b> · Bỏng + Thủy = <b>Dập lửa</b> (thành Ướt) · ' +
+    'Chậm + Thổ = <b>Lún đất</b> (trói) · đòn nặng vào kẻ đang Choáng/Trói = <b>Đập mạnh</b> ×1.4 · đánh kẻ đang bị Hất tung = <b>Trên không</b> · Đánh dấu: đòn sau ×1.3 · Vỡ giáp: nhận thêm 15%.</p>'; }
 const STAGE_LV = { child: 2, teen: 3, adult: 4, legend: 5, adult4: 4, legend4: 5 };const W = {};   // Thủy Long sheets
 
 function drawCell(cell, x, y, flip, k, alpha = 1) {
@@ -249,8 +493,25 @@ function drawFx(cell, x, y, ang, h, anchor = 'center', alpha = 1) {
   const k = h / cell.h, w = cell.w * k;
   ctx.save(); ctx.globalAlpha = alpha; ctx.translate(x, y);
   if (anchor === 'center') { ctx.rotate(ang); if (Math.cos(ang) < -0.01) ctx.scale(1, -1); }
+  if (anchor !== 'ground') { ctx.shadowColor = 'rgba(10,6,4,.85)'; ctx.shadowBlur = 4; }   // effects in the air get a dark halo so they read on any backdrop
   ctx.drawImage(cell.c, -w / 2, anchor === 'ground' ? -h * 0.8 : -h / 2, w, h);
   ctx.restore();
+}
+// a solid black copy of a cell: its silhouette, for the dark outline round the pets
+function black(cell) {
+  if (!cell.black) {
+    const o = document.createElement('canvas'); o.width = cell.w; o.height = cell.h;
+    const x = o.getContext('2d'); x.drawImage(cell.c, 0, 0); x.globalCompositeOperation = 'source-in'; x.fillStyle = '#0a0604'; x.fillRect(0, 0, cell.w, cell.h);
+    cell.black = { c: o, w: cell.w, h: cell.h };
+  }
+  return cell.black;
+}
+// a pet with a 2 px dark outline (its silhouette drawn 8 times around it first), so it stands out on busy backdrops
+const OUTLINE_PX = 2;
+function drawOutlined(cell, x, y, flip, k) {
+  const b = black(cell);
+  for (const [dx, dy] of [[-1, 0], [1, 0], [0, -1], [0, 1], [-0.7, -0.7], [0.7, -0.7], [-0.7, 0.7], [0.7, 0.7]]) drawCell(b, x + dx * OUTLINE_PX, y + dy * OUTLINE_PX, flip, k);
+  drawCell(cell, x, y, flip, k);
 }
 // a solid white copy of a cell for the one-frame hit flash (no blending needed on the device)
 function white(cell) {
@@ -265,6 +526,8 @@ function white(cell) {
 // ---------- rules ----------
 const RANGE = { j: 90, k: 380, i: 200 };
 const HALF = 0.6;          // funnel half-width (radians, ~35 degrees each side)
+const AIM_KITS = ['dn', 'hl', 'md', 'rl', 'mt', 'ml', 'tn', 'dl', 'sa', 'gi', 'ch', 'bt', 'ga', 'tt', 'tc', 'ta', 'tr', 'tl', 'kt', 'kg', 'ku', 'kn', 'ld'];
+const AIM_SKIP = ['ktk', 'ldl'];   // shots / dashes whose direction does not matter: Kim Tê's needle ring, Liêm Đao's blink
 const SWEEP_MS = 1100;     // arrow goes edge to edge and back in this time
 const CD = { j: 380, k: 1400, l: 6000, i: 0 };   // the ultimate waits for a full energy bar instead
 const DMG = { j: 6, k: 15, ult: [10, 10, 18] };
@@ -438,7 +701,58 @@ const CD_GA = { j: 550, k: 7000, l: 7000, i: 0 };
 const DMG_GA = { arrow: 6, vortex: 2, dragon: 4, pillar: 18 };
 const VORTEX_MS = 3000, VORTEX_R = 75, MIST_MS = 2500, MIST_R = 46, MISTDASH = 200;
 const diving = f => f.kit === 'sa' && now < f.diveUntil;
-const cdOf = (f, k) => (f.kit === 'sa' ? CD_SA : f.kit === 'gi' ? CD_GI : f.kit === 'ch' ? CD_CH : f.kit === 'bt' ? CD_BT : f.kit === 'ga' ? CD_GA : f.kit === 'ml' ? CD_ML : f.kit === 'tn' ? CD_TN : f.kit === 'dl' ? CD_DL : f.kit === 'mt' ? CD_MT : f.kit === 'rl' ? CD_RL : f.kit === 'md' ? CD_MD : f.kit === 'hl' ? CD_HL : f.kit === 'dn' ? CD_DN : f.kit === 'vl' ? CD_VL : f.kit === 'cao' ? CD_CAO : f.kit === 'quy' ? CD_QUY : f.kit === 'hoa' ? CD_HOA : f.kit === 'thuy' ? CD_THUY : f.kit === 'moc' ? CD_MOC : f.kit === 'tho' ? CD_THO : f.kit === 'kim' ? CD_KIM : CD)[k];
+// Thổ Tượng (bruiser): passive, ordinary hits do not push it. J club; K mud spray slows and leaves a puddle; L a stomp
+// that stuns close by; I a war mammoth charges across the foe's row and tosses it.
+const CD_TT = { j: 650, k: 6000, l: 9000, i: 0 };
+const DMG_TT = { club: 9, mud: 3, stomp: 6, toss: 22 };
+const MUD_MS = 3000, MUD_RX = 46, MUD_RY = 24, STOMP_R = 95, STOMP_STUN = 800, MAMMOTH_SPEED = 0.5;
+// Thổ Tích (trickster): J tail whip; K a pebble that bounces off walls (and the foe) three times; L sheds its skin as a
+// decoy and slips away hidden; I six warned meteors fall on the foe, then a giant one (stuns).
+const CD_TC = { j: 400, k: 3500, l: 9000, i: 0 };
+const DMG_TC = { whip: 6, pebble: 4, meteor: 3, big: 14 };
+const SHED_MS = 1500;
+// Thạch Nhân (tank): J rock punch; K a rolling boulder; L three orbiting rocks: hits do 30%, a rock flies back at the
+// hitter; I three expanding rings of stone pillars, the last stuns.
+const CD_TA = { j: 550, k: 5000, l: 10000, i: 0 };
+const DMG_TA = { punch: 8, boulder: 9, back: 3, ring: 7, last: 10 };
+const ROCKARM_MS = 5000, RING_R = 230, RING_MS = 650;
+// Thành Trì (fortress): J shield bash; K a stone wall ahead blocks shots and movement; L a turret that shoots stones;
+// I walls box the foe in, then three catapult stones land inside, the last stuns.
+const CD_TR = { j: 550, k: 8000, l: 10000, i: 0 };
+const DMG_TR = { bash: 7, stone: 3, cata: 7, last: 10 };
+const WALL_MS = 4000, WALL_LEN = 96, TURRET_MS = 5000, TURRET_GAP = 900, BOX_W = 70, BOX_H = 40;
+// Thổ Long (earth mage): J sand breath; K a line of rock spikes; L a fissure that slows; I flies up, rocks rain round the
+// foe, then it dives onto the foe's spot (stuns).
+const CD_TL = { j: 550, k: 4500, l: 7000, i: 0 };
+const DMG_TL = { sand: 6, spikes: 7, fissure: 4, rock: 3, dive: 16 };
+const FISSURE_MS = 2500, FISSURE_LEN = 170;
+let fieldThings = [];   // standing field pieces (walls, turrets, shed skins) sorted with the fighters
+const segDist = (px, py, x, y, a, len) => { const dx = px - x, dy = py - y, t = Math.max(-len / 2, Math.min(len / 2, dx * Math.cos(a) + dy * Math.sin(a))); return Math.hypot(dx - Math.cos(a) * t, dy - Math.sin(a) * t); };
+// Kim Tê (bruiser): J horn gore; K a ring of eight steel needles; L a horn-first leap; I a rune under the foe, a rain
+// of needles, then a giant steel horn bursts up and tosses it.
+const CD_KT = { j: 550, k: 5000, l: 7000, i: 0 };
+const DMG_KT = { gore: 8, needle: 3, land: 8, rain: 3, horn: 16 };
+const KT_LEAP = 170, KT_LAND_R = 70, KT_RUNE_R = 70;
+// Kim Giáp (tank): J claw; K three scales in a fan; L curls up: hits do 20%, shots bounce back; I a giant steel ball
+// rolls after the foe.
+const CD_KG = { j: 550, k: 4000, l: 8000, i: 0 };
+const DMG_KG = { claw: 7, scale: 4, ball: 18 };
+const CURL_MS = 1500;
+// Kim Ưng (flying shooter): J a steel feather dart; K a gust cone that blows the foe away; L a dive bomb ahead; I an
+// eagle shadow trails the foe, locks, and a giant steel eagle dives on it.
+const CD_KU = { j: 450, k: 5000, l: 6500, i: 0 };
+const DMG_KU = { feather: 5, gust: 3, dive: 8, eagle: 18 };
+const KU_DIVE = 150;
+// Kim Thạch Nhân (crystal mage): J crystal punch; K a warned spike under the foe (slows); L a pillar that bursts into
+// six shards; I a wave of crystal spikes runs at the foe and locks it in a crystal prison.
+const CD_KN = { j: 550, k: 4500, l: 8000, i: 0 };
+const DMG_KN = { punch: 9, spike: 9, shard: 3, prison: 14 };
+const KN_WARN = 500, PILLAR_MS = 2000, CRYSTAL_MS = 1800;
+// Liêm Đao (assassin): J sickle slash; K a boomerang sickle; L blinks behind the foe and cuts an X; I a giant crescent
+// sweeps along the foe's row and back.
+const CD_LD = { j: 380, k: 4000, l: 7000, i: 0 };
+const DMG_LD = { slash: 7, sickle: 5, x: 10, moon: 11, back: 11 };
+const cdOf = (f, k) => (f.kit === 'kt' ? CD_KT : f.kit === 'kg' ? CD_KG : f.kit === 'ku' ? CD_KU : f.kit === 'kn' ? CD_KN : f.kit === 'ld' ? CD_LD : f.kit === 'tt' ? CD_TT : f.kit === 'tc' ? CD_TC : f.kit === 'ta' ? CD_TA : f.kit === 'tr' ? CD_TR : f.kit === 'tl' ? CD_TL : f.kit === 'sa' ? CD_SA : f.kit === 'gi' ? CD_GI : f.kit === 'ch' ? CD_CH : f.kit === 'bt' ? CD_BT : f.kit === 'ga' ? CD_GA : f.kit === 'ml' ? CD_ML : f.kit === 'tn' ? CD_TN : f.kit === 'dl' ? CD_DL : f.kit === 'mt' ? CD_MT : f.kit === 'rl' ? CD_RL : f.kit === 'md' ? CD_MD : f.kit === 'hl' ? CD_HL : f.kit === 'dn' ? CD_DN : f.kit === 'vl' ? CD_VL : f.kit === 'cao' ? CD_CAO : f.kit === 'quy' ? CD_QUY : f.kit === 'hoa' ? CD_HOA : f.kit === 'thuy' ? CD_THUY : f.kit === 'moc' ? CD_MOC : f.kit === 'tho' ? CD_THO : f.kit === 'kim' ? CD_KIM : CD)[k];
 const WATER = ['#0b2a5c', '#1b5fae', '#2f8fe0', '#6fd0ff', '#d8f6ff', '#ffffff'];
 
 const keys = {};
@@ -455,11 +769,11 @@ function fighter(x, y, ang, bot) {
   return { stage, h, fxk: fxkOf(h), x, y, ang, dir: dirOf(ang), turnT: 0, bot, act: null, t0: 0, fired: false, hp: MAX_HP, shield: 0, dashT: -9999, dashAng: 0,
            hurtT: -9999, stunUntil: -9999, lastK: -9999, en: 0, el: bot ? (BOTPET ? BOTPET.el : botEl) : PET ? PET.el : 'hoa', kit: bot ? (BOTPET ? BOTPET.kit : 'ho') : PET ? PET.kit : 'ho', rootUntil: 0, healT: -9999,
            burnUntil: 0, burnNext: 0, rageUntil: 0, comboN: 0, z: 0, charmUntil: 0, foxUntil: 0, flyUntil: 0, flameUntil: 0, split: false, markUntil: 0, orbUntil: 0, stealthUntil: 0, ambushUntil: 0, recastUntil: 0, shrooms: [], flowers: [], traps: [],
-           slowUntil: 0, curtain: 0, aiming: null, cd: { j: 0, k: 0, l: 0, i: 0 }, mx: 0, my: 0, kbx: 0, kby: 0, vx: 0, vy: 0 };
+           slowUntil: 0, wetUntil: 0, markedUntil: 0, brokenUntil: 0, comboT: -1e9, curtain: 0, aiming: null, cd: { j: 0, k: 0, l: 0, i: 0 }, mx: 0, my: 0, kbx: 0, kby: 0, vx: 0, vy: 0 };
 }
 function newRound() {
   P = fighter(170, 300, 0, false); B = fighter(470, 300, Math.PI, true);
-  shots = []; beams = []; fields = []; fxs = []; ults = []; parts = []; scorch = []; over = null; startT = now; hist.length = 0;
+  shots = []; beams = []; fields = []; fxs = []; ults = []; parts = []; scorch = []; over = null; startT = now; hist.length = 0; fightSaid = false;
   brain = { orbit: Math.random() < 0.5 ? 1 : -1, orbitT: 0, dodgeUntil: 0, dodgeAng: 0, holdUntil: 0, nextAtk: 0, err: 0, nextThink: 0, seen: new WeakSet() };
 }
 const live = () => !over && now > startT + 1500;
@@ -469,10 +783,13 @@ function press(f, k) {
   if (f.kit === 'quy' && k === 'k' && f.act === 'k' && f.roll && !f.roll.endT) { f.roll.endT = now; return; }
   if (!live() || f.act || f.hp <= 0 || now < f.stunUntil || now < f.charmUntil || diving(f)) return;
   // rooted: no dash either
-  if (k === 'shift') { if (now > f.dashT + DASH_CD && now >= f.rootUntil) { f.aiming = null; f.act = 'dash'; f.t0 = now; f.dashT = now; f.dashAng = f.bot ? f.dashAng : f.ang; } return; }
+  if (k === 'shift') { if (now > f.dashT + DASH_CD && now >= f.rootUntil) { f.aiming = null; f.act = 'dash'; f.t0 = now; f.dashT = now; sfx(f.el, 'luot', f.bot ? 0.5 : 0.8); f.dashAng = f.bot ? f.dashAng : f.ang; } return; }
   if (!(k in f.cd) || now < f.cd[k] || f.aiming || (k === 'i' && f.en < EN_MAX)) return;
   if (f.kit === 'kim' && (k === 'j' || k === 'l')) { f.hold = { k, t0: now }; return; }   // gather until the key is let go
-  if (f.kit === 'dn' || f.kit === 'hl' || f.kit === 'md' || f.kit === 'rl' || f.kit === 'mt' || f.kit === 'ml' || f.kit === 'tn' || f.kit === 'dl' || ['sa', 'gi', 'ch', 'bt', 'ga'].includes(f.kit) || (k === 'l' && f.kit !== 'vl') || k === 'j' || (k === 'i' && (f.kit === 'tho' || f.kit === 'kim')) || (k === 'k' && f.kit === 'vl') || (k === 'k' && f.kit === 'quy')) { cast(f, k); return; }   // shield, basic attack, the quake: no aim
+  // the newer pets aim their shots and dashes like Hỏa Hổ's K: hold, the arrow sweeps across the funnel, let go to fire
+  // where it points (AIM_KITS, K / L whose kind is a shot or a dash); their other skills still go off at once
+  const aimIt = AIM_KITS.includes(f.kit) && (k === 'k' || k === 'l') && !AIM_SKIP.includes(f.kit + k) && ['ban', 'luot'].includes((SFX_KL[f.kit] || ['ban', 'vung'])[k === 'k' ? 0 : 1]);
+  if (!aimIt && (f.kit === 'dn' || f.kit === 'hl' || f.kit === 'md' || f.kit === 'rl' || f.kit === 'mt' || f.kit === 'ml' || f.kit === 'tn' || f.kit === 'dl' || ['sa', 'gi', 'ch', 'bt', 'ga', 'tt', 'tc', 'ta', 'tr', 'tl', 'kt', 'kg', 'ku', 'kn', 'ld'].includes(f.kit) || (k === 'l' && f.kit !== 'vl') || k === 'j' || (k === 'i' && (f.kit === 'tho' || f.kit === 'kim')) || (k === 'k' && f.kit === 'vl') || (k === 'k' && f.kit === 'quy'))) { cast(f, k); return; }   // shield, basic attack, the quake: no aim
   f.aiming = { k, base: f.ang, t0: now, p0: now, ang: f.ang, tx: f.x, ty: f.y };
   updateAim(f);
 }
@@ -498,6 +815,10 @@ function cast(f, k, a) {
   if (a) f.ang = a.ang;
   f.dir = dirOf(f.ang);                // an attack faces its target at once
   f.act = k; f.t0 = now; f.fired = false;
+  if (k === 'j' || k === 'k' || k === 'l') { f.lastKey = k; f.castT = now; }
+  { const v = f.bot ? 0.7 : 1, kl = SFX_KL[f.kit] || ['ban', 'vung'];
+    if (k === 'j') sfxSkill(f, 'j', 'danh', v); else if (k === 'k') sfxSkill(f, 'k', kl[0], v); else if (k === 'l') sfxSkill(f, 'l', kl[1], v);
+    else if (k === 'i') { sfxSkill(f, 'gong', 'gong', v); f.ultBoom = now + (ULT_LAND[f.kit] || 1200) + 150; } }   // the blast: at the ult's first hit (sfxHit), or by then if it misses (sfxLoops)
   if (k === 'j' && f.kit === 'hoa') { f.comboN = now - (f.lastJ || -9999) < COMBO_MS && f.comboN < 3 ? f.comboN + 1 : 1; f.lastJ = now; }
   if (k === 'k' && f.kit === 'hoa') {      // the leap: from here to LEAP_DIST along the arrow, kept inside the arena
     const tx = Math.max(40, Math.min(600, f.x + Math.cos(f.ang) * LEAP_DIST)), ty = Math.max(150, Math.min(445, f.y + Math.sin(f.ang) * LEAP_DIST * 0.8));
@@ -523,6 +844,18 @@ function cast(f, k, a) {
     if (f.mx || f.my) f.ang = Math.atan2(f.my, f.mx);
     f.mdDash = { hit: false }; fxs.push({ kind: 'mdPoof', by: f, x: f.x, y: mid(f), t0: now });
   }
+  if (f.kit === 'kt' && k === 'i') { const o = foe(f); ults.push({ type: 'needleRain', by: f, t0: now, x: o.x, y: o.y, life: 900 + 2600, done: {} }); }
+  if (f.kit === 'kg' && k === 'i') ults.push({ type: 'steelBall', by: f, t0: now, life: 900 + 2200, done: {} });
+  if (f.kit === 'ku' && k === 'i') ults.push({ type: 'eagleDive', by: f, t0: now, life: 900 + 2400, done: {} });
+  if (f.kit === 'kn' && k === 'i') ults.push({ type: 'crystalWave', by: f, t0: now, x: f.x, y: f.y, ang: Math.atan2(foe(f).y - f.y, foe(f).x - f.x), life: 900 + 3200, done: {} });
+  if (f.kit === 'ld' && k === 'i') ults.push({ type: 'moonSweep', by: f, t0: now, y: foe(f).y, life: 900 + 2300, done: {} });
+  if (f.kit === 'kg' && k === 'l') f.curlUntil = now + CURL_MS;
+  if (f.kit === 'tt' && k === 'i') { const o = foe(f), side = o.x > 320 ? -1 : 1; ults.push({ type: 'mammoth', by: f, t0: now, x: side > 0 ? 20 : 620, y: o.y, dir: side, life: 900 + 2400, done: {} }); }
+  if (f.kit === 'tc' && k === 'i') ults.push({ type: 'meteors', by: f, t0: now, life: 900 + 3600, done: {}, marks: [] });
+  if (f.kit === 'ta' && k === 'l') f.rockArmor = { n: 3, until: now + ROCKARM_MS };
+  if (f.kit === 'ta' && k === 'i') ults.push({ type: 'rockRings', by: f, t0: now, x: f.x, y: f.y, life: 900 + 3 * 700 + 700, done: {} });
+  if (f.kit === 'tr' && k === 'i') { const o = foe(f); ults.push({ type: 'fortress', by: f, t0: now, x: Math.max(110, Math.min(530, o.x)), y: Math.max(190, Math.min(410, o.y)), life: 900 + 2600, done: {} }); }
+  if (f.kit === 'tl' && k === 'i') ults.push({ type: 'dragonDive', by: f, t0: now, life: 900 + 2800, done: {}, rocks: [] });
   if (f.kit === 'sa' && k === 'i') ults.push({ type: 'jaws', by: f, t0: now, life: 900 + 2600 + 600, done: {} });
   if (f.kit === 'gi' && k === 'l') { f.guardUntil = now + GUARD_MS; f.rootUntil = Math.max(f.rootUntil, f.guardUntil); f.rootSh = null; }
   if (f.kit === 'gi' && k === 'i') { const o = foe(f); ults.push({ type: 'bigClaw', by: f, t0: now, x: o.x, y: o.y, life: 900 + 2600 + 500, done: {} }); }
@@ -592,18 +925,29 @@ const say = (who, text, col) => fxs.push({ kind: 'text', who, text, col, t0: now
 function hit(f, dmg, fromX, fromY, big, by, kind) {
   const soft = kind === 'ultTick' || kind === 'burn' || kind === 'spin' || kind === 'breath' || kind === 'zone';
   if (f.hp <= 0 || over || f.split) return;
-  if (diving(f)) return;                                    // under the water: untouchable
+  if (diving(f) || f.flyUp) return;                         // under the water / up in the sky: untouchable
   if (f.kit === 'gi' && now < f.guardUntil && !soft && kind !== 'counter' && by !== f) {   // the shell guard blocks the front
     const off = Math.abs(((Math.atan2(fromY - f.y, fromX - f.x) - f.ang) + Math.PI * 3) % (Math.PI * 2) - Math.PI);
     if (off < 1.75) { giParry(f, by); return; }
+  }
+  if (f.kit === 'kg' && now < f.curlUntil && by !== f) dmg *= 0.2;
+  if (f.kit === 'ta' && f.rockArmor && f.rockArmor.n > 0 && !soft && by !== f && kind !== 'rockback') {   // a rock soaks it and flies back
+    f.rockArmor.n--; dmg *= 0.3;
+    shots.push({ by: f, kind: 'rockback', dmg: DMG_TA.back, x: f.x, y: mid(f), ang: Math.atan2(mid(by) - mid(f), by.x - f.x), sp: 0.45, turn: 0.01, life: 700, t0: now });
   }
   if (f.kit === 'ch' && f.wshield && f.wshield.hits > 0 && !soft && by !== f) { f.wshield.hits--; fxs.push({ kind: 'block', who: f, t0: now }); return; }
   const khac = KHAC[by.el] === f.el;
   if (khac) { dmg *= KHAC_X; if (!soft) say(f, 'Khắc!', '#ff8a3a'); }
   const armored = now < f.armorUntil || (f.kit === 'quy' && f.act === 'k' && f.roll && !f.roll.endT);
   if (armored) { dmg *= 0.5; f.armorHitT = now; }       // stone armor: half damage, no knockback
+  if (by && by !== f) dmg *= (KIT_POWER[by.kit] || 1) * (KIT_DEF[f.kit] || 1);   // balance: damage dealt / taken per pet
+  if (ULT_CTX && dashing(f) && by !== f) { dmg *= 0.5; if (!f.halfT || now - f.halfT > 400) { f.halfT = now; say(f, 'Né nửa!', '#ffe08a'); } }   // a dash only halves an ultimate
+  dmg = traitHit(f, dmg, big, by, kind);
   dmg = Math.round(dmg);
   f.hp = Math.max(0, f.hp - dmg); f.hurtT = now;
+  if (dmg > 0 && by && by.ultBoom && (ULT_CTX || /^ult/.test(kind || ''))) { by.ultBoom = 0; sfxSkill(by, 'ult', 'ult', by.bot ? 0.7 : 1); }   // the ult's first blow, even a small one: its blast
+  if (dmg > 0 && !soft) { sfxHit(by, big || kind === 'ultLast' ? 'nang' : 'trung', big ? 1 : 0.75);   // nang: the heavy thump
+    if (f.hp > 0 && real - (f.yelpT || -1e9) > 250) { f.yelpT = real; sfxPet(f, 'dau', f.bot ? 0.6 : 0.75); } }   // the one hit says "ah!" 
   if (by.kit === 'hl' && now < f.markUntil && kind !== 'burn') burn(f, by);
   if (now < f.stealthUntil) { f.stealthUntil = 0; fxs.push({ kind: 'mdPoof', by: f, x: f.x, y: mid(f), t0: now }); }   // hit: revealed   // marked: Hỏa Linh's hits all burn
   // the damage number pops out of the body and falls away; bigger for heavy blows, orange when it overcomes
@@ -619,13 +963,13 @@ function hit(f, dmg, fromX, fromY, big, by, kind) {
   // the ultimate's first blows pull toward the middle of the ring (so the later blows still land), the last one throws out
   const a = Math.atan2(f.y - fromY, f.x - fromX);
   const push = soft ? 0 : kind === 'jc' ? 0.08 : kind === 'ult' ? -0.25 : kind === 'ultLast' ? 1.1 : kind === 'beam' ? 1.3 : big ? 0.9 : 0.35;
-  if (!soft && !armored) { f.kbx = Math.cos(a) * push; f.kby = Math.sin(a) * push; }   // a short slide, not a jump
+  if (!soft && !armored && !(f.kit === 'tt' && !kind.startsWith('ult'))) { f.kbx = Math.cos(a) * push; f.kby = Math.sin(a) * push; }   // a short slide, not a jump
   shake = Math.max(shake, soft ? (kind === 'burn' ? 0 : 3) : big ? 7 : 3);
   if (big && f.act !== 'i') { f.aiming = null; if (f.act !== 'dash') f.act = null; }   // a heavy hit breaks the aim
   if (f.kit === 'tn' && now < f.stanceUntil && !soft && kind !== 'thorn' && by !== f && by.hp > 0 && now - (f.thornT || 0) > 300) {   // rooted: thorns hit back
     f.thornT = now; hit(by, DMG_TN.thorn, f.x, f.y, false, f, 'thorn'); fxs.push({ kind: 'tnThorn', by: f, x: by.x, y: mid(by), t0: now });
   }
-  if (f.hp === 0) { over = { t0: now, winner: foe(f) }; score[f === P ? 'bot' : 'me']++; }
+  if (f.hp === 0) { over = { t0: now, winner: foe(f) }; sfxPlay('ko', sfxBuf.ko, 1); sfxPet(f, 'nga', 0.9); score[f === P ? 'bot' : 'me']++; }
 }
 
 // the basic attack is melee: one swipe that hits whatever stands within reach in front, no projectile
@@ -694,7 +1038,7 @@ function stepQuy(f, u, dt) {
       if (f.y < 142 || f.y > 448) { f.rollAng = -f.rollAng; f.y = Math.max(142, Math.min(448, f.y)); shake = Math.max(shake, 3); }
       f.ang = f.rollAng;
       if (dt && Math.random() < 0.3) parts.push({ x: f.x - Math.cos(f.rollAng) * 16, y: f.y - 4, vx: 0, vy: -0.05, t0: now, life: 300, col: '#ff8a3a', sz: 2 });
-      if (o.hp > 0 && Math.hypot(o.x - f.x, o.y - f.y) < 40 && !(o.act === 'dash' && now - o.t0 < DODGE_MS)) {
+      if (o.hp > 0 && Math.hypot(o.x - f.x, o.y - f.y) < 40 && !dodgingNow(o)) {
         r.endT = now;
         if (now < o.shield) fxs.push({ kind: 'block', who: o, t0: now });
         else { hit(o, DMG_QUY.roll, f.x, f.y, true, f, 'roll'); fxs.push({ kind: 'rollHit', by: f, x: o.x, y: mid(o), t0: now }); }
@@ -708,7 +1052,7 @@ function stepQuy(f, u, dt) {
     if (n >= 1 && n <= 5 && (f.spinN || 0) < n) {
       f.spinN = n;
       const ex = (o.x - f.x) / SPIN_R, ey = (o.y - f.y) / (SPIN_R * 0.7);
-      if (o.hp > 0 && ex * ex + ey * ey <= 1 && !(o.act === 'dash' && now - o.t0 < DODGE_MS)) {
+      if (o.hp > 0 && ex * ex + ey * ey <= 1 && !dodgingNow(o)) {
         if (now < o.shield) fxs.push({ kind: 'block', who: o, t0: now });
         else { hit(o, DMG_QUY.spin, f.x, f.y, false, f, 'spin'); if (n === 1 || now >= o.burnUntil) burn(o, f); }
       }
@@ -717,7 +1061,7 @@ function stepQuy(f, u, dt) {
   } else if (f.act === 'i') {         // the ultimate: crouch through the cut-in, jump to the ring, slam
     const L = f.ultLeap, t = (u - 900) / 400;
     if (t > 0 && t < 1) { f.x = L.x0 + (L.x1 - L.x0) * t; f.y = L.y0 + (L.y1 - L.y0) * t; f.z = Math.sin(t * Math.PI) * 70; }
-    if (t >= 1 && f.z) { f.z = 0; f.x = L.x1; f.y = L.y1; }
+    if (t >= 1 && f.z) { f.z = 0; f.x = L.x1; f.y = L.y1; sfxLand(f, true); }   // Hỏa Quy lands on the volcano
     if (u > 2000) { f.act = null; f.z = 0; }
   }
 }
@@ -733,7 +1077,7 @@ function updateVolcano(u) {
     if (last) { flashUntil = real + 70; flashCol = '#ffd36e'; stopUntil = Math.max(stopUntil, real + 90); }
     for (let n = 0; n < 12; n++) parts.push({ x: u.x + (Math.random() - 0.5) * ULT_RX * 1.6, y: u.y + (Math.random() - 0.5) * ULT_RY, vx: (Math.random() - 0.5) * 0.2, vy: -(0.3 + Math.random() * 0.5), t0: now, life: 600, col: ['#fff3b0', '#ffd36e', '#ff8a3a', '#e0402a'][n % 4], sz: n % 3 ? 2 : 4 });
     const ex = (f.x - u.x) / ULT_RX, ey = (f.y - u.y) / ULT_RY;
-    if (f.hp > 0 && ex * ex + ey * ey <= 1 && !(f.act === 'dash' && now - f.t0 < DODGE_MS)) hit(f, now < f.shield ? dmg / 2 : dmg, u.x, u.y, true, u.by, kind);
+    if (f.hp > 0 && ex * ex + ey * ey <= 1 && !dodgingNow(f)) hit(f, now < f.shield ? dmg / 2 : dmg, u.x, u.y, true, u.by, kind);
   });
 }
 function drawVolcano(u) {
@@ -776,12 +1120,12 @@ function stepHoa(f, u) {
     const L = f.leap, t = (u - 120) / LEAP_MS;
     if (t > 0 && t < 1) { f.x = L.x0 + (L.x1 - L.x0) * t; f.y = L.y0 + (L.y1 - L.y0) * t; f.z = Math.sin(t * Math.PI) * 46; }
     if (t >= 1 && !f.fired) {
-      f.fired = true; f.x = L.x1; f.y = L.y1; f.z = 0;
+      f.fired = true; f.x = L.x1; f.y = L.y1; f.z = 0; sfxLand(f, false);   // Hỏa Hổ's pounce lands
       const o = foe(f), ex = (o.x - f.x) / (PATCH_RX + 10), ey = (o.y - f.y) / (PATCH_RY + 14);
       fxs.push({ kind: 'pounce', by: f, x: f.x, y: f.y, t0: now });
       fields.push({ by: f, x: f.x, y: f.y, t0: now });
       shake = Math.max(shake, 10); zoom = { t0: real, x: f.x, y: f.y - 20, k: 0.05 };
-      if (o.hp > 0 && ex * ex + ey * ey <= 1 && !(o.act === 'dash' && now - o.t0 < DODGE_MS)) {
+      if (o.hp > 0 && ex * ex + ey * ey <= 1 && !dodgingNow(o)) {
         if (now < o.shield) fxs.push({ kind: 'block', who: o, t0: now });
         else { hit(o, DMG_HOA.pounce, f.x, f.y, true, f, 'pounce'); burn(o, f); }
       }
@@ -1006,6 +1350,432 @@ function drawSplitParts(u, things) {
   }
 }
 
+// ---------- Kim Tê kit ----------
+const inCone = (f, o, R, arc) => { const d = Math.hypot(o.x - f.x, o.y - f.y), off = Math.abs(((Math.atan2(o.y - f.y, o.x - f.x) - f.ang) + Math.PI * 3) % (Math.PI * 2) - Math.PI); return o.hp > 0 && d < R && (d < 26 || off < arc) && !dodgingNow(o); };
+const inOval = (o, x, y, R) => { const ex = (o.x - x) / R, ey = (o.y - y) / (R * 0.55); return o.hp > 0 && ex * ex + ey * ey <= 1 && !dodgingNow(o); };
+const clampX = x => Math.max(40, Math.min(600, x)), clampY = y => Math.max(150, Math.min(445, y));
+function stepKt(f, u, dt) {
+  const o = foe(f);
+  if (f.act === 'j') {
+    if (u > 160 && !f.fired) { f.fired = true; const hp0 = o.hp; claw(f, DMG_KT.gore); if (o.hp < hp0) fxs.push({ kind: 'kHit', by: f, x: o.x, y: mid(o), sheet: 'fx1', a: 0, n: 4, t0: now }); }
+    if (u > 400) f.act = null;
+  } else if (f.act === 'k') {          // the mane flares: eight needles fly out all round
+    if (u > 200 && !f.fired) {
+      f.fired = true; fxs.push({ kind: 'kHit', by: f, x: f.x, y: mid(f), sheet: 'fx2', a: 0, n: 4, big: 150, t0: now });
+      for (let n = 0; n < 8; n++) shots.push({ by: f, kind: 'needle', dmg: DMG_KT.needle, x: f.x, y: f.y - f.h * 0.5, ang: n * Math.PI / 4, sp: 0.5, life: 700, t0: now });
+    }
+    if (u > 420) f.act = null;
+  } else if (f.act === 'l') {          // a leap, horn first
+    if (!f.leapK) f.leapK = { x0: f.x, y0: f.y, x1: clampX(f.x + Math.cos(f.ang) * KT_LEAP), y1: clampY(f.y + Math.sin(f.ang) * KT_LEAP * 0.75) };
+    const k = Math.min(1, u / 420), L = f.leapK; f.x = L.x0 + (L.x1 - L.x0) * k; f.y = L.y0 + (L.y1 - L.y0) * k; f.z = Math.sin(k * Math.PI) * 60;
+    if (k >= 1 && !f.fired) {
+      f.fired = true; f.z = 0; sfxLand(f, false); shake = Math.max(shake, 10); fxs.push({ kind: 'kHit', by: f, x: f.x, y: f.y - 10, sheet: 'fx2', a: 5, n: 3, big: 150, t0: now });
+      if (inOval(o, f.x, f.y, KT_LAND_R)) hit(o, DMG_KT.land, f.x, f.y, true, f, 'jc');
+    }
+    if (u > 560) { f.act = null; f.leapK = null; f.z = 0; }
+  } else if (f.act === 'i' && u > 1000) f.act = null;
+}
+function updateNeedleRain(u, dt) {
+  const v = now - u.t0 - 900, f = u.by, o = foe(f);
+  if (v < 0) return;
+  if (v < 1500) { const k = Math.min(1, 0.004 * dt); u.x += (o.x - u.x) * k; u.y += (o.y - u.y) * k; }   // the rune creeps after the foe
+  for (let n = 0; n < 4; n++) if (v >= 300 + n * 350 && !u.done['r' + n]) { u.done['r' + n] = 1; shake = Math.max(shake, 4); if (inOval(o, u.x, u.y, KT_RUNE_R)) hit(o, DMG_KT.rain, u.x, u.y, false, f, 'ultTick'); }
+  if (v >= 1900 && !u.done.horn) {
+    u.done.horn = 1; shake = Math.max(shake, 16); flashUntil = real + 60; flashCol = '#e0f4ff';
+    if (inOval(o, u.x, u.y, KT_RUNE_R)) { hit(o, (now < o.shield ? 0.5 : 1) * DMG_KT.horn, u.x, u.y, true, f, 'ultLast'); if (o.hp > 0) launch(o); zoom = { t0: real, x: o.x, y: o.y - 30, k: 0.08 }; }
+  }
+}
+function drawNeedleRain(u) {
+  const v = now - u.t0 - 900, f = u.by, sh = sheetOf(f), K = f.fxk;
+  if (v < 0) return;
+  const c = sh.fx4[v < 1900 ? 8 + Math.floor(now / 150) % 2 : v < 2300 ? 10 : 11];
+  if (v < 2500) drawFx(c, u.x, u.y + 6, 0, KT_RUNE_R * 2.4 * c.h / c.w, 'ground');
+  if (v > 200 && v < 1900) { drawFx(sh.fx3[Math.floor(now / 80) % 4], u.x, u.y - 70, 0, 170 * K); drawFx(sh.fx4[4 + Math.floor(now / 120) % 2], u.x, u.y - 40, 0, 150 * K); }
+  if (v >= 1900 && v < 2600) drawFx(sh.fx4[Math.min(3, Math.floor((v - 1900) / 130))], u.x, u.y - 60, 0, 200 * K);
+  if (v >= 1900 && v < 2600) { const s2 = sh.fx3[4 + Math.min(3, Math.floor((v - 1900) / 170))]; drawFx(s2, u.x, u.y + 4, 0, KT_RUNE_R * 2.2 * s2.h / s2.w, 'ground'); }
+}
+
+// ---------- Kim Giáp kit ----------
+function stepKg(f, u, dt) {
+  const o = foe(f);
+  if (f.act === 'j') {
+    if (u > 140 && !f.fired) { f.fired = true; const hp0 = o.hp; claw(f, DMG_KG.claw); if (o.hp < hp0) fxs.push({ kind: 'kHit', by: f, x: o.x, y: mid(o), sheet: 'fx1', a: 0, n: 4, t0: now }); }
+    if (u > 380) f.act = null;
+  } else if (f.act === 'k') {
+    if (u > 180 && !f.fired) { f.fired = true; for (const d of [-0.25, 0, 0.25]) shots.push({ by: f, kind: 'scale', dmg: DMG_KG.scale, x: f.x + Math.cos(f.ang) * 18, y: f.y - f.h * 0.5, ang: f.ang + d, sp: 0.46, life: 800, t0: now }); }
+    if (u > 380) f.act = null;
+  } else if (f.act === 'l') { if (u > CURL_MS) f.act = null; }
+  else if (f.act === 'i' && u > 900 + 2200) f.act = null;
+}
+// the steel ball: rolls after the foe, steering, and tosses it once
+function updateSteelBall(u, dt) {
+  const v = now - u.t0 - 900, f = u.by, o = foe(f);
+  if (v < 0) return;
+  if (v > 2000) { f.flyUp = false; return; }
+  f.flyUp = true; if (u.ang === undefined) u.ang = Math.atan2(o.y - f.y, o.x - f.x);
+  const want = Math.atan2(o.y - f.y, o.x - f.x), d = ((want - u.ang) + Math.PI * 3) % (Math.PI * 2) - Math.PI;
+  u.ang += Math.max(-0.0035 * dt, Math.min(0.0035 * dt, d));
+  f.x = clampX(f.x + Math.cos(u.ang) * 0.42 * dt); f.y = clampY(f.y + Math.sin(u.ang) * 0.32 * dt); f.ang = u.ang;
+  if (Math.hypot(f.x - (u.lx || -99), f.y - (u.ly || -99)) > 30) { u.lx = f.x; u.ly = f.y; fxs.push({ kind: 'kTrail', by: f, x: f.x, y: f.y + 4, ang: u.ang, t0: now }); }
+  shake = Math.max(shake, 3);
+  if (!u.done.hit && o.hp > 0 && Math.hypot(o.x - f.x, (o.y - f.y) * 1.3) < 56 && !dodgingNow(o)) {
+    u.done.hit = 1; hit(o, (now < o.shield ? 0.5 : 1) * DMG_KG.ball, f.x, f.y, true, f, 'ultLast'); if (o.hp > 0) launch(o);
+    fxs.push({ kind: 'kHit', by: f, x: o.x, y: o.y - 20, sheet: 'fx4', a: 5, n: 3, big: 200, t0: now }); shake = Math.max(shake, 15); zoom = { t0: real, x: o.x, y: o.y - 30, k: 0.08 };
+  }
+}
+function drawSteelBall(u) {
+  const v = now - u.t0 - 900, f = u.by, sh = sheetOf(f);
+  if (v < 0 || v > 2000) return;
+  drawFx(sh.fx4[Math.floor(now / 80) % 4], f.x, f.y - 40, 0, 110 * f.fxk, 'center', 1);
+}
+
+// ---------- Kim Ưng kit ----------
+function stepKu(f, u, dt) {
+  const o = foe(f);
+  if (f.act === 'j') {
+    if (u > 140 && !f.fired) { f.fired = true; shots.push({ by: f, kind: 'feather', dmg: DMG_KU.feather, x: f.x + Math.cos(f.ang) * 20, y: f.y - f.h * 0.5, ang: f.ang, sp: 0.55, life: 800, t0: now }); }
+    if (u > 320) f.act = null;
+  } else if (f.act === 'k') {          // the gust: a cone ahead that blows the foe away
+    if (u > 200 && !f.fired) {
+      f.fired = true; fxs.push({ kind: 'kCone', by: f, x: f.x + Math.cos(f.ang) * 80, y: mid(f) + Math.sin(f.ang) * 34, ang: f.ang, t0: now });
+      if (inCone(f, o, 170, 0.6)) { hit(o, DMG_KU.gust, f.x, f.y, false, f, 'jc'); o.kbx = Math.cos(f.ang) * 1.7; o.kby = Math.sin(f.ang) * 1.3; say(o, 'Bay!', '#e0e8f8'); }
+    }
+    if (u > 460) f.act = null;
+  } else if (f.act === 'l') {          // the dive bomb
+    if (!f.leapK) { const r = Math.min(KU_DIVE, Math.hypot(o.x - f.x, o.y - f.y)); f.leapK = { x0: f.x, y0: f.y, x1: clampX(f.x + Math.cos(f.ang) * r), y1: clampY(f.y + Math.sin(f.ang) * r * 0.8) }; }
+    const k = Math.min(1, u / 360), L = f.leapK; f.x = L.x0 + (L.x1 - L.x0) * k; f.y = L.y0 + (L.y1 - L.y0) * k; f.z = Math.sin(Math.min(1, k * 1.4) * Math.PI * 0.5) * 50 * (1 - k) * 2;
+    if (k >= 1 && !f.fired) {
+      f.fired = true; f.z = 0; sfxLand(f, false); shake = Math.max(shake, 9); fxs.push({ kind: 'kHit', by: f, x: f.x, y: f.y - 10, sheet: 'fx2', a: 4, n: 4, big: 130, t0: now });
+      if (inOval(o, f.x, f.y, 66)) hit(o, DMG_KU.dive, f.x, f.y, true, f, 'jc');
+    }
+    if (u > 520) { f.act = null; f.leapK = null; f.z = 0; }
+  } else if (f.act === 'i' && u > 1000) f.act = null;
+}
+// the eagle shadow trails the foe, locks on, and the giant eagle dives onto the locked spot
+function updateEagleDive(u, dt) {
+  const v = now - u.t0 - 900, f = u.by, o = foe(f);
+  if (v < 0) return;
+  if (v < 1500) { u.x = u.x === undefined ? o.x : u.x + (o.x - u.x) * Math.min(1, 0.008 * dt); u.y = u.y === undefined ? o.y : u.y + (o.y - u.y) * Math.min(1, 0.008 * dt); }
+  if (v >= 1800 && !u.done.hit) {
+    u.done.hit = 1; shake = Math.max(shake, 16); flashUntil = real + 60; flashCol = '#f0f4ff';
+    if (inOval(o, u.x, u.y, 70)) { hit(o, (now < o.shield ? 0.5 : 1) * DMG_KU.eagle, u.x, u.y, true, f, 'ultLast'); if (o.hp > 0) launch(o); zoom = { t0: real, x: o.x, y: o.y - 30, k: 0.08 }; }
+  }
+}
+function drawEagleDive(u) {
+  const v = now - u.t0 - 900, f = u.by, sh = sheetOf(f), K = f.fxk;
+  if (v < 0 || u.x === undefined) return;
+  if (v < 1500) { const c = sh.fx3[Math.floor(now / 100) % 4]; drawFx(c, u.x, u.y + 6, 0, 150 * c.h / c.w, 'ground'); const a = v / 700 * Math.PI * 2; drawCell(sh.fx4[Math.floor(now / 90) % 4], u.x + Math.cos(a) * 200, 150 + Math.sin(a) * 18, Math.sin(a) > 0, 100 * K / sh.fx4[0].h); }
+  else if (v < 1800) { const c = sh.fx3[4 + Math.floor(now / 120) % 2]; drawFx(c, u.x, u.y + 6, 0, 140 * c.h / c.w, 'ground'); drawCell(sh.fx4[4], u.x, u.y - 260 + (v - 1500) / 300 * 240, false, 150 * K / sh.fx4[4].h); }
+  else if (v < 2300) drawFx(sh.fx4[5 + Math.min(2, Math.floor((v - 1800) / 150))], u.x, u.y - 30, 0, 200 * K);
+}
+
+// ---------- Kim Thạch Nhân kit ----------
+function stepKn(f, u, dt) {
+  const o = foe(f);
+  if (f.act === 'j') {
+    if (u > 150 && !f.fired) { f.fired = true; const hp0 = o.hp; claw(f, DMG_KN.punch); if (o.hp < hp0) fxs.push({ kind: 'kHit', by: f, x: o.x, y: mid(o), sheet: 'fx1', a: 0, n: 4, t0: now }); }
+    if (u > 420) f.act = null;
+  } else if (f.act === 'k') {          // a glyph under the foe, the spikes half a second later
+    if (u > 200 && !f.fired) { f.fired = true; fields.push({ kind: 'glyph', by: f, x: o.x, y: o.y, t0: now }); }
+    if (u > 400) f.act = null;
+  } else if (f.act === 'l') {
+    if (u > 260 && !f.fired) { f.fired = true; fields.push({ kind: 'pillar', by: f, x: clampX(f.x + Math.cos(f.ang) * 60), y: clampY(f.y + Math.sin(f.ang) * 44), t0: now }); }
+    if (u > 460) f.act = null;
+  } else if (f.act === 'i' && u > 1000) f.act = null;
+}
+// a wave of spikes runs out from the golem toward where the foe stood; a hit locks the foe in crystal, which then bursts
+function updateCrystalWave(u, dt) {
+  const v = now - u.t0 - 900, f = u.by, o = foe(f);
+  if (v < 0) return;
+  if (v < 1000) {                      // the wave runs out, steering after the foe
+    if (u.hx === undefined) { u.hx = u.x; u.hy = u.y; }
+    const want = Math.atan2(o.y - u.hy, o.x - u.hx), d = ((want - u.ang) + Math.PI * 3) % (Math.PI * 2) - Math.PI;
+    u.ang += Math.max(-0.004 * dt, Math.min(0.004 * dt, d));
+    u.hx += Math.cos(u.ang) * 0.5 * dt; u.hy += Math.sin(u.ang) * 0.4 * dt; shake = Math.max(shake, 3);
+    if (!u.done.caught && o.hp > 0 && Math.hypot(o.x - u.hx, (o.y - u.hy) * 1.3) < 44 && !dodgingNow(o)) {
+      u.done.caught = now; u.px = o.x; u.py = o.y; o.stunUntil = Math.max(o.stunUntil, now + CRYSTAL_MS); o.aiming = null; if (o.act !== 'i') o.act = null; say(o, 'Bị nhốt!', '#e0ffff');
+    }
+  }
+  if (u.done.caught && !u.done.burst && now - u.done.caught >= CRYSTAL_MS) {
+    u.done.burst = now; shake = Math.max(shake, 15); flashUntil = real + 60; flashCol = '#e0ffff';
+    if (o.hp > 0) { hit(o, (now < o.shield ? 0.5 : 1) * DMG_KN.prison, u.px, u.py, true, f, 'ultLast'); zoom = { t0: real, x: o.x, y: o.y - 30, k: 0.08 }; }
+  }
+}
+function drawCrystalWave(u) {
+  const v = now - u.t0 - 900, f = u.by, sh = sheetOf(f), K = f.fxk;
+  if (v < 0) return;
+  if (v < 1000) drawFx(sh.fx4[Math.floor(v / 250) % 4], u.hx, u.hy - 20, Math.cos(u.ang) < 0 ? Math.PI : 0, 110 * K);
+  if (u.done.caught && !u.done.burst) { const c = sh.fx3[Math.floor(now / 110) % 4]; drawFx(c, u.px, u.py - f.h * 0.4, 0, f.h * 1.6 * K); }
+  if (u.done.burst && now - u.done.burst < 450) drawFx(sh.fx3[4 + Math.min(3, Math.floor((now - u.done.burst) / 110))], u.px, u.py - 30, 0, 150 * K);
+}
+
+// ---------- Liêm Đao kit ----------
+function stepLd(f, u, dt) {
+  const o = foe(f);
+  if (f.act === 'j') {
+    if (u > 90 && !f.fired) { f.fired = true; const hp0 = o.hp; claw(f, DMG_LD.slash); if (o.hp < hp0) fxs.push({ kind: 'kHit', by: f, x: o.x, y: mid(o), sheet: 'fx1', a: 0, n: 4, ang: f.ang, t0: now }); }
+    if (u > 280) f.act = null;
+  } else if (f.act === 'k') {
+    if (u > 150 && !f.fired) { f.fired = true; shots.push({ by: f, kind: 'sickle', dmg: DMG_LD.sickle, x: f.x + Math.cos(f.ang) * 20, y: f.y - f.h * 0.5, ang: f.ang, sp: 0.5, life: 1600, t0: now }); }
+    if (u > 320) f.act = null;
+  } else if (f.act === 'l') {          // vanish, step out behind the foe, cut an X
+    if (!f.fired) {
+      f.fired = true; fxs.push({ kind: 'kHit', by: f, x: f.x, y: mid(f), sheet: 'fx2', a: 0, n: 4, big: 90, t0: now });
+      const a = Math.atan2(o.y - f.y, o.x - f.x); f.x = clampX(o.x + Math.cos(a) * 42); f.y = clampY(o.y + Math.sin(a) * 30); f.ang = a + Math.PI; f.dir = dirOf(f.ang);
+    }
+    if (u > 160 && !f.blinkHit) {
+      f.blinkHit = true; fxs.push({ kind: 'kHit', by: f, x: o.x, y: mid(o), sheet: 'fx2', a: 4, n: 4, big: 90, t0: now });
+      if (o.hp > 0 && Math.hypot(o.x - f.x, o.y - f.y) < 90 && !dodgingNow(o)) hit(o, DMG_LD.x, f.x, f.y, false, f, 'jc');
+    }
+    if (u > 420) { f.act = null; f.blinkHit = false; }
+  } else if (f.act === 'i' && u > 1000) f.act = null;
+}
+// a red line on the foe's row, then the crescent sweeps across it and back
+function updateMoonSweep(u, dt) {
+  const v = now - u.t0 - 900, f = u.by, o = foe(f);
+  if (v < 0) return;
+  if (v < 600) u.y += (o.y - u.y) * Math.min(1, 0.006 * dt);   // the warning line follows the foe's row until the sweep
+  for (const [n, a, b] of [[0, 700, 1300], [1, 1400, 2000]]) {
+    if (v < a || v > b || u.done['h' + n]) continue;
+    const k = (v - a) / (b - a), x = n === 0 ? -40 + k * 720 : 680 - k * 720; u.mx = x; shake = Math.max(shake, 4);
+    if (o.hp > 0 && Math.abs(o.x - x) < 50 && Math.abs(o.y - u.y) < 32 && !dodgingNow(o)) {
+      u.done['h' + n] = 1; const last = n === 1; hit(o, (last && now < o.shield ? 0.5 : 1) * (last ? DMG_LD.back : DMG_LD.moon), x, u.y, true, f, last ? 'ultLast' : 'ultTick2');
+      fxs.push({ kind: 'kHit', by: f, x: o.x, y: mid(o), sheet: 'fx4', a: 5, n: 3, big: 160, t0: now }); if (last) zoom = { t0: real, x: o.x, y: o.y - 30, k: 0.08 };
+    }
+  }
+}
+function drawMoonSweep(u) {
+  const v = now - u.t0 - 900, f = u.by, sh = sheetOf(f), K = f.fxk;
+  if (v < 0 || v > 2100) return;
+  if (v < 2000) { const c = sh.fx3[Math.floor(now / 100) % 4]; drawFx(c, 320, u.y + 6, 0, 600 * c.h / c.w, 'ground', v < 700 ? 1 : 0.5); }
+  if (v >= 700 && v < 1300) drawFx(sh.fx4[Math.floor(now / 80) % 4], -40 + (v - 700) / 600 * 720, u.y - 30, 0, 170 * K);
+  if (v >= 1400 && v < 2000) drawFx(sh.fx4[4], 680 - (v - 1400) / 600 * 720, u.y - 30, 0, 170 * K);
+}
+
+// ---------- Thổ Tượng kit ----------
+function stepTt(f, u, dt) {
+  const o = foe(f);
+  if (f.act === 'j') {
+    if (u > 170 && !f.fired) { f.fired = true; const hp0 = o.hp; claw(f, DMG_TT.club); if (o.hp < hp0) fxs.push({ kind: 'ttSmash', by: f, x: o.x, y: mid(o), t0: now }); }
+    if (u > 420) f.act = null;
+  } else if (f.act === 'k') {          // the mud spray: a cone ahead, and a puddle where it lands
+    if (u > 180 && !f.fired) {
+      f.fired = true; fxs.push({ kind: 'ttSpray', by: f, x: f.x + Math.cos(f.ang) * 70, y: mid(f) + Math.sin(f.ang) * 30, ang: f.ang, t0: now });
+      const d = Math.hypot(o.x - f.x, o.y - f.y), off = Math.abs(((Math.atan2(o.y - f.y, o.x - f.x) - f.ang) + Math.PI * 3) % (Math.PI * 2) - Math.PI);
+      if (o.hp > 0 && d < 150 && (d < 30 || off < 0.6) && !dodgingNow(o)) { hit(o, DMG_TT.mud, f.x, f.y, false, f, 'jc'); o.slowUntil = Math.max(o.slowUntil, now + 2000); say(o, 'Dính bùn!', '#c8a070'); }
+      fields.push({ kind: 'mud', by: f, x: Math.max(50, Math.min(590, f.x + Math.cos(f.ang) * 95)), y: Math.max(155, Math.min(445, f.y + Math.sin(f.ang) * 70)), t0: now });
+    }
+    if (u > 450) f.act = null;
+  } else if (f.act === 'l') {          // raise the foot, stamp: stuns close by
+    if (u > 320 && !f.fired) {
+      f.fired = true; sfxLand(f, false); shake = Math.max(shake, 10); fxs.push({ kind: 'ttStomp', by: f, x: f.x, y: f.y, t0: now });
+      if (o.hp > 0 && Math.hypot(o.x - f.x, (o.y - f.y) * 1.3) < STOMP_R && !dodgingNow(o)) {
+        hit(o, DMG_TT.stomp, f.x, f.y, false, f, 'jc');
+        if (o.hp > 0) { o.stunUntil = now + STOMP_STUN; o.aiming = null; if (o.act !== 'i') o.act = null; say(o, 'Choáng!', '#ffe08a'); }
+      }
+    }
+    if (u > 560) f.act = null;
+  } else if (f.act === 'i' && u > 1000) f.act = null;
+}
+// the war mammoth: runs in from the edge along the foe's row, steering a little, and tosses it
+function updateMammoth(u, dt) {
+  const v = now - u.t0 - 900, f = u.by, o = foe(f);
+  if (v < 0 || u.done.gone) return;
+  u.x += u.dir * MAMMOTH_SPEED * dt; u.y += Math.max(-0.05 * dt, Math.min(0.05 * dt, (o.y - u.y) * 0.003 * dt));
+  if (Math.hypot(u.x - (u.lx || -99), u.y - (u.ly || -99)) > 34) { u.lx = u.x; u.ly = u.y; fxs.push({ kind: 'ttCrack', by: f, x: u.x, y: u.y + 6, t0: now }); }
+  shake = Math.max(shake, 3);
+  if (!u.done.toss && o.hp > 0 && Math.abs(o.x - u.x) < 50 && Math.abs(o.y - u.y) < 34 && !dodgingNow(o)) {
+    u.done.toss = 1; hit(o, (now < o.shield ? 0.5 : 1) * DMG_TT.toss, u.x, u.y, true, f, 'ultLast'); if (o.hp > 0) launch(o);
+    fxs.push({ kind: 'ttToss', by: f, x: o.x, y: o.y, t0: now }); shake = Math.max(shake, 15); zoom = { t0: real, x: o.x, y: o.y - 30, k: 0.08 };
+  }
+  if (u.x < -80 || u.x > 720) u.done.gone = 1;
+}
+function drawMammoth(u) {
+  const v = now - u.t0 - 900, f = u.by, sh = sheetOf(f);
+  if (v < 0 || u.done.gone) return;
+  drawCell(sh.fx4[Math.floor(now / 90) % 4], u.x, u.y + 12, u.dir < 0, 150 * f.fxk / sh.fx4[0].h);
+}
+
+// ---------- Thổ Tích kit ----------
+function stepTc(f, u, dt) {
+  const o = foe(f);
+  if (f.act === 'j') {
+    if (u > 100 && !f.fired) { f.fired = true; const hp0 = o.hp; claw(f, DMG_TC.whip); if (o.hp < hp0) fxs.push({ kind: 'tcWhip', by: f, x: o.x, y: mid(o), ang: f.ang, t0: now }); }
+    if (u > 300) f.act = null;
+  } else if (f.act === 'k') {
+    if (u > 160 && !f.fired) { f.fired = true; shots.push({ by: f, kind: 'pebble', dmg: DMG_TC.pebble, x: f.x + Math.cos(f.ang) * 20, y: f.y - f.h * 0.5, ang: f.ang, sp: 0.42, life: 1500, t0: now, bounces: 0 }); }
+    if (u > 340) f.act = null;
+  } else if (f.act === 'l') {          // the shed skin stays; the lizard slips away unseen
+    if (!f.fired) {
+      f.fired = true; fields.push({ kind: 'skin', by: f, x: f.x, y: f.y, t0: now, ang: f.ang });
+      f.stealthUntil = now + SHED_MS; fxs.push({ kind: 'tcPuff', by: f, x: f.x, y: mid(f), t0: now });
+    }
+    if (u < 200) { const a = f.mx || f.my ? Math.atan2(f.my, f.mx) : f.ang + Math.PI; f.x = Math.max(40, Math.min(600, f.x + Math.cos(a) * 0.6 * dt)); f.y = Math.max(150, Math.min(448, f.y + Math.sin(a) * 0.5 * dt)); }
+    else f.act = null;
+  } else if (f.act === 'i' && u > 1000) f.act = null;
+}
+// the meteors: six small ones, each marked on the foe's spot 0.4 s before it lands, then a giant one
+function updateMeteors(u, dt) {
+  const v = now - u.t0 - 900, f = u.by, o = foe(f);
+  if (v < 0) return;
+  for (let n = 0; n < 7; n++) {
+    const big = n === 6, mark = big ? 2300 : n * 330, land = mark + (big ? 700 : 420);
+    if (v >= mark && !u.done['m' + n]) { u.done['m' + n] = 1; u.marks.push({ n, x: o.x, y: o.y, t0: now, land: now + (land - mark), big }); }
+    if (v >= land && !u.done['l' + n]) {
+      u.done['l' + n] = 1; const m = u.marks.find(m => m.n === n); m.hit = now; shake = Math.max(shake, big ? 16 : 6);
+      const R = big ? 64 : 40, ex = (o.x - m.x) / R, ey = (o.y - m.y) / (R * 0.55);
+      if (o.hp > 0 && ex * ex + ey * ey <= 1 && !dodgingNow(o)) hit(o, big ? (now < o.shield ? 0.5 : 1) * DMG_TC.big : DMG_TC.meteor, m.x, m.y, big, f, big ? 'ultLast' : 'ultTick');
+      if (big) { flashUntil = real + 60; flashCol = '#ffd080'; }
+    }
+  }
+}
+function drawMeteors(u) {
+  const f = u.by, sh = sheetOf(f), K = f.fxk;
+  for (const m of u.marks) {
+    if (!m.hit) {
+      const w = sh.fx3[Math.floor(now / 90) % 4]; drawFx(w, m.x, m.y + 6, 0, (m.big ? 140 : 80) * w.h / w.w, 'ground');
+      const k = 1 - (m.land - now) / (m.big ? 700 : 420);   // falling in from the upper left
+      if (m.big) drawFx(sh.fx4[Math.floor(now / 80) % 4], m.x - (1 - k) * 160, m.y - 40 - (1 - k) * 260, 0, 130 * K);
+      else drawFx(sh.fx3[4], m.x - (1 - k) * 80, m.y - 20 - (1 - k) * 180, 0, 40 * K);
+    } else {
+      const g = Math.floor((now - m.hit) / 110);
+      if (m.big) { if (g < 4) drawFx(sh.fx4[4 + g], m.x, m.y - 30, 0, 170 * K); else if (g < 14) { const c = sh.fx4[8 + Math.floor(now / 200) % 2]; drawFx(c, m.x, m.y + 6, 0, 150 * c.h / c.w, 'ground'); } }
+      else if (g < 3) drawFx(sh.fx3[5 + g], m.x, m.y - 10, 0, 60 * K);
+    }
+  }
+}
+
+// ---------- Thạch Nhân kit ----------
+function stepTa(f, u, dt) {
+  const o = foe(f);
+  if (f.rockArmor && (now > f.rockArmor.until || f.rockArmor.n <= 0)) f.rockArmor = null;
+  if (f.act === 'j') {
+    if (u > 140 && !f.fired) { f.fired = true; const hp0 = o.hp; claw(f, DMG_TA.punch); if (o.hp < hp0) fxs.push({ kind: 'taPunch', by: f, x: o.x, y: mid(o), t0: now }); }
+    if (u > 400) f.act = null;
+  } else if (f.act === 'k') {
+    if (u > 260 && !f.fired) { f.fired = true; shots.push({ by: f, kind: 'boulder', dmg: DMG_TA.boulder, x: f.x + Math.cos(f.ang) * 30, y: f.y - f.h * 0.35, ang: f.ang, sp: 0.3, life: 1300, t0: now }); }
+    if (u > 480) f.act = null;
+  } else if (f.act === 'l') { if (u > 300) f.act = null; }
+  else if (f.act === 'i' && u > 900 + 3 * 700) f.act = null;
+}
+// three rings of stone pillars spread out from the golem; each hits once as its front passes the foe
+function updateRockRings(u, dt) {
+  const v = now - u.t0 - 900, f = u.by, o = foe(f);
+  if (v < 0) return;
+  for (let n = 0; n < 3; n++) {
+    const w = v - n * 700;
+    if (w < 0 || w > RING_MS || u.done['h' + n]) continue;
+    if (w < 40 && !u.done['s' + n]) { u.done['s' + n] = 1; shake = Math.max(shake, n === 2 ? 12 : 8); f.stompT = now; sfxLand(f, n === 2); }
+    const r = w / RING_MS * RING_R, d = Math.hypot(o.x - u.x, (o.y - u.y) * 1.8);
+    if (o.hp > 0 && Math.abs(d - r) < 22 && !dodgingNow(o)) { u.done['h' + n] = 1; const last = n === 2; hit(o, last ? DMG_TA.last : DMG_TA.ring, u.x, u.y, true, f, last ? 'ultLast' : 'ultTick2'); }
+  }
+}
+function drawRockRings(u) {
+  const v = now - u.t0 - 900, f = u.by, sh = sheetOf(f);
+  if (v < 0) return;
+  for (let n = 0; n < 3; n++) {
+    const w = v - n * 700;
+    if (w < 0 || w > RING_MS + 250) continue;
+    const r = Math.min(1, w / RING_MS) * RING_R, c = sh.fx4[w > RING_MS ? 3 : w < 120 ? 1 : 2];
+    drawFx(c, u.x, u.y + 8, 0, Math.max(30, r * 2) * c.h / c.w, 'ground');
+  }
+}
+
+// ---------- Thành Trì kit ----------
+function stepTr(f, u, dt) {
+  const o = foe(f);
+  if (f.act === 'j') {
+    if (u > 150 && !f.fired) { f.fired = true; const hp0 = o.hp; claw(f, DMG_TR.bash); if (o.hp < hp0) { o.kbx = Math.cos(f.ang) * 1.0; o.kby = Math.sin(f.ang) * 0.8; fxs.push({ kind: 'trBash', by: f, x: o.x, y: mid(o), t0: now }); } }
+    if (u > 400) f.act = null;
+  } else if (f.act === 'k') {
+    if (u > 220 && !f.fired) { f.fired = true; shake = Math.max(shake, 5); fields.push({ kind: 'wall', by: f, x: Math.max(50, Math.min(590, f.x + Math.cos(f.ang) * 60)), y: Math.max(160, Math.min(440, f.y + Math.sin(f.ang) * 44)), a: f.ang + Math.PI / 2, t0: now }); }
+    if (u > 420) f.act = null;
+  } else if (f.act === 'l') {
+    if (u > 260 && !f.fired) { f.fired = true; fields.push({ kind: 'turret', by: f, x: f.x + Math.cos(f.ang + Math.PI / 2) * 30, y: f.y + 4, t0: now, next: now + 500 }); }
+    if (u > 460) f.act = null;
+  } else if (f.act === 'i' && u > 1000) f.act = null;
+}
+// walls rise in a box round the foe and keep it in; three catapult stones land inside, the last one stuns
+function updateFortress(u, dt) {
+  const v = now - u.t0 - 900, f = u.by, o = foe(f);
+  if (v < 0) return;
+  if (!u.done.box) { u.done.box = 1; const ex = Math.abs(o.x - u.x) / BOX_W, ey = Math.abs(o.y - u.y) / BOX_H; u.caught = o.hp > 0 && ex <= 1 && ey <= 1 && !dodgingNow(o); shake = Math.max(shake, 8); }
+  if (u.caught && v < 2400 && o.hp > 0) { o.x = Math.max(u.x - BOX_W + 14, Math.min(u.x + BOX_W - 14, o.x)); o.y = Math.max(u.y - BOX_H + 8, Math.min(u.y + BOX_H - 8, o.y)); }
+  for (let n = 0; n < 3; n++) {
+    const at = 900 + n * 600;
+    if (v >= at - 500 && !u.done['w' + n]) { u.done['w' + n] = 1; u.warn = { x: o.x, y: o.y }; }
+    if (v >= at && !u.done['s' + n]) {
+      u.done['s' + n] = 1; const w = u.warn, last = n === 2; shake = Math.max(shake, last ? 15 : 9);
+      fxs.push({ kind: 'trBoom', by: f, x: w.x, y: w.y, t0: now });
+      const ex = (o.x - w.x) / 52, ey = (o.y - w.y) / 30;
+      if (o.hp > 0 && ex * ex + ey * ey <= 1 && !dodgingNow(o)) hit(o, last ? (now < o.shield ? 0.5 : 1) * DMG_TR.last : DMG_TR.cata, w.x, w.y, true, f, last ? 'ultLast' : 'ultTick2');
+      u.warn = null;
+    }
+  }
+}
+function drawFortress(u) {
+  const v = now - u.t0 - 900, f = u.by, sh = sheetOf(f);
+  if (v < 0 || v > 2700) return;
+  const fr = v < 150 ? 0 : v < 2400 ? (Math.floor(now / 200) % 2 ? 2 : 1) : 3, c = sh.fx4[fr];
+  drawFx(c, u.x, u.y + BOX_H + 10, 0, BOX_W * 2.4 * c.h / c.w, 'ground');
+  if (u.warn) { const w = sh.fx3[Math.floor(now / 90) % 4]; drawFx(w, u.warn.x, u.warn.y + 6, 0, 104 * w.h / w.w, 'ground'); }
+}
+
+// ---------- Thổ Long kit ----------
+function stepTl(f, u, dt) {
+  const o = foe(f);
+  if (f.act === 'j') {
+    if (u > 150 && !f.fired) {
+      f.fired = true; fxs.push({ kind: 'tlSand', by: f, x: f.x + Math.cos(f.ang) * 60, y: mid(f) + Math.sin(f.ang) * 26, ang: f.ang, t0: now });
+      const d = Math.hypot(o.x - f.x, o.y - f.y), off = Math.abs(((Math.atan2(o.y - f.y, o.x - f.x) - f.ang) + Math.PI * 3) % (Math.PI * 2) - Math.PI);
+      if (o.hp > 0 && d < 120 && (d < 26 || off < 0.5) && !dodgingNow(o)) hit(o, DMG_TL.sand, f.x, f.y, false, f, 'j');
+    }
+    if (u > 380) f.act = null;
+  } else if (f.act === 'k') {
+    if (u > 220 && !f.fired) { f.fired = true; shots.push({ by: f, kind: 'spikes', dmg: DMG_TL.spikes, x: f.x + Math.cos(f.ang) * 30, y: f.y - f.h * 0.46 + Math.sin(f.ang) * 20, gy: f.h * 0.46, ang: f.ang, sp: 0.36, life: 900, t0: now }); }
+    if (u > 420) f.act = null;
+  } else if (f.act === 'l') {
+    if (u > 250 && !f.fired) {
+      f.fired = true; shake = Math.max(shake, 7);
+      const fl = { kind: 'fissure', by: f, x: f.x + Math.cos(f.ang) * (FISSURE_LEN / 2 + 20), y: f.y + Math.sin(f.ang) * (FISSURE_LEN / 2 + 20) * 0.75, a: f.ang, t0: now };
+      fields.push(fl);
+      if (o.hp > 0 && segDist(o.x, o.y, fl.x, fl.y, fl.a, FISSURE_LEN) < 22 && !dodgingNow(o)) hit(o, DMG_TL.fissure, fl.x, fl.y, false, f, 'jc');
+    }
+    if (u > 480) f.act = null;
+  } else if (f.act === 'i' && u > 900 + 2400) f.act = null;
+}
+// the dragon flies up out of sight, rocks rain on warned spots round the foe, then it dives onto the foe's spot
+function updateDragonDive(u, dt) {
+  const v = now - u.t0 - 900, f = u.by, o = foe(f);
+  if (v < 0) return;
+  if (!u.done.up) { u.done.up = 1; f.flyUp = true; u.fx = f.x; u.fy = f.y; }
+  if (v < 1900 && now >= (u.next || 0)) {
+    u.next = now + 320; const a = Math.random() * Math.PI * 2, r = Math.random() * 70;
+    u.rocks.push({ x: Math.max(40, Math.min(600, o.x + Math.cos(a) * r)), y: Math.max(150, Math.min(445, o.y + Math.sin(a) * r * 0.6)), land: now + 500, t0: now });
+  }
+  for (const r of u.rocks) if (!r.hit && now >= r.land) {
+    r.hit = now; shake = Math.max(shake, 5); const ex = (o.x - r.x) / 40, ey = (o.y - r.y) / 22;
+    if (o.hp > 0 && ex * ex + ey * ey <= 1 && !dodgingNow(o)) hit(o, DMG_TL.rock, r.x, r.y, false, f, 'ultTick');
+  }
+  if (v >= 1900 && !u.done.mark) { u.done.mark = 1; u.mx = o.x; u.my = o.y; }
+  if (v >= 2500 && !u.done.dive) {
+    u.done.dive = 1; f.flyUp = false; sfxLand(f, true); f.x = u.mx; f.y = Math.min(448, u.my + 30); shake = Math.max(shake, 16); flashUntil = real + 60; flashCol = '#ffe0a0';
+    const ex = (o.x - u.mx) / 66, ey = (o.y - u.my) / 38;
+    if (o.hp > 0 && ex * ex + ey * ey <= 1 && !dodgingNow(o)) { hit(o, (now < o.shield ? 0.5 : 1) * DMG_TL.dive, u.mx, u.my - 10, true, f, 'ultLast'); zoom = { t0: real, x: o.x, y: o.y - 30, k: 0.08 }; }
+  }
+}
+function drawDragonDive(u) {
+  const v = now - u.t0 - 900, f = u.by, sh = sheetOf(f), K = f.fxk;
+  if (v < 0) return;
+  for (const r of u.rocks) {
+    if (!r.hit) { const w = sh.fx3[Math.floor(now / 90) % 4]; drawFx(w, r.x, r.y + 6, 0, 70 * w.h / w.w, 'ground'); const k = (now - r.t0) / 500; drawFx(sh.fx3[4], r.x, r.y - 200 * (1 - k), 0, 36 * K); }
+    else { const g = Math.floor((now - r.hit) / 100); if (g < 3) drawFx(sh.fx3[5 + g], r.x, r.y - 10, 0, 50 * K); }
+  }
+  if (v < 1900) { const a = v / 1900 * Math.PI * 2; drawCell(sh.fx4[Math.floor(now / 90) % 4], 320 + Math.cos(a) * 240, 170 + Math.sin(a) * 20, Math.sin(a) > 0, 110 * K / sh.fx4[0].h); }   // circling high above
+  else if (v < 2500) { const w = sh.fx3[Math.floor(now / 90) % 4]; drawFx(w, u.mx, u.my + 6, 0, 150 * w.h / w.w, 'ground'); drawCell(sh.fx4[4], u.mx, u.my - 220 + (v - 1900) / 600 * 220, false, 140 * K / sh.fx4[4].h); }
+  else if (v < 3100) { const g = Math.min(2, Math.floor((v - 2500) / 150)); drawFx(sh.fx4[5 + g], u.mx, u.my - 30, 0, 190 * K); const c = sh.fx4[8 + Math.floor(now / 200) % 2]; drawFx(c, u.mx, u.my + 8, 0, 170 * c.h / c.w, 'ground'); }
+}
+
 // ---------- Thủy Sa kit ----------
 const bloodX = f => f.kit === 'sa' && foe(f).hp < BLOOD_HP ? 1.3 : 1;
 function stepSa(f, u, dt) {
@@ -1105,7 +1875,7 @@ function updateBigClaw(u, dt) {
   for (let n = 0; n < 3; n++) {
     const at = 1000 + n * 550;
     if (v >= at && !u.done['s' + n]) {
-      u.done['s' + n] = 1; u.slamT = now; shake = Math.max(shake, n === 2 ? 15 : 9);
+      u.done['s' + n] = 1; u.slamT = now; sfxLand(f, n === 2); shake = Math.max(shake, n === 2 ? 15 : 9);
       fxs.push({ kind: 'giSplash', by: f, x: u.x, y: u.y, t0: now });
       const last = n === 2;
       if (o.hp > 0 && (u.held || Math.hypot(o.x - u.x, (o.y - u.y) * 1.3) < 60 && !dodgingNow(o))) hit(o, last ? DMG_GI.last : DMG_GI.slam, u.x, u.y - 40, true, f, last ? 'ultLast' : 'ultTick2');
@@ -1166,7 +1936,7 @@ function updateSwordRing(u, dt) {
   if (v < 0) return;
   if (v >= 500 && !u.done.mark) { u.done.mark = 1; u.x = o.x; u.y = o.y; }
   if (v >= 1000 && !u.done.land) {
-    u.done.land = 1; shake = Math.max(shake, 10);
+    u.done.land = 1; shake = Math.max(shake, 10); sfxLand(f, false);
     const ex = (o.x - u.x) / 85, ey = (o.y - u.y) / 46;
     if (o.hp > 0 && ex * ex + ey * ey <= 1 && !dodgingNow(o)) { u.caged = true; hit(o, DMG_CH.cage, u.x, u.y, false, f, 'ult'); if (o.hp > 0) root(o, f, 1100); o.rootSh = null; }
   }
@@ -1239,7 +2009,7 @@ function drawFlood(u) {
   const v = now - u.t0 - 900, f = u.by, sh = sheetOf(f), K = f.fxk;
   if (v < 0 || !u.done.rain) return;
   if (v < 1800) { const c = sh.fx4[Math.floor(now / 90) % 4]; drawFx(c, u.x, u.y - 60, 0, BRAIN_R * 2.2 * c.h / c.w); return; }
-  if (v < 2800 && u.held) { const c = sh.fx4[8 + Math.floor(now / 160) % 2]; drawFx(c, u.hx, u.hy - 30, 0, 110 * K); }
+  if (v < 2800 && u.held) { const c = sh.fx4[8 + Math.floor(now / 160) % 2]; drawFx(c, u.hx, u.hy - 30, 0, 120 * K, 'center', 0.7); }
   else if (v >= 2800 && v < 3300) { const g = Math.min(1, Math.floor((v - 2800) / 200)); drawFx(sh.fx4[10 + g], u.hx || u.x, (u.hy || u.y) - 30, 0, 170 * K); }
   if (v < 2300 && !u.held) { const g = Math.min(3, Math.floor((v - 1800) / 120)); drawFx(sh.fx4[4 + g], u.x, u.y - 30, 0, 120 * K); }
 }
@@ -1416,7 +2186,7 @@ function updateGiant(u, dt) {
   if (v < 0 || f.hp <= 0) return;
   if (v < GIANT_MS) {
     if ((f.mx || f.my) && now >= (u.next || 0) && !f.act && now >= f.stunUntil) {
-      u.next = now + 520; f.stompT = now; shake = Math.max(shake, 5);
+      u.next = now + 520; f.stompT = now; shake = Math.max(shake, 5); sfxLand(f, false);
       fxs.push({ kind: 'tnStomp', by: f, x: f.x, y: f.y, t0: now });
       if (o.hp > 0 && Math.hypot(o.x - f.x, (o.y - f.y) * 1.4) < 95 && !dodgingNow(o)) hit(o, DMG_TN.stomp, f.x, f.y, false, f, 'ultTick');
     }
@@ -1647,7 +2417,7 @@ function updateMonster(u, dt) {
     const at = 1000 + n * 1200;
     if (v >= at - 600 && !u.done['w' + n]) { u.done['w' + n] = 1; u.warn = { x: f.x, y: f.y, t0: now, n }; }
     if (v >= at && !u.done['s' + n]) {
-      u.done['s' + n] = 1; u.slamT = now; shake = Math.max(shake, 9);
+      u.done['s' + n] = 1; u.slamT = now; sfxLand(u.by, n === 2); shake = Math.max(shake, 9);
       const w = u.warn, ex = (f.x - w.x) / 62, ey = (f.y - w.y) / 34;
       fxs.push({ kind: 'rlShock', by: u.by, x: w.x, y: w.y, t0: now });
       if (f.hp > 0 && ex * ex + ey * ey <= 1 && !dodgingNow(f)) hit(f, now < f.shield ? DMG_RL.claw / 2 : DMG_RL.claw, w.x, w.y, true, u.by, 'ult');
@@ -1776,7 +2546,7 @@ function stepHl(f, u, dt) {
     const t = (u - GATHER2_MS) / JUMP2_MS;
     if (t > 0 && t < 1) f.z = Math.sin(t * Math.PI) * 56;
     if (t >= 1 && !f.slamDone) {
-      f.slamDone = true; f.z = 0;
+      f.slamDone = true; f.z = 0; sfxLand(f, true);
       shake = Math.max(shake, 14); zoom = { t0: real, x: f.x, y: f.y - 20, k: 0.08 }; flashUntil = real + 60; flashCol = '#ffd36e';
       if (o.hp > 0 && Math.hypot(o.x - f.x, (o.y - f.y) * 1.4) < 70 && !dodgingNow(o)) hit(o, DMG_HL.slam, f.x, f.y, true, f, 'ult');
       ults.push({ type: 'geysers', by: f, t0: now - 900, x: f.x, y: f.y, life: 900 + 2600, vents: geyserField(f.x, f.y) });
@@ -1852,7 +2622,11 @@ function sparks(x, y, n, power) {
                  col: BOLT[2 + ((Math.random() * 4) | 0)], sz: Math.random() < 0.3 ? 4 : 2 });
   }
 }
-const dodgingNow = o => o.act === 'dash' && now - o.t0 < DODGE_MS;
+// A dash's dodge window. Ultimates can't be dashed through: while the ultimates update (ULT_CTX) the dash does not
+// dodge, it only halves the blow (see hit). Ordinary skills and shots are still dodged whole.
+let ULT_CTX = false;
+const dashing = o => o.act === 'dash' && now - o.t0 < DODGE_MS;
+const dodgingNow = o => !ULT_CTX && dashing(o);
 function kimPunch(f, g) {           // a punch whose reach, damage and weight grow with the charge
   const o = foe(f), dx = o.x - f.x, dy = o.y - f.y, d = Math.hypot(dx, dy), reach = CLAW_REACH * (1 + 0.5 * g);
   const off = Math.abs(((Math.atan2(dy, dx) - f.ang) + Math.PI * 3) % (Math.PI * 2) - Math.PI);
@@ -1937,7 +2711,7 @@ function stepTho(f, u, dt) {
       const stepLen = Math.min(r.dist - r.done, RUSH_SPEED * dt);
       f.x += Math.cos(f.ang) * stepLen; f.y += Math.sin(f.ang) * stepLen; r.done += stepLen;
       if (dt && Math.random() < 0.5) dust(f.x - Math.cos(f.ang) * 20, f.y, 1, 0.6);
-      const dodging = o.act === 'dash' && now - o.t0 < DODGE_MS;
+      const dodging = dodgingNow(o);
       if (o.hp > 0 && !dodging && Math.hypot(o.x - f.x, o.y - f.y) < 40) {
         r.hit = true;
         if (now < o.shield) fxs.push({ kind: 'block', who: o, t0: now });
@@ -1979,7 +2753,7 @@ function updateQuake(u) {
 function updateForest(u) {
   const w = now - u.t0 - 900, f = foe(u.by);
   if (w < 0) return;
-  const inside = () => { const ex = (f.x - u.x) / ULT_RX, ey = (f.y - u.y) / ULT_RY; return ex * ex + ey * ey <= 1 && !(f.act === 'dash' && now - f.t0 < DODGE_MS); };
+  const inside = () => { const ex = (f.x - u.x) / ULT_RX, ey = (f.y - u.y) / ULT_RY; return ex * ex + ey * ey <= 1 && !dodgingNow(f); };
   [[220, 0, 'ult'], [520, 1, 'ult'], [900, 2, 'ultLast']].forEach(([at, i, kind]) => {
     if (w < at || u.done[i]) return;
     u.done[i] = 1;
@@ -2045,7 +2819,7 @@ function curtainBlocks(f, x, y) {
 function updateSpout(u, dt) {
   const w = now - u.t0 - 900, f = foe(u.by);
   if (w < 0) return;
-  const dx = f.x - u.x, dy = f.y - u.y, d = Math.hypot(dx, dy) || 1, dodging = f.act === 'dash' && now - f.t0 < DODGE_MS;
+  const dx = f.x - u.x, dy = f.y - u.y, d = Math.hypot(dx, dy) || 1, dodging = dodgingNow(f);
   if (w < SPOUT_MS) {
     // it drifts after the foe and drags it in, grinding every 300 ms while it is inside
     u.x += dx / d * Math.min(d, 0.05 * dt); u.y += dy / d * Math.min(d, 0.05 * dt);
@@ -2159,7 +2933,7 @@ function think() {
 
 // The bot pet: the first skill in its kit's list that is ready and whose range fits is pressed; aimed skills are
 // released after a short hold (the aim code above points them), held Kim skills after a random charge.
-const BOT_WANT = { sa: 70, gi: 70, ch: 65, bt: 170, ga: 200, ml: 75, tn: 70, dl: 170, mt: 70, rl: 140, md: 60, hl: 170, hoa: 70, tho: 70, dn: 90, quy: 140, cao: 110, vl: 170, kim: 120, thuy: 150, moc: 150 };
+const BOT_WANT = { kt: 70, kg: 75, ku: 190, kn: 140, ld: 70, tt: 70, tc: 90, ta: 75, tr: 80, tl: 150, sa: 70, gi: 70, ch: 65, bt: 170, ga: 200, ml: 75, tn: 70, dl: 170, mt: 70, rl: 140, md: 60, hl: 170, hoa: 70, tho: 70, dn: 90, quy: 140, cao: 110, vl: 170, kim: 120, thuy: 150, moc: 150 };
 const BOT_PLAN = {
   hoa: [['l', 0, 140], ['k', 90, 220], ['j', 0, CLAW_REACH]],
   quy: [['l', 0, 70], ['k', 60, 260], ['j', 60, 330]],
@@ -2182,6 +2956,16 @@ const BOT_PLAN = {
   ch: [['k', 60, 260], ['l', 0, 90], ['j', 0, CLAW_REACH]],
   bt: [['k', 80, 280], ['l', 0, 160], ['j', 60, 330]],
   ga: [['l', 0, 90], ['k', 80, 260], ['j', 80, 380]],
+  tt: [['l', 0, 90], ['k', 30, 150], ['j', 0, CLAW_REACH]],
+  kt: [['l', 80, 200], ['k', 0, 150], ['j', 0, CLAW_REACH]],
+  kg: [['k', 60, 260], ['j', 0, CLAW_REACH]],
+  ku: [['k', 0, 140], ['l', 60, 160], ['j', 80, 400]],
+  kn: [['k', 60, 380], ['l', 0, 150], ['j', 0, CLAW_REACH]],
+  ld: [['l', 80, 300], ['k', 60, 320], ['j', 0, CLAW_REACH]],
+  tc: [['k', 60, 300], ['l', -1, 0], ['j', 0, CLAW_REACH]],
+  ta: [['l', 0, 120], ['k', 80, 330], ['j', 0, CLAW_REACH]],
+  tr: [['l', 60, 260], ['k', 80, 200], ['j', 0, CLAW_REACH]],
+  tl: [['l', 50, 190], ['k', 80, 320], ['j', 0, 120]],
 };
 function botPet(me, D, toP) {
   const b = brain, L = LEVELS[level];
@@ -2244,6 +3028,16 @@ function step(f, dt) {
   if (f.kit === 'ch') { stepCh(f, u, dt); return; }
   if (f.kit === 'bt') { stepBt(f, u, dt); return; }
   if (f.kit === 'ga') { stepGa(f, u, dt); return; }
+  if (f.kit === 'tt') { stepTt(f, u, dt); return; }
+  if (f.kit === 'kt') { stepKt(f, u, dt); return; }
+  if (f.kit === 'kg') { stepKg(f, u, dt); return; }
+  if (f.kit === 'ku') { stepKu(f, u, dt); return; }
+  if (f.kit === 'kn') { stepKn(f, u, dt); return; }
+  if (f.kit === 'ld') { stepLd(f, u, dt); return; }
+  if (f.kit === 'tc') { stepTc(f, u, dt); return; }
+  if (f.kit === 'ta') { stepTa(f, u, dt); return; }
+  if (f.kit === 'tr') { stepTr(f, u, dt); return; }
+  if (f.kit === 'tl') { stepTl(f, u, dt); return; }
   if (f.act === 'j') {
     if (u > 90 && !f.fired) { f.fired = true; claw(f); }
     if (u > 320) f.act = null;
@@ -2259,6 +3053,7 @@ function step(f, dt) {
 function frame(t) {
   const rdt = Math.min(50, t - (real || t)); real = t;
   const dt = real < stopUntil ? 0 : rdt; now += dt;
+  sfxLoops();
   P.mx = (keys['d'] || keys['arrowright'] ? 1 : 0) - (keys['a'] || keys['arrowleft'] ? 1 : 0);
   P.my = (keys['s'] || keys['arrowdown'] ? 1 : 0) - (keys['w'] || keys['arrowup'] ? 1 : 0);
   if (!live()) P.mx = P.my = 0;
@@ -2266,6 +3061,7 @@ function frame(t) {
   while (hist.length > 90) hist.shift();
   if (dt) think();
   step(P, dt); step(B, dt);
+  if (UI.san) { inRing(P); inRing(B); }
 
   // shots
   for (const s of shots) {
@@ -2281,9 +3077,21 @@ function frame(t) {
     }
     s.x += Math.cos(s.ang) * s.sp * dt; s.y += Math.sin(s.ang) * s.sp * dt;
     const f = foe(s.by);
+    if (s.kind === 'sickle' && !s.dead) {
+      if (!s.back && now - s.t0 > 500) { s.back = true; s.hitT = 0; }
+      if (s.back) { s.ang = Math.atan2(mid(s.by) - s.y, s.by.x - s.x); if (Math.hypot(s.by.x - s.x, mid(s.by) - s.y) < 24) s.dead = true; }
+    }
+    if (!s.dead && f.kit === 'kg' && now < f.curlUntil && Math.hypot(s.x - f.x, s.y - mid(f)) < 36) {   // off the steel shell
+      s.by = f; s.ang += Math.PI; s.t0 = now; s.turn = 0; fxs.push({ kind: 'kHit', by: f, x: s.x, y: s.y, sheet: 'fx2', a: 4, n: 3, big: 40, t0: now }); continue;
+    }
+    if (s.kind === 'pebble' && !s.dead && (s.x < 34 || s.x > 606 || s.y < 120 || s.y > 430)) {   // off a wall
+      if (s.x < 34 || s.x > 606) s.ang = Math.PI - s.ang; else s.ang = -s.ang;
+      s.x = Math.max(34, Math.min(606, s.x)); s.y = Math.max(120, Math.min(430, s.y)); s.bounces++; if (s.bounces > 3) s.dead = true; fxs.push({ kind: 'tcPebHit', by: s.by, x: s.x, y: s.y, t0: now });
+    }
+    if (!s.dead && fields.some(fl => fl.kind === 'wall' && fl.by !== s.by && segDist(s.x, s.y + 34, fl.x, fl.y, fl.a, WALL_LEN) < 16)) { s.dead = true; fxs.push({ kind: 'trBash', by: f, x: s.x, y: s.y, t0: now }); continue; }   // the stone wall stops it
     if (!s.dead && fields.some(fl => fl.kind === 'mist' && fl.by !== s.by && Math.hypot(s.x - fl.x, (s.y + 34 - fl.y) * 1.3) < MIST_R)) { s.dead = true; fxs.push({ kind: 'gaMist', by: f, x: s.x, y: s.y, t0: now, g: 3 }); continue; }   // the mist swallows it
     if (!s.dead && now < f.curtain && curtainBlocks(f, s.x, s.y + 34)) { s.dead = true; f.curtainHitT = now; fxs.push({ kind: 'splash', x: s.x, y: s.y, t0: now }); splash(s.x, s.y, 14, 1.2); continue; }
-    if (!s.dead && f.hp > 0 && Math.hypot(s.x - f.x, s.y - mid(f)) < (s.kind === 2 ? 40 : s.kind === 'vine' ? 34 : s.kind === 'wave' ? 36 : s.kind === 'swirl' ? 34 : s.kind === 'tnWave' ? 38 : s.kind === 'rootSnake' ? 30 : s.kind === 'prison' ? 34 : s.kind === 'bubble' ? 30 : 28)) {
+    if (!s.dead && !(s.hitT && now - s.hitT < 350) && f.hp > 0 && Math.hypot(s.x - f.x, s.y - mid(f)) < (s.kind === 2 ? 40 : s.kind === 'vine' ? 34 : s.kind === 'wave' ? 36 : s.kind === 'swirl' ? 34 : s.kind === 'tnWave' ? 38 : s.kind === 'rootSnake' ? 30 : s.kind === 'prison' ? 34 : s.kind === 'bubble' ? 30 : s.kind === 'boulder' ? 38 : s.kind === 'spikes' ? 34 : 28)) {
       if (f.act === 'dash' && now - f.t0 < DODGE_MS) { if (!s.dodged) { s.dodged = true; say(f, 'Né!', '#ffe08a'); } }
       else {
         s.dead = true;
@@ -2295,6 +3103,13 @@ function frame(t) {
           const a = Math.atan2(s.by.y - f.y, s.by.x - f.x); f.kbx = Math.cos(a) * 1.05; f.kby = Math.sin(a) * 1.05; f.slowUntil = Math.max(f.slowUntil, now + 1200);
           say(f, 'Dính!', '#a8e04a'); fxs.push({ kind: 'rlSplat', by: s.by, x: s.x, y: s.y, t0: now });
         }
+        else if (s.kind === 'needle' || s.kind === 'scale' || s.kind === 'feather' || s.kind === 'shard') { hit(f, s.dmg, s.x, s.y + 34, false, s.by, 'jc'); fxs.push({ kind: 'kHit', by: s.by, x: s.x, y: s.y, sheet: s.kind === 'shard' ? 'fx2' : 'fx1', a: s.kind === 'feather' ? 4 : s.kind === 'shard' ? 5 : 6, n: 1, big: 34, t0: now }); }
+        else if (s.kind === 'sickle') { hit(f, s.dmg, s.x, s.y + 34, false, s.by, 'jc'); fxs.push({ kind: 'kHit', by: s.by, x: s.x, y: s.y, sheet: 'fx1', a: 1, n: 2, big: 44, ang: s.ang, t0: now }); s.dead = false; s.hitT = now; }
+        else if (s.kind === 'pebble') { hit(f, s.dmg, s.x, s.y + 34, false, s.by, 'jc'); fxs.push({ kind: 'tcPebHit', by: s.by, x: s.x, y: s.y, t0: now }); s.dead = false; s.hitT = now; s.ang += Math.PI; s.bounces++; if (s.bounces > 3) s.dead = true; }
+        else if (s.kind === 'boulder') { hit(f, s.dmg, s.x, s.y + 34, true, s.by, 'beam'); fxs.push({ kind: 'taPunch', by: s.by, x: s.x, y: s.y, t0: now }); }
+        else if (s.kind === 'rockback') { hit(f, s.dmg, s.x, s.y + 34, false, s.by, 'jc'); fxs.push({ kind: 'taRock', by: s.by, x: s.x, y: s.y, t0: now }); }
+        else if (s.kind === 'stone') { hit(f, s.dmg, s.x, s.y + 34, false, s.by, 'jc'); fxs.push({ kind: 'trBash', by: s.by, x: s.x, y: s.y, t0: now }); }
+        else if (s.kind === 'spikes') { hit(f, s.dmg, s.x, s.y + 34, false, s.by, 'jc'); }
         else if (s.kind === 'spike') { hit(f, s.dmg, s.x, s.y + 34, false, s.by, 'jc'); fxs.push({ kind: 'giPinch', by: s.by, x: s.x, y: s.y, t0: now }); }
         else if (s.kind === 'wblade') { hit(f, s.dmg, s.x, s.y + 34, false, s.by, 'jc'); fxs.push({ kind: 'gaHit', by: s.by, x: s.x, y: s.y, t0: now }); }
         else if (s.kind === 'bubble') { hit(f, s.dmg, s.x, s.y + 34, false, s.by, 'j'); fxs.push({ kind: 'btPop', by: s.by, x: s.x, y: s.y, t0: now }); }
@@ -2318,7 +3133,15 @@ function frame(t) {
   shots = shots.filter(s => !s.dead);
   updateBeams(dt);
   // ultimates: three blows inside the ring
+  ULT_CTX = true;
   for (const u of ults) {
+    // ultimates that land where they were aimed (Hỏa Hổ's blast, Mộc Hùng's forest, Hỏa Quy's volcano) drift toward the
+    // foe during the cut-in, so stepping aside as it starts is no longer a sure dodge
+    if ((!u.type || u.type === 'forest' || u.type === 'volcano') && u.x !== undefined && now - u.t0 < 900) {
+      const o = foe(u.by), k = Math.min(1, 0.0035 * dt);
+      u.x += (o.x - u.x) * k; u.y += (o.y - u.y) * k;
+      if (u.type === 'volcano' && u.by.ultLeap) { u.by.ultLeap.x1 = u.x; u.by.ultLeap.y1 = u.y; }
+    }
     if (u.type === 'spout') { updateSpout(u, dt); continue; }
     if (u.type === 'forest') { updateForest(u); continue; }
     if (u.type === 'quake') { updateQuake(u); continue; }
@@ -2339,6 +3162,16 @@ function frame(t) {
     if (u.type === 'swordRing') { updateSwordRing(u, dt); continue; }
     if (u.type === 'flood') { updateFlood(u, dt); continue; }
     if (u.type === 'seaDragon') { updateSeaDragon(u, dt); continue; }
+    if (u.type === 'mammoth') { updateMammoth(u, dt); continue; }
+    if (u.type === 'needleRain') { updateNeedleRain(u, dt); continue; }
+    if (u.type === 'steelBall') { updateSteelBall(u, dt); continue; }
+    if (u.type === 'eagleDive') { updateEagleDive(u, dt); continue; }
+    if (u.type === 'crystalWave') { updateCrystalWave(u, dt); continue; }
+    if (u.type === 'moonSweep') { updateMoonSweep(u, dt); continue; }
+    if (u.type === 'meteors') { updateMeteors(u, dt); continue; }
+    if (u.type === 'rockRings') { updateRockRings(u, dt); continue; }
+    if (u.type === 'fortress') { updateFortress(u, dt); continue; }
+    if (u.type === 'dragonDive') { updateDragonDive(u, dt); continue; }
     if (u.type === 'cutin') continue;
     const fno = Math.floor((now - u.t0 - 900) / 110), f = foe(u.by);
     [3, 4, 6].forEach((n, i) => {
@@ -2346,10 +3179,11 @@ function frame(t) {
         u.done[n] = 1;
         burst(u, i);
         const ex = (f.x - u.x) / ULT_RX, ey = (f.y - u.y) / ULT_RY;
-        if (ex * ex + ey * ey <= 1 && !(f.act === 'dash' && now - f.t0 < DODGE_MS)) { hit(f, now < f.shield ? DMG.ult[i] / 2 : DMG.ult[i], u.x, u.y, true, u.by, i === 2 ? 'ultLast' : 'ult'); if (u.by.kit === 'hoa') burn(f, u.by); }
+        if (ex * ex + ey * ey <= 1 && !dodgingNow(f)) { hit(f, now < f.shield ? DMG.ult[i] / 2 : DMG.ult[i], u.x, u.y, true, u.by, i === 2 ? 'ultLast' : 'ult'); if (u.by.kit === 'hoa') burn(f, u.by); }
       }
     });
   }
+  ULT_CTX = false;
   for (const fl of fields) {          // the dragon's fire zone: slows and singes
     if (fl.kind !== 'zone') continue;
     const o = foe(fl.by), ex = (o.x - fl.x) / ZONE_RX, ey = (o.y - fl.y) / ZONE_RY;
@@ -2357,6 +3191,21 @@ function frame(t) {
   }
   for (const fl of fields) {          // a foe standing in a burning patch (or the fox's lava) keeps burning
     if (fl.kind === 'zone') continue;
+    if (fl.kind === 'glyph') { const o = foe(fl.by);
+      if (now - fl.t0 >= KN_WARN && !fl.done) { fl.done = true; shake = Math.max(shake, 7); if (inOval(o, fl.x, fl.y, 44)) { hit(o, DMG_KN.spike, fl.x, fl.y, false, fl.by, 'jc'); o.slowUntil = Math.max(o.slowUntil, now + 1500); } }
+      continue; }
+    if (fl.kind === 'pillar') {
+      if (now - fl.t0 >= PILLAR_MS && !fl.done) { fl.done = true; shake = Math.max(shake, 8); for (let n = 0; n < 6; n++) shots.push({ by: fl.by, kind: 'shard', dmg: DMG_KN.shard, x: fl.x, y: fl.y - 40, ang: n * Math.PI / 3, sp: 0.42, life: 800, t0: now }); }
+      continue; }
+    if (fl.kind === 'mud') { const o = foe(fl.by), ex = (o.x - fl.x) / MUD_RX, ey = (o.y - fl.y) / MUD_RY; if (o.hp > 0 && ex * ex + ey * ey <= 1) o.slowUntil = Math.max(o.slowUntil, now + 300); continue; }
+    if (fl.kind === 'fissure') { const o = foe(fl.by); if (o.hp > 0 && segDist(o.x, o.y, fl.x, fl.y, fl.a, FISSURE_LEN) < 22) o.slowUntil = Math.max(o.slowUntil, now + 300); continue; }
+    if (fl.kind === 'wall') { const o = foe(fl.by), d = segDist(o.x, o.y, fl.x, fl.y, fl.a, WALL_LEN);   // shove the foe out of the wall
+      if (o.hp > 0 && d < 20) { const nx = -Math.sin(fl.a), ny = Math.cos(fl.a), side = (o.x - fl.x) * nx + (o.y - fl.y) * ny >= 0 ? 1 : -1; o.x += nx * side * (20 - d); o.y += ny * side * (20 - d); }
+      continue; }
+    if (fl.kind === 'turret') { const o = foe(fl.by);
+      if (now >= fl.next && o.hp > 0 && Math.hypot(o.x - fl.x, o.y - fl.y) < 300 && !hidden(o)) { fl.next = now + TURRET_GAP; fl.shotT = now; shots.push({ by: fl.by, kind: 'stone', dmg: DMG_TR.stone, x: fl.x, y: fl.y - 40, ang: Math.atan2(mid(o) - fl.y + 40, o.x - fl.x), sp: 0.34, turn: 0.002, life: 1100, t0: now }); }
+      continue; }
+    if (fl.kind === 'skin') continue;
     if (fl.kind === 'whirl' || fl.kind === 'vortex') {       // pull toward the middle; the eye hurts
       const o = foe(fl.by), R = fl.kind === 'whirl' ? WHIRL_R : VORTEX_R * 1.6, dx = fl.x - o.x, dy = fl.y - o.y, d = Math.hypot(dx, dy * 1.4);
       if (o.hp > 0 && d < R && !diving(o) && !dodgingNow(o)) {
@@ -2372,7 +3221,7 @@ function frame(t) {
     const ex = (o.x - fl.x) / RX, ey = (o.y - fl.y) / RY;
     if (ex * ex + ey * ey <= 1) burn(o, fl.by);
   }
-  fields = fields.filter(fl => now - fl.t0 < (fl.kind === 'whirl' ? WHIRL_MS : fl.kind === 'vortex' ? VORTEX_MS : fl.kind === 'mist' ? MIST_MS : fl.kind === 'trench' ? TRENCH_MS : fl.kind === 'trail' ? TRAIL_MS : fl.kind === 'lava' ? LAVA_MS : fl.kind === 'zone' ? ZONE_MS : PATCH_MS));
+  fields = fields.filter(fl => now - fl.t0 < (fl.kind === 'glyph' ? KN_WARN + 400 : fl.kind === 'pillar' ? PILLAR_MS + 350 : fl.kind === 'mud' ? MUD_MS : fl.kind === 'fissure' ? FISSURE_MS : fl.kind === 'wall' ? WALL_MS : fl.kind === 'turret' ? TURRET_MS : fl.kind === 'skin' ? 2000 : fl.kind === 'whirl' ? WHIRL_MS : fl.kind === 'vortex' ? VORTEX_MS : fl.kind === 'mist' ? MIST_MS : fl.kind === 'trench' ? TRENCH_MS : fl.kind === 'trail' ? TRAIL_MS : fl.kind === 'lava' ? LAVA_MS : fl.kind === 'zone' ? ZONE_MS : PATCH_MS));
   tickBurn(P); tickBurn(B);
   for (const o of [P, B]) if (o.bubbleUntil && now >= o.bubbleUntil) { o.bubbleUntil = 0; if (o.hp > 0) hit(o, DMG_BT.prison, o.x, o.y, false, o.bubbleBy, 'jc'); fxs.push({ kind: 'btPrisonPop', by: o.bubbleBy, x: o.x, y: mid(o), t0: now }); }
   for (const u of ults) if (!u.type && now - u.t0 >= ULT_LIFE) scorch.push({ x: u.x, y: u.y, t0: now });
@@ -2440,7 +3289,7 @@ function draw() {
   if (ults.some(u => now - u.t0 < (u.type === 'spout' ? u.life - 400 : 1100))) { ctx.fillStyle = DIM || dimPattern(); ctx.fillRect(-20, 110, 680, 400); }
   if (ults.some(u => u.type === 'spout' && now - u.t0 > 700 && now - u.t0 < u.life - 300)) drawRain();
   for (const u of ults) {             // warning ring while the cut-in plays, then the eruption under everyone
-    if (u.type === 'fox' || u.type === 'stream' || u.type === 'split' || u.type === 'geysers' || u.type === 'cutin' || u.type === 'storm2' || u.type === 'monster' || u.type === 'mtRush' || u.type === 'stag' || u.type === 'giant' || u.type === 'leafStorm' || ['jaws', 'bigClaw', 'swordRing', 'flood', 'seaDragon'].includes(u.type)) continue;   // its direction showed in the aim funnel
+    if (u.type === 'fox' || u.type === 'stream' || u.type === 'split' || u.type === 'geysers' || u.type === 'cutin' || u.type === 'storm2' || u.type === 'monster' || u.type === 'mtRush' || u.type === 'stag' || u.type === 'giant' || u.type === 'leafStorm' || ['jaws', 'bigClaw', 'swordRing', 'flood', 'seaDragon', 'mammoth', 'meteors', 'rockRings', 'fortress', 'dragonDive', 'needleRain', 'steelBall', 'eagleDive', 'crystalWave', 'moonSweep'].includes(u.type)) continue;   // its direction showed in the aim funnel
     const v = now - u.t0, sh = sheetOf(u.by);
     if (v < 900) {
       const pal = { thuy: ['#2f8fe0', '#d8f6ff', '#6fd0ff'], moc: ['#3f8f2a', '#e0ffb0', '#a8e04a'], tho: ['#a87838', '#ffe0a0', '#d8a040'], kim: ['#2f8fe0', '#ffffff', '#6fd0ff'], quy: ['#e0402a', '#ffe08a', '#ff8a3a'] }[u.by.kit] || ['#ff3b2a', '#ffe08a', '#ffe08a'];
@@ -2461,6 +3310,13 @@ function draw() {
   for (const u of ults) if (u.type === 'volcano') drawVolcano(u);
   for (const fl of fields) {           // burning patch on the ground: the patch loop, shrinking in its last 0.3 s
     const v = now - fl.t0, sh = sheetOf(fl.by);
+    if (fl.kind === 'glyph') { const c = v < KN_WARN ? sh.fx1[4 + Math.floor(now / 120) % 2] : sh.fx1[6 + Math.min(1, Math.floor((v - KN_WARN) / 200))]; drawFx(c, fl.x, fl.y + (v < KN_WARN ? 4 : -20), 0, v < KN_WARN ? 90 * c.h / c.w : 80 * fl.by.fxk, v < KN_WARN ? 'ground' : 'center'); continue; }
+    if (fl.kind === 'pillar') { const c = sh.fx2[v < 150 ? 0 : v < PILLAR_MS - 300 ? 1 : v < PILLAR_MS ? 2 : 3]; fieldThings.push({ y: fl.y, draw: () => drawFx(c, fl.x, fl.y + 6, 0, 90 * fl.by.fxk, 'ground') }); continue; }
+    if (fl.kind === 'mud') { const c = sh.fx2[Math.floor(now / 160) % 4], left = MUD_MS - v; if (left > 300 || Math.floor(now / 70) % 2) drawFx(c, fl.x, fl.y + 4, 0, MUD_RX * 2.4 * c.h / c.w, 'ground'); continue; }
+    if (fl.kind === 'fissure') { const left = FISSURE_MS - v, c = sh.fx2[v < 150 ? 4 : left < 300 ? 7 : 5 + Math.floor(now / 200) % 2]; drawFx(c, fl.x, fl.y + 4, fl.a, FISSURE_LEN * 1.1 * c.h / c.w, 'ground'); continue; }
+    if (fl.kind === 'wall') { const left = WALL_MS - v, c = sh.fx2[v < 150 ? 0 : left < 300 ? 3 : left < 900 ? 2 : 1]; fieldThings.push({ y: fl.y, draw: () => drawFx(c, fl.x, fl.y + 10, Math.cos(fl.a) < 0 ? fl.a + Math.PI : fl.a, WALL_LEN * 1.1 * c.h / c.w, 'ground') }); continue; }
+    if (fl.kind === 'turret') { const left = TURRET_MS - v, c = sh.fx2[left < 300 ? 7 : fl.shotT && now - fl.shotT < 150 ? 5 : 4]; fieldThings.push({ y: fl.y, draw: () => drawFx(c, fl.x, fl.y + 6, 0, 56 * fl.by.fxk, 'ground') }); continue; }
+    if (fl.kind === 'skin') { const c = sh.fx2[v < 1400 ? Math.floor(v / 400) % 2 : v < 1700 ? 2 : 3]; fieldThings.push({ y: fl.y, draw: () => drawFx(c, fl.x, fl.y + 6, 0, fl.by.h * 1.05, 'ground') }); continue; }
     if (fl.kind === 'whirl') { const c = sh.fx3[Math.floor(now / 90) % 4], left = WHIRL_MS - v; if (left > 300 || Math.floor(now / 70) % 2) drawFx(c, fl.x, fl.y + 6, 0, WHIRL_R * 1.7 * c.h / c.w, 'ground'); continue; }
     if (fl.kind === 'vortex') { const left = VORTEX_MS - v, c = sh.fx2[v < 150 ? 4 : v < 300 ? 5 : left < 250 ? 6 : Math.floor(now / 90) % 4]; drawFx(c, fl.x, fl.y + 6, 0, VORTEX_R * 2.4 * c.h / c.w, 'ground'); continue; }
     if (fl.kind === 'mist') { const left = MIST_MS - v, c = sh.fx3[Math.floor(now / 140) % 4]; if (left > 300 || Math.floor(now / 70) % 2) drawFx(c, fl.x, fl.y - 20, 0, MIST_R * 2.6 * c.h / c.w, 'center', 0.85); continue; }
@@ -2488,7 +3344,18 @@ function draw() {
     drawFx(sh.vo[4 + Math.floor(now / 110) % 4], fl.x, fl.y + PATCH_RY * 0.6, 0, PATCH_RY * 3.2 * Math.min(1, left / 300), 'ground');
   }
   const things = [P, B].map(f => ({ y: f.y, draw: () => drawFighter(f) }));
+  for (const t of fieldThings) things.push(t); fieldThings = [];
   for (const u of ults) if (u.type === 'split') drawSplitParts(u, things);
+  for (const u of ults) if (u.type === 'needleRain') things.push({ y: u.y + 2, draw: () => drawNeedleRain(u) });
+  for (const u of ults) if (u.type === 'steelBall') things.push({ y: u.by.y, draw: () => drawSteelBall(u) });
+  for (const u of ults) if (u.type === 'eagleDive') things.push({ y: 998, draw: () => drawEagleDive(u) });
+  for (const u of ults) if (u.type === 'crystalWave') things.push({ y: 997, draw: () => drawCrystalWave(u) });
+  for (const u of ults) if (u.type === 'moonSweep') things.push({ y: u.y + 3, draw: () => drawMoonSweep(u) });
+  for (const u of ults) if (u.type === 'mammoth') things.push({ y: u.y + 2, draw: () => drawMammoth(u) });
+  for (const u of ults) if (u.type === 'meteors') things.push({ y: 998, draw: () => drawMeteors(u) });
+  for (const u of ults) if (u.type === 'rockRings') drawRockRings(u);
+  for (const u of ults) if (u.type === 'fortress') things.push({ y: u.y + BOX_H, draw: () => drawFortress(u) });
+  for (const u of ults) if (u.type === 'dragonDive') things.push({ y: 998, draw: () => drawDragonDive(u) });
   for (const u of ults) if (u.type === 'jaws') { drawJawsGround(u); things.push({ y: (u.done.mark ? u.my : u.y || 0) + 2, draw: () => drawJaws(u) }); }
   for (const u of ults) if (u.type === 'bigClaw') things.push({ y: u.y + 3, draw: () => drawBigClaw(u) });
   for (const u of ults) if (u.type === 'swordRing') things.push({ y: (u.y || 0) + 3, draw: () => drawSwordRing(u) });
@@ -2515,6 +3382,16 @@ function draw() {
   drawAim(B); drawAim(P);
   for (const s0 of shots) {
     const s = s0.drawBy ? Object.assign(Object.create(s0), { by: s0.drawBy }) : s0;   // a shot blown back keeps its owner's looks
+    if (s.kind === 'needle') { const sh = sheetOf(s.by); drawFx(sh.fx1[4 + Math.floor((now - s.t0) / 80) % 2], s.x, s.y, s.ang, 22 * s.by.fxk); continue; }
+    if (s.kind === 'scale') { const sh = sheetOf(s.by); drawFx(sh.fx1[4 + Math.floor((now - s.t0) / 80) % 2], s.x, s.y, s.ang, 26 * s.by.fxk); continue; }
+    if (s.kind === 'feather') { const sh = sheetOf(s.by); drawFx(sh.fx1[Math.floor((now - s.t0) / 80) % 4], s.x, s.y, s.ang, 28 * s.by.fxk); continue; }
+    if (s.kind === 'shard') { const sh = sheetOf(s.by); drawFx(sh.fx2[4], s.x, s.y, s.ang, 26 * s.by.fxk); continue; }
+    if (s.kind === 'sickle') { const sh = sheetOf(s.by); drawFx(sh.fx1[4 + Math.floor((now - s.t0) / 70) % 4], s.x, s.y, 0, 40 * s.by.fxk); continue; }
+    if (s.kind === 'pebble') { const sh = sheetOf(s.by); drawFx(sh.fx1[4 + Math.floor((now - s.t0) / 80) % 2], s.x, s.y, s.ang, 22 * s.by.fxk); continue; }
+    if (s.kind === 'boulder') { const sh = sheetOf(s.by), c = sh.fx1[4 + Math.floor((now - s.t0) / 90) % 4]; drawFx(c, s.x, s.y + 20, 0, 60 * s.by.fxk, 'ground'); continue; }
+    if (s.kind === 'rockback') { const sh = sheetOf(s.by); drawFx(sh.fx2[4], s.x, s.y, s.ang, 24 * s.by.fxk); continue; }
+    if (s.kind === 'stone') { const sh = sheetOf(s.by); drawFx(sh.fx1[4 + Math.floor((now - s.t0) / 90) % 4], s.x, s.y, s.ang, 26 * s.by.fxk); continue; }
+    if (s.kind === 'spikes') { const sh = sheetOf(s.by), c = sh.fx2[Math.floor((now - s.t0) / 110) % 4]; drawFx(c, s.x, s.y + s.gy, s.ang, 90 * c.h / c.w * s.by.fxk, 'ground'); continue; }
     if (s.kind === 'spike') { const sh = sheetOf(s.by); drawFx(sh.fx1[4 + Math.floor((now - s.t0) / 90) % 2], s.x, s.y, s.ang, 26 * s.by.fxk); continue; }
     if (s.kind === 'wblade') { const sh = sheetOf(s.by); drawFx(sh.fx1[4 + Math.floor((now - s.t0) / 90) % 2], s.x, s.y, s.ang, 44 * s.by.fxk); continue; }
     if (s.kind === 'bubble') { const sh = sheetOf(s.by); drawFx(sh.fx1[Math.floor((now - s.t0) / 120) % 4], s.x, s.y, 0, 30 * s.by.fxk); continue; }
@@ -2564,6 +3441,23 @@ function draw() {
       } else e.dead = true;
       continue;
     }
+    if (e.kind === 'status') { drawStatus(e.who); e.dead = true; continue; }
+    if (e.kind === 'comboFlash') { if (v < 260) { ctx.save(); ctx.globalAlpha = 1 - v / 260; ctx.strokeStyle = e.col; ctx.lineWidth = 4;
+      ctx.beginPath(); ctx.arc(e.x, e.y, 20 + v / 4, 0, Math.PI * 2); ctx.stroke(); ctx.restore(); } else e.dead = true; continue; }
+    if (e.kind === 'kHit') { const sh = sheetOf(e.by), g = Math.floor(v / 80); if (g < e.n) drawFx(sh[e.sheet][e.a + g], e.x, e.y, e.ang || 0, (e.big || 50) * e.by.fxk); else e.dead = true; continue; }
+    if (e.kind === 'kCone') { const sh = sheetOf(e.by), g = Math.floor(v / 80); if (g < 5) drawFx(sh.fx2[g % 4], e.x, e.y, e.ang, 130 * e.by.fxk); else e.dead = true; continue; }
+    if (e.kind === 'kTrail') { const sh = sheetOf(e.by), g = Math.floor(v / 90); if (g < 4) drawFx(sh.fx3[g], e.x, e.y, e.ang, 70 * e.by.fxk); else e.dead = true; continue; }
+    if (e.kind === 'ttSmash' || e.kind === 'taPunch' || e.kind === 'trBash') { const sh = sheetOf(e.by), g = Math.floor(v / 70); if (g < 4) drawFx(sh.fx1[g], e.x, e.y, 0, 50 * e.by.fxk); else e.dead = true; continue; }
+    if (e.kind === 'ttSpray') { const sh = sheetOf(e.by), g = Math.floor(v / 80); if (g < 5) drawFx(sh.fx1[4 + g % 4], e.x, e.y, e.ang, 80 * e.by.fxk); else e.dead = true; continue; }
+    if (e.kind === 'ttStomp') { const sh = sheetOf(e.by), g = Math.floor(v / 90); if (g < 4) { const c = sh.fx2[4 + g]; drawFx(c, e.x, e.y + 6, 0, STOMP_R * 2.2 * c.h / c.w, 'ground'); } else e.dead = true; continue; }
+    if (e.kind === 'ttCrack') { const sh = sheetOf(e.by); if (v < 1800) { const c = sh.fx4[8 + Math.floor(e.x) % 2]; if (v < 1400 || Math.floor(now / 80) % 2) drawFx(c, e.x, e.y, 0, 70 * c.h / c.w, 'ground'); } else e.dead = true; continue; }
+    if (e.kind === 'ttToss') { const sh = sheetOf(e.by), g = Math.floor(v / 110); if (g < 4) drawFx(sh.fx4[4 + g], e.x, e.y - 30, 0, 150 * e.by.fxk); else e.dead = true; continue; }
+    if (e.kind === 'tcWhip') { const sh = sheetOf(e.by), g = Math.floor(v / 60); if (g < 4) drawFx(sh.fx1[g], e.x, e.y, e.ang, 50 * e.by.fxk); else e.dead = true; continue; }
+    if (e.kind === 'tcPuff') { const sh = sheetOf(e.by), g = Math.floor(v / 90); if (g < 2) drawFx(sh.fx2[4 + g], e.x, e.y, 0, 60 * e.by.fxk); else e.dead = true; continue; }
+    if (e.kind === 'tcPebHit') { const sh = sheetOf(e.by); if (v < 160) drawFx(sh.fx1[7], e.x, e.y, 0, 30 * e.by.fxk); else e.dead = true; continue; }
+    if (e.kind === 'taRock') { const sh = sheetOf(e.by); if (v < 160) drawFx(sh.fx2[5], e.x, e.y, 0, 36 * e.by.fxk); else e.dead = true; continue; }
+    if (e.kind === 'trBoom') { const sh = sheetOf(e.by), g = Math.floor(v / 110); if (g < 4) drawFx(sh.fx4[4 + g], e.x, e.y - 30, 0, 130 * e.by.fxk); else e.dead = true; continue; }
+    if (e.kind === 'tlSand') { const sh = sheetOf(e.by), g = Math.floor(v / 80); if (g < 4) drawFx(sh.fx1[g], e.x, e.y, e.ang, 70 * e.by.fxk); else e.dead = true; continue; }
     if (e.kind === 'saBite') { const sh = sheetOf(e.by), g = Math.floor(v / 70); if (g < 4) drawFx(sh.fx1[g], e.x, e.y, 0, 50 * e.by.fxk); else e.dead = true; continue; }
     if (e.kind === 'saErupt') { const sh = sheetOf(e.by), g = Math.floor(v / 90); if (g < 4) { const c = sh.fx2[g]; drawFx(c, e.x, e.y + 6, 0, (e.small ? 60 : 96) * e.by.fxk, 'ground'); } else e.dead = true; continue; }
     if (e.kind === 'giPinch') { const sh = sheetOf(e.by), g = Math.floor(v / 70); if (g < 4) drawFx(sh.fx1[g], e.x, e.y, 0, 46 * e.by.fxk); else e.dead = true; continue; }
@@ -2657,13 +3551,39 @@ function draw() {
     ctx.fillText(pk ? pk.ult : 'THIÊN HỎA HỔ VƯƠNG', u.by.bot ? 20 - slide * 640 : 620 + slide * 640, top + h + 22);
   }
   drawHud();
+  if (R36S) { ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); rgb565(); ctx.restore(); }
 }
 
+// the backdrop's stone ring is the edge of the arena: feet are kept inside its ellipse (RING_*: measured on the backdrop)
+// Arenas come from ui/san/san.json (made by scripts/lam_san_dau.py from assets/source/dau-truong/<element>/): grouped by
+// element, each with its picture and its ring (centre y, half width, half height). A fight uses an arena of the
+// opponent's element, picked at random among them; &san=<element> or &san=<id> picks one; with no opponent pet, a
+// neutral one (chung). pickArena runs while the page loads.
+let SAN = null, RING_X = 320, RING_Y = 300, RING_RX = 300, RING_RY = 140;
+async function pickArena() {
+  const man = await fetch('ui/san/san.json').then(r => r.json()).catch(() => null);
+  if (!man) return null;
+  const all = Object.values(man).flat(), q = new URLSearchParams(location.search).get('san');
+  const pool = (q && all.filter(a => a.id === q).length && all.filter(a => a.id === q)) || (q && man[q]) || (BOTPET && man[BOTPET.el]) || man.chung || all;
+  SAN = pool[Math.floor(Math.random() * pool.length)];
+  RING_Y = SAN.y; RING_RX = SAN.rx; RING_RY = SAN.ry;
+  return SAN;
+}
+function inRing(f) {
+  const dx = f.x - RING_X, dy = f.y - RING_Y, e = Math.hypot(dx / RING_RX, dy / RING_RY);
+  if (e > 1) { f.x = RING_X + dx / e; f.y = RING_Y + dy / e; }
+}
 function drawGround() {
-  ctx.fillStyle = '#3b2a20'; ctx.fillRect(-20, -20, 680, 520);
-  for (let y = 0; y < 480; y += 32) for (let x = (y / 32) % 2 * 16; x < 640; x += 32) { ctx.fillStyle = '#432f23'; ctx.fillRect(x, y, 16, 16); }
-  ctx.strokeStyle = '#6b4a32'; ctx.lineWidth = 3; ctx.beginPath(); ctx.ellipse(320, 300, 280, 150, 0, 0, Math.PI * 2); ctx.stroke();
-  ctx.fillStyle = '#2a1d16'; ctx.fillRect(0, 0, 640, 110);
+  if (UI.san) {                       // the arena backdrop (see pickArena)
+    ctx.drawImage(UI.san, 0, 0, 640, 480);
+    const g = ctx.createLinearGradient(0, 0, 0, 52); g.addColorStop(0, 'rgba(20,10,4,.6)'); g.addColorStop(1, 'rgba(20,10,4,0)');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, 640, 52);              // a soft shade under the health bars
+  } else {
+    ctx.fillStyle = '#3b2a20'; ctx.fillRect(-20, -20, 680, 520);
+    for (let y = 0; y < 480; y += 32) for (let x = (y / 32) % 2 * 16; x < 640; x += 32) { ctx.fillStyle = '#432f23'; ctx.fillRect(x, y, 16, 16); }
+    ctx.strokeStyle = '#6b4a32'; ctx.lineWidth = 3; ctx.beginPath(); ctx.ellipse(320, 300, 280, 150, 0, 0, Math.PI * 2); ctx.stroke();
+    ctx.fillStyle = '#2a1d16'; ctx.fillRect(0, 0, 640, 110);
+  }
   // scorch mark where an ultimate landed: thins out pixel by pixel over 4 s, a few embers glow at first
   for (const s of scorch) {
     const age = (now - s.t0) / 4000;
@@ -2799,6 +3719,36 @@ function cellOf(f) {
   if (now < f.stunUntil) return [rows[15], flip];   // dizzy, stars round the head
   if (now < f.charmUntil) return [rows[4 + Math.floor(now / 130) % 4], flip];   // charmed: walking to the fox
   if (f.kit === 'dn' && f.act === 'i' && f.reformT && now - f.reformT < 400) return [sh.chung[7], 0, kc];   // pebbles gathering back
+  if (['kt', 'kg', 'kn', 'ld'].includes(f.kit) && f.act === 'j') return [rows[u < 140 ? 8 : 9], flip];
+  if (f.kit === 'ku' && f.act === 'j') return [rows[u < 140 ? 8 : 9], flip];
+  if (f.kit === 'kt' && f.act === 'k') return [rows[11], flip];
+  if (f.kit === 'kt' && f.act === 'l') return [rows[f.fired ? 13 : 10], flip];
+  if (f.kit === 'kt' && f.act === 'i') return [rows[12], flip];
+  if (f.kit === 'kg' && f.act === 'k') return [rows[10], flip];
+  if (f.kit === 'kg' && f.act === 'l') return [rows[11], flip];
+  if (f.kit === 'ku' && f.act === 'k') return [rows[11], flip];
+  if (f.kit === 'ku' && f.act === 'l') return [rows[10], flip];
+  if (f.kit === 'kn' && f.act === 'k') return [rows[10], flip];
+  if (f.kit === 'kn' && f.act === 'l') return [rows[11], flip];
+  if (f.kit === 'ld' && f.act === 'k') return [rows[10], flip];
+  if (f.kit === 'ld' && f.act === 'l') return [rows[f.blinkHit ? 9 : 11], flip];
+  if (f.kit === 'tt' && f.act === 'j') return [rows[u < 170 ? 8 : 9], flip];
+  if (f.kit === 'tt' && f.act === 'k') return [rows[10], flip];
+  if (f.kit === 'tt' && f.act === 'l') return [rows[u < 320 ? 11 : 12], flip];
+  if (f.kit === 'tc' && f.act === 'j') return [rows[u < 100 ? 8 : 9], flip];
+  if (f.kit === 'tc' && f.act === 'k') return [rows[10], flip];
+  if (f.kit === 'tc' && f.act === 'i') return [rows[12], flip];
+  if (f.kit === 'ta' && f.act === 'j') return [rows[u < 140 ? 8 : 9], flip];
+  if (f.kit === 'ta' && f.act === 'k') return [rows[10], flip];
+  if (f.kit === 'ta' && f.act === 'l') return [rows[11], flip];
+  if (f.kit === 'ta' && f.act === 'i' && u >= 900) return [rows[f.stompT && now - f.stompT < 200 ? 12 : 13], flip];
+  if (f.kit === 'tr' && f.act === 'j') return [rows[u < 150 ? 8 : 9], flip];
+  if (f.kit === 'tr' && f.act === 'k') return [rows[10], flip];
+  if (f.kit === 'tr' && f.act === 'l') return [rows[11], flip];
+  if (f.kit === 'tr' && f.act === 'i' && u >= 900) return [rows[12], flip];
+  if (f.kit === 'tl' && f.act === 'j') return [rows[u < 150 ? 8 : 9], flip];
+  if (f.kit === 'tl' && f.act === 'k') return [rows[10], flip];
+  if (f.kit === 'tl' && f.act === 'l') return [rows[11], flip];
   if (f.kit === 'sa' && f.act === 'j') return [rows[u < 110 ? 8 : 9], flip];
   if (f.kit === 'sa' && f.act === 'k') return [rows[12], flip];
   if (f.kit === 'sa' && f.act === 'l') return [rows[11], flip];
@@ -2871,7 +3821,8 @@ function cellOf(f) {
   return [rows[Math.floor(now / 180) % 4], flip];
 }
 function drawFighter(f) {
-  if (f.split) return;                 // burst into pebbles: they are drawn by the ultimate
+  if (f.split) return;
+  fxs.push({ kind: 'status', who: f, t0: now });        // drawn on top with the effects                 // burst into pebbles: they are drawn by the ultimate
   const sh = sheetOf(f);
   ctx.fillStyle = 'rgba(0,0,0,.35)'; ctx.beginPath(); ctx.ellipse(f.x, f.y, 24 * f.h / 74, 8 * f.h / 74, 0, 0, Math.PI * 2); ctx.fill();
   const [cell, flip, k = f.h / sh.e[0].h] = cellOf(f), u = now - f.t0, moving = f.mx || f.my, K = f.fxk * tierFx(f);
@@ -2940,12 +3891,14 @@ function drawFighter(f) {
   if (f.kit === 'mt' && (f.act === 'k' && now - f.t0 < CHARGE_MS || ults.some(x => x.type === 'mtRush' && x.by === f && x.run))) drawFx(sh.fx1[4 + Math.floor(now / 70) % 4], f.x - Math.cos(f.ang) * f.h * 0.7, f.y - f.h * 0.2, f.ang, f.h * 0.8 * K);   // dust behind the charge
   if (f.kit === 'md' && f.act === 'k') drawFx(sh.fx2[Math.floor(now / 60) % 4], f.x - Math.cos(f.ang) * 26, mid(f), f.ang, f.h * 0.9 * K);   // leaf dash trail
   const body = hidden(f) ? (f.bot || Math.floor(now / 400) % 4 ? ditherCell(cell) : cell) : cell;   // camouflaged
+  if (f.kit === 'kg' && now < f.curlUntil) drawFx(sh.fx2[Math.floor(now / 110) % 4], f.x, mid(f), 0, f.h * 1.3 * K, 'center');
+  if (f.kit === 'ta' && f.rockArmor) drawFx(sh.fx2[Math.floor(now / 110) % 4], f.x, mid(f), 0, f.h * 1.4 * K, 'center');   // orbiting rocks
   if (diving(f)) drawFx(sh.fx1[4 + Math.floor(now / 80) % 4], f.x, f.y + 4, f.mx || f.my ? Math.atan2(f.my, f.mx) : f.ang, f.h * 0.55 * K, 'ground');   // only the fin shows
   if (f.kit === 'gi' && now < f.guardUntil) drawFx(sh.fx2[Math.floor(now / 90) % 4], f.x + Math.cos(f.ang) * f.h * 0.35, mid(f), f.ang, f.h * 1.1 * K);   // the shell guard in front
   if (f.kit === 'ch' && f.wshield) drawFx(sh.fx3[Math.floor(now / 110) % 4], f.x, mid(f), 0, f.h * 1.5 * K, 'center', 0.8);   // the water shield
   if (f.kit === 'ch' && f.act === 'k' && now - f.t0 < SURF_MS) drawFx(sh.fx2[Math.floor(now / 80) % 4], f.x - Math.cos(f.ang) * 10, f.y - 6, f.ang, f.h * 1.0 * K);   // the wave under the surfer
   if (f.kit === 'bt' && f.act === 'l' && now - f.t0 > 150) drawFx(sh.fx3[Math.floor(now / 70) % 4], f.x - Math.cos(f.rollAng) * f.h * 0.6, f.y - f.h * 0.3, f.rollAng, f.h * 0.8 * K);   // splash trail
-  if (!diving(f) && !(f.kit === 'ga' && f.act === 'l' && now - f.t0 < 250) && !(hidden(f) && f.bot && Math.floor(now / 90) % 3)) drawCell(now - f.hurtT < FLASH_MS ? white(cell) : body, f.x, f.y - (f.z || 0), flip, k * (f.kit === 'tn' ? tnScale(f) : 1));
+  if (!diving(f) && !f.flyUp && !(f.kit === 'ga' && f.act === 'l' && now - f.t0 < 250) && !(hidden(f) && f.bot && Math.floor(now / 90) % 3)) drawOutlined(now - f.hurtT < FLASH_MS ? white(cell) : body, f.x, f.y - (f.z || 0), flip, k * (f.kit === 'tn' ? tnScale(f) : 1));
   if (f.kit === 'hl') drawOrbs(f, true, K);           // and in front of it
   for (const u of ults) if (u.type === 'stream' && u.by === f) drawStream(u);
   if (now < f.markUntil && f.markBy) drawFx(sheetOf(f.markBy).fx2[5 + Math.floor(now / 160) % 2], f.x, f.y - f.h - 14, 0, 26);   // the fire brand over the head
@@ -2976,21 +3929,89 @@ function drawFighter(f) {
     ctx.fillStyle = '#4ab0ff'; ctx.fillRect(f.x - 30, f.y - f.h - 18, 60 * f.hp / MAX_HP, 6);
   }
 }
-function bar(x, w, f, label, col, alignRight) {
-  ctx.fillStyle = 'rgba(0,0,0,.55)'; ctx.fillRect(x, 8, w, 46);
-  ctx.fillStyle = '#ddd'; ctx.font = '12px sans-serif'; ctx.textAlign = 'left'; ctx.fillText(label, x + 8, 22);
-  const bx = x + 8 + ctx.measureText(label).width + 8, bw = x + w - 10 - bx;
-  ctx.fillStyle = '#300'; ctx.fillRect(bx, 14, bw, 8); ctx.fillStyle = col; ctx.fillRect(bx, 14, bw * f.hp / MAX_HP, 8);
-  const names = petOf(f) ? petOf(f).skills
-                                 : [['j', 'Trảo'], ['k', 'Hổ Gầm'], ['l', 'Thuẫn'], ['i', 'Hổ Vương']];
-  names.forEach(([k, n], i) => {
-    const cx = x + 8 + i * ((w - 16) / 4), cw = (w - 16) / 4 - 4;
-    const left = k === 'i' ? 1 - f.en / EN_MAX : Math.max(0, f.cd[k] - now) / cdOf(f, k);
-    ctx.fillStyle = f.bot ? '#123a66' : PET ? PET.chip : '#5a2a10'; ctx.fillRect(cx, 30, cw, 18);
-    ctx.fillStyle = 'rgba(0,0,0,.6)'; ctx.fillRect(cx + cw * (1 - left), 30, cw * left, 18);
-    if (k === 'i' && !left && Math.floor(now / 200) % 2) { ctx.fillStyle = '#fff'; ctx.fillRect(cx, 30, cw, 2); ctx.fillRect(cx, 46, cw, 2); }   // full: blinking rims
-    ctx.fillStyle = left ? '#999' : f.bot ? '#cff0ff' : '#ffd36e'; ctx.font = '11px sans-serif';
-    ctx.fillText((f.bot ? '' : k.toUpperCase() + ' ') + n, cx + 3, 43);
+// ---------- HUD: small health bars on top, the player's skill keys at the bottom ----------
+// Built from the game's own UI pieces (assets/source/ui/r36s, copied to ui/): the bronze bar frame `thanh_khung` with
+// a coloured fill `thanh_fill_*` cut to the percentage, and the carved badge frame `level_huy-hieu` for the portrait
+// and the skill keys.
+const UI = {};
+const HB_W = 150, HB_H = 14;                     // health bar size on screen (the frame art is 240 x 22, the fill 240 x 18)
+// the frame (its inside is the empty bar), then fills: [[fraction, fill art], ...] drawn in order, later ones on top
+function uiBar(x, y, w, h, fills, right) {
+  if (!UI.khung) return;
+  ctx.drawImage(UI.khung, x, y, w, h);
+  const iw = w * (226 / 240), ih = h * (16 / 22), ix = x + w * (7 / 240), iy = y + h * (3 / 22);
+  for (const [frac, fill] of fills) {             // the fill art, cut to the percentage from the outer edge
+    const fw = Math.max(0, Math.min(1, frac)), sw = 228 * fw, dw = iw * fw;
+    if (fw > 0 && UI[fill]) ctx.drawImage(UI[fill], right ? 6 + 228 - sw : 6, 0, sw, 18, right ? ix + iw - dw : ix, iy, dw, ih);
+  }
+}
+function hpBar(f, right) {
+  const P_ = 30, top = 8, px = right ? 640 - 8 - P_ : 8, bx = right ? px - 6 - HB_W : px + P_ + 6;
+  // portrait in the carved badge frame
+  const sh = sheetOf(f), cell = sh && sh.s && sh.s[0];
+  if (UI.huy) ctx.drawImage(UI.huy, px, top, P_, P_);    // the badge frame, the face inside it
+  if (cell) { ctx.save(); ctx.beginPath(); ctx.rect(px + 5, top + 6, P_ - 10, P_ - 11); ctx.clip(); drawCell(cell, px + P_ / 2, top + 44, right, 44 / cell.h); ctx.restore(); }
+  // name, small, over the bar
+  const name = petOf(f) ? petOf(f).name.replace(' Nhi', '') : f.bot ? ELEMENTS[botEl].name : 'Hỏa Hổ';
+  ctx.font = 'bold 10px sans-serif'; ctx.textAlign = right ? 'right' : 'left';
+  ctx.fillStyle = '#1a0c06'; ctx.fillText(name, (right ? bx + HB_W : bx) + 1, top + 8); ctx.fillStyle = '#fff1d0'; ctx.fillText(name, right ? bx + HB_W : bx, top + 7);
+  // health (with the damage just taken trailing in red) and the ult energy under it
+  f.hpTrail = f.hpTrail === undefined || f.hp > f.hpTrail ? f.hp : Math.max(f.hp, f.hpTrail - 0.8);
+  const hfill = f.hp > 50 ? 'fill_xanh' : f.hp > 25 ? 'fill_vang' : 'fill_do';
+  uiBar(bx, top + 10, HB_W, HB_H, [[f.hpTrail / MAX_HP, 'fill_do'], [f.hp / MAX_HP, hfill]], right);
+  const ew = HB_W * 0.62, e = Math.min(1, f.en / EN_MAX);
+  uiBar(right ? bx + HB_W - ew : bx, top + 25, ew, 8, [[e, 'fill_ngoc']], right);
+  if (e >= 1 && Math.floor(now / 200) % 2) { ctx.fillStyle = 'rgba(255,255,220,.35)'; ctx.fillRect(right ? bx + HB_W - ew : bx, top + 26, ew, 6); }
+}
+// The player's four skills as picture icons at the bottom centre, built from what the pet already has: the carved badge
+// frame (ui/level_huy-hieu.png) holding a frame of the skill's own effect sheet (J fx1, K fx1 shot, L fx2, I the cut-in),
+// with the key on a small tag under it. Cooling down: the icon greys and darkens from the top with the seconds left;
+// the ultimate lights up from the bottom as energy fills, and blinks when ready.
+function roundRect(x, y, w, h, r) { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
+function skillIcon(sh, k) {
+  if (!sh) return null;
+  if (k === 'i') return sh.cutin || null;
+  const c = k === 'j' ? sh.fx1 && sh.fx1[1] : k === 'k' ? sh.fx1 && sh.fx1[5] : sh.fx2 && sh.fx2[1];
+  return c || null;
+}
+function skillRow(f) {
+  const S_ = 40, gap = 10, x0 = 320 - (4 * S_ + 3 * gap) / 2, y0 = 480 - S_ - 18, sh = sheetOf(f);
+  ['j', 'k', 'l', 'i'].forEach((k, i) => {
+    const x = x0 + i * (S_ + gap), ult = k === 'i';
+    const left = ult ? 1 - Math.min(1, f.en / EN_MAX) : Math.max(0, f.cd[k] - now) / cdOf(f, k), ready = left <= 0;
+    const held = keys[k] || (f.aiming && f.aiming.k === k);
+    if (UI.huy) ctx.drawImage(UI.huy, x, y0, S_, S_);
+    const ix = x + 6, iy = y0 + 7, iw = S_ - 12, ih = S_ - 13;       // inside the carving
+    ctx.fillStyle = '#16202a'; ctx.fillRect(ix, iy, iw, ih);
+    const ic = skillIcon(sh, k);
+    if (ic) {
+      ctx.save(); ctx.beginPath(); ctx.rect(ix, iy, iw, ih); ctx.clip();
+      if (!ready) ctx.filter = 'grayscale(1) brightness(.6)';
+      if (ult) {                                     // the cut-in: its middle, filling the square
+        const side = Math.min(ic.w, ic.h), sx = (ic.w - side) / 2 + side * 0.15, sy = (ic.h - side) / 2;
+        ctx.drawImage(ic.c, sx, sy, side * 0.85, side * 0.85, ix, iy, iw, ih);
+      } else {                                       // an effect frame, fitted and a little zoomed in
+        const k2 = Math.max(iw / ic.w, ih / ic.h) * 1.15, w = ic.w * k2, h = ic.h * k2;
+        ctx.drawImage(ic.c, ix + (iw - w) / 2, iy + (ih - h) / 2, w, h);
+      }
+      ctx.restore(); ctx.filter = 'none';
+    }
+    if (ult && !ready) {                             // energy: the colour comes back from the bottom up
+      ctx.save(); ctx.beginPath(); ctx.rect(ix, iy + ih * left, iw, ih * (1 - left)); ctx.clip();
+      if (ic) { const side = Math.min(ic.w, ic.h), sx = (ic.w - side) / 2 + side * 0.15, sy = (ic.h - side) / 2; ctx.drawImage(ic.c, sx, sy, side * 0.85, side * 0.85, ix, iy, iw, ih); }
+      ctx.restore();
+    } else if (!ready) {
+      ctx.fillStyle = 'rgba(0,0,0,.45)'; ctx.fillRect(ix, iy, iw, ih * left);
+      ctx.font = 'bold 12px sans-serif'; ctx.textAlign = 'center'; ctx.fillStyle = '#1a0c06';
+      const t = Math.ceil((f.cd[k] - now) / 100) / 10, txt = t >= 10 ? String(Math.ceil(t)) : t.toFixed(1);
+      ctx.fillText(txt, x + S_ / 2 + 1, y0 + S_ / 2 + 5); ctx.fillStyle = '#fff'; ctx.fillText(txt, x + S_ / 2, y0 + S_ / 2 + 4);
+    }
+    if (held || (ult && ready && Math.floor(now / 200) % 2)) { ctx.strokeStyle = '#fff6c0'; ctx.lineWidth = 2; ctx.strokeRect(ix - 1, iy - 1, iw + 2, ih + 2); }
+    // the key tag under the icon
+    const tx = x + S_ / 2 - 8, ty = y0 + S_ + 1;
+    ctx.fillStyle = '#1a0c06'; roundRect(tx, ty, 16, 13, 3); ctx.fill();
+    ctx.strokeStyle = ready ? '#c89a50' : '#6a5030'; ctx.lineWidth = 1; roundRect(tx + 0.5, ty + 0.5, 15, 12, 3); ctx.stroke();
+    ctx.font = 'bold 10px sans-serif'; ctx.textAlign = 'center'; ctx.fillStyle = ready ? '#f0d49a' : '#8a7458'; ctx.fillText(k.toUpperCase(), x + S_ / 2, ty + 10);
   });
 }
 function center(text, y, size, col) {
@@ -2998,11 +4019,13 @@ function center(text, y, size, col) {
   ctx.fillStyle = '#1a0c06'; ctx.fillText(text, 322, y + 2); ctx.fillStyle = col; ctx.fillText(text, 320, y);
 }
 function drawHud() {
-  bar(8, 300, P, PET ? PET.name.replace(' Nhi', '') + ' ' + STAGE_NAME[PET_STAGE] + ' Lv' + STAGE_LV[PET_STAGE] + ' · Bậc ' + skillTier : (NHI ? 'Hỏa Hổ Nhi' : 'Hỏa Hổ') + ' · Hỏa', PET ? PET.col : '#e04030');
-  bar(332, 300, B, 'Bot ' + LEVELS[level].name + ' · ' + (BOTPET ? BOTPET.name.replace(' Nhi', '') : ELEMENTS[botEl].name) + ' · ' + STAGE_NAME[B.stage], '#4ab0ff');
-  ctx.fillStyle = '#ddd'; ctx.font = 'bold 13px sans-serif'; ctx.textAlign = 'center'; ctx.fillText(`${score.me} - ${score.bot}`, 320, 78);
+  hpBar(P, false); hpBar(B, true);
+  ctx.font = 'bold 13px sans-serif'; ctx.textAlign = 'center';                     // the score, between the bars
+  ctx.fillStyle = '#1a0c06'; ctx.fillText(`${score.me} - ${score.bot}`, 321, 27); ctx.fillStyle = '#ffd36e'; ctx.fillText(`${score.me} - ${score.bot}`, 320, 26);
+  skillRow(P);
   const v = now - startT;
   if (v < 1500) center(v < 1000 ? 'SẴN SÀNG' : 'ĐÁNH!', 270, 34, '#ffe08a');
+  if (v >= 1000 && v < 1500 && !fightSaid) { fightSaid = true; sfxPlay('fight', sfxBuf.fight, 1); }   // the announcer: "Fight!"
   if (over && now - over.t0 > 600) {
     center(over.winner === P ? 'THẮNG!' : 'THUA!', 250, 44, over.winner === P ? '#ffe08a' : '#8fd8ff');
     center('Enter: đấu lại · 0/1/2/3: Tập/Dễ/Vừa/Khó', 290, 14, '#ddd');
@@ -3011,6 +4034,8 @@ function drawHud() {
 
 addEventListener('keydown', e => {
   const k = e.key.toLowerCase();
+  sfxInit();
+  if (k === 'm') { sfxOn = !sfxOn; if (musicGain) musicGain.gain.value = sfxOn ? MUSIC_VOL : 0; }
   if (e.key.startsWith('Arrow') || e.key === ' ') e.preventDefault();
   if (k === 'enter' && over) newRound();
   if (k.length === 1 && '0123'.includes(k)) { level = +k; newRound(); }
@@ -3047,10 +4072,13 @@ function recolourBot() {
                        .concat(PET.kit === 'hoa' ? [T('vo', 4, 2), T('no', 4, 2)] : []));
     W.cutin = cut(await load(body + 'cutin.png'), 1, 1)[0];
     const L2 = async (n, c, r) => [n, cut(await load(dir + n + '_lv2.png'), c, r)];
-    if (!['tho', 'kim', 'hoa', 'quy', 'cao', 'vl', 'dn', 'hl', 'md', 'rl', 'mt', 'ml', 'tn', 'dl', 'sa', 'gi', 'ch', 'bt', 'ga'].includes(PET.kit))   // Thổ Ngưu has no level-2 effects yet
+    if (!['tho', 'kim', 'hoa', 'quy', 'cao', 'vl', 'dn', 'hl', 'md', 'rl', 'mt', 'ml', 'tn', 'dl', 'sa', 'gi', 'ch', 'bt', 'ga', 'tt', 'tc', 'ta', 'tr', 'tl', 'kt', 'kg', 'ku', 'kn', 'ld'].includes(PET.kit))   // Thổ Ngưu has no level-2 effects yet
       Object.assign(W2, W, Object.fromEntries(await Promise.all([L2('fx1', 4, 2), L2('fx2', 4, 2), L2('fx3', 4, 2), L2('fx4', 4, 3), L2('aura', 4, 2)])));
   }
   recolourBot();
+  await Promise.all([['khung', 'thanh_khung'], ['fill_xanh', 'thanh_fill_xanh-reu'], ['fill_vang', 'thanh_fill_vang'], ['fill_do', 'thanh_fill_do'],
+                     ['fill_ngoc', 'thanh_fill_ngoc'], ['huy', 'level_huy-hieu']].map(async ([k, n]) => { UI[k] = await load('ui/' + n + '.png'); }));
+  if (await pickArena()) UI.san = await load(SAN.file);
   if (BOTPET) {                       // the bot pet's own Nhi sheets; a mirror match is hue-shifted so the two differ
     const dir = 'img/' + BOTPET.dir + '/', mirror = PET === BOTPET;
     const T = async (n, c, r) => { const cells = cut(await load(dir + n + '.png'), c, r); WB[n] = mirror ? tint(cells, 'hue-rotate(170deg) saturate(1.2)') : cells; };

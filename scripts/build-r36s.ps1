@@ -26,7 +26,10 @@ function Build($name, $sources, $flags, $dist, $need) {
         $object = Join-Path $out ($name + '-' + [IO.Path]::GetFileNameWithoutExtension($source) + '.o')
         # our own files with every warning, QuickJS as it comes
         $warn = @(if ($source -like 'r36s/quickjs/*') { '-w' } else { '-Wall'; '-Wextra' })
-        & python -m ziglang cc -target $target -std=gnu99 -O2 -D_GNU_SOURCE "-I$inc" @flags @warn -c $source -o $object
+        # made for the R36S's Cortex-A35 (RK3326; the RG351 family has the same core); the pixel loops at -O3,
+        # where the compiler turns them into SIMD
+        $opt = @(if ($source -like 'r36s/quickjs/*') { '-O2' } else { '-O3' })
+        & python -m ziglang cc -target $target -mcpu=cortex_a35 -std=gnu99 @opt -D_GNU_SOURCE "-I$inc" @flags @warn -c $source -o $object
         if ($LASTEXITCODE -ne 0) { throw "compile failed: $source" }
         $objects += $object
     }

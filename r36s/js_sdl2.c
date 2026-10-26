@@ -45,9 +45,29 @@ static void load_map(void) {
     fclose(f);
 }
 
+/* the two analog sticks work as the D-pad: a direction is on past STICK_ON and off again below STICK_OFF, so a
+   stick held near the edge does not flicker (and menus do not step twice) */
+#define STICK_ON 14000
+#define STICK_OFF 9000
+static unsigned stick_bits;
+
+static unsigned sticks(SDL_GameController *p) {
+    static const struct { SDL_GameControllerAxis axis; int sign; unsigned bit; } dir[] = {
+        { SDL_CONTROLLER_AXIS_LEFTX, -1, PAD_LEFT }, { SDL_CONTROLLER_AXIS_LEFTX, 1, PAD_RIGHT },
+        { SDL_CONTROLLER_AXIS_LEFTY, -1, PAD_UP }, { SDL_CONTROLLER_AXIS_LEFTY, 1, PAD_DOWN },
+        { SDL_CONTROLLER_AXIS_RIGHTX, -1, PAD_LEFT }, { SDL_CONTROLLER_AXIS_RIGHTX, 1, PAD_RIGHT },
+        { SDL_CONTROLLER_AXIS_RIGHTY, -1, PAD_UP }, { SDL_CONTROLLER_AXIS_RIGHTY, 1, PAD_DOWN } };
+    unsigned bits = 0, i;
+    for (i = 0; i < sizeof dir / sizeof *dir; ++i) {
+        int v = SDL_GameControllerGetAxis(p, dir[i].axis) * dir[i].sign;
+        if (v > STICK_ON || (v > STICK_OFF && (stick_bits & dir[i].bit))) bits |= dir[i].bit;
+    }
+    return bits;
+}
+
 static unsigned read_pad(void) {
     const Uint8 *keys = SDL_GetKeyboardState(0);
-    unsigned bits = 0, i;
+    unsigned bits = 0, stick = 0, i;
     int k;
     for (k = 0; k < 4; ++k) {
         if (!pads[k]) continue;
@@ -55,7 +75,10 @@ static unsigned read_pad(void) {
             if (map[i].button >= 0 && SDL_GameControllerGetButton(pads[k], (SDL_GameControllerButton)map[i].button)) bits |= map[i].bit;
             if (map[i].axis >= 0 && SDL_GameControllerGetAxis(pads[k], (SDL_GameControllerAxis)map[i].axis) > 16000) bits |= map[i].bit;
         }
+        stick |= sticks(pads[k]);
     }
+    stick_bits = stick;
+    bits |= stick;
     /* keyboard on a PC, the same keys as the test page */
     if (keys[SDL_SCANCODE_UP]) bits |= PAD_UP;
     if (keys[SDL_SCANCODE_DOWN]) bits |= PAD_DOWN;
@@ -94,6 +117,13 @@ int main(int argc, char **argv) {
     texture = renderer ? SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, JS_SCREEN_W, JS_SCREEN_H) : 0;
     if (!texture) { printf("no window: %s\n", SDL_GetError()); SDL_Quit(); return 1; }
     SDL_RenderSetLogicalSize(renderer, JS_SCREEN_W, JS_SCREEN_H);
+    {
+        SDL_RendererInfo info;
+        if (SDL_GetRendererInfo(renderer, &info) == 0)
+            printf("renderer: %s (video %s)%s%s\n", info.name, SDL_GetCurrentVideoDriver(),
+                   info.flags & SDL_RENDERER_ACCELERATED ? ", accelerated" : ", software",
+                   info.flags & SDL_RENDERER_PRESENTVSYNC ? ", vsync" : "");
+    }
     SDL_ShowCursor(SDL_DISABLE);
     load_map();
     for (i = 0; i < SDL_NumJoysticks() && n < 4; ++i)
@@ -114,8 +144,14 @@ int main(int argc, char **argv) {
     else printf("no sound: %s\n", SDL_GetError());
 
     start = SDL_GetTicks();
+    {
+    /* every 5 s a line in log.txt: frames a second and where the time went (the game's frame, putting it on the
+       screen), so the real speed on the handheld can be read off the card */
+    Uint32 stat_t = SDL_GetTicks(), stat_n = 0, stat_worst = 0;
+    Uint64 stat_js = 0, stat_show = 0, freq = SDL_GetPerformanceFrequency();
     while (running) {
         Uint32 t0 = SDL_GetTicks(), spent;
+        Uint64 p0, p1, p2;
         unsigned pad;
         const uint32_t *screen;
         SDL_Event e;
@@ -132,14 +168,26 @@ int main(int argc, char **argv) {
         } else quit_since = 0;
         if (SDL_GetKeyboardState(0)[SDL_SCANCODE_ESCAPE] && SDL_GetKeyboardState(0)[SDL_SCANCODE_LCTRL]) running = 0;
 
+        p0 = SDL_GetPerformanceCounter();
         screen = jsrt_frame((double)(t0 - start), pad);
+        p1 = SDL_GetPerformanceCounter();
         if (audio) { SDL_LockAudio(); jsrt_audio_commit(); SDL_UnlockAudio(); }
         SDL_UpdateTexture(texture, 0, screen, JS_SCREEN_W * 4);
         SDL_RenderClear(renderer);
         SDL_RenderCopy(renderer, texture, 0, 0);
         SDL_RenderPresent(renderer);
+        p2 = SDL_GetPerformanceCounter();
+        stat_js += p1 - p0; stat_show += p2 - p1; ++stat_n;
+        if ((Uint32)((p2 - p0) * 1000 / freq) > stat_worst) stat_worst = (Uint32)((p2 - p0) * 1000 / freq);
+        if (SDL_GetTicks() - stat_t >= 5000) {
+            double s = (SDL_GetTicks() - stat_t) / 1000.0;
+            printf("t=%us  %.1f fps  game %.1f ms  screen %.1f ms  worst %u ms\n", (unsigned)((SDL_GetTicks() - start) / 1000),
+                   stat_n / s, stat_js * 1000.0 / freq / stat_n, stat_show * 1000.0 / freq / stat_n, (unsigned)stat_worst);
+            stat_t = SDL_GetTicks(); stat_n = 0; stat_js = stat_show = 0; stat_worst = 0;
+        }
         spent = SDL_GetTicks() - t0;
         if (spent < 16) SDL_Delay(16 - spent);              /* up to 60 frames a second, as a browser */
+    }
     }
     jsrt_quit();
     if (audio) SDL_CloseAudio();

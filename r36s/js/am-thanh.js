@@ -21,7 +21,8 @@
       else if (S.sparkle !== was.sparkle) sfx('sach', 220);                   // the room cleaned
       else if (was.night === 1 && S.nightGoal === 0) sfx('thuc-day', 230);     // woken up
       else if (btn === 'B') sfx('quay-lai', 180);
-      else if (btn === 'A' || btn === 'SELECT' || btn === 'R2') sfx('chon', 190);
+      else if (btn === 'A') { /* A stays quiet: its click was too sharp (the player's call) */ }
+      else if (btn === 'SELECT' || btn === 'R2') sfx('chon', 190);
       else if ([S.cursor, S.pick, S.tab, S.item, S.mapSel, S.stats, S.sock, S.gp && S.gp.r, S.gp && S.gp.c,
                 S.gemMode].join() !== was.key) sfx('menu', 160);
       return r;

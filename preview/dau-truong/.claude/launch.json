@@ -1,0 +1,6 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    { "name": "preview", "runtimeExecutable": "python", "runtimeArgs": ["-m", "http.server", "8765", "--directory", "D:/INDIEGAME/HoLua/preview"], "port": 8765 }
+  ]
+}

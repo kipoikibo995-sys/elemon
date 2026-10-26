@@ -1,0 +1,5 @@
+Nhạc trận đánh, bản quyền CC0 (public domain, không cần ghi tên), tải từ OpenGameArt ngày 25/10/2026:
+- determined_pursuit_loop.wav  "Determined Pursuit (epic orchestra loop)" - Emma_MA
+  https://opengameart.org/content/determined-pursuit-epic-orchestra-loop  -> dùng làm nhac/chien-dau.ogg (đấu trường)
+- QaziJamJam.wav  "QaziJamJam (orchestral battle theme)" - Emma_MA
+  https://opengameart.org/content/qazijamjam-orchestral-battle-theme  -> để dành cho trận boss / trận lớn

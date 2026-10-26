@@ -12,17 +12,19 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
+#include <time.h>
 
-#define MAX_SURF 2048
+#define MAX_SURF 32768                       /* slots only; a match's pictures are freed after it (free) */
 #define MAX_FONTS 64
 #define MAX_GLYPHS 512
-#define MAX_SOUNDS 48
+#define SCALE_MAX 4096                       /* the widest / tallest draw the fast paths take */
+#define MAX_SOUNDS 1024   /* the game's and every Solo pet's (31 x 9) and element sounds, each read from the card once */
 #define CHANNELS 8
 
 typedef struct { int w, h, opaque; uint32_t *px; } Surf;   /* opaque: a picture with no see-through pixel */
 typedef struct { int size, bold, ascent, descent, loaded; Surf atlas; uint16_t map[0x3000];
                  struct { short x, y, w, h, l, adv, top; } g[MAX_GLYPHS]; } Font;
-typedef struct { char name[24]; int16_t *data; int len; } Sound;
+typedef struct { char name[48]; int16_t *data; int len; } Sound;
 typedef struct { const int16_t *d; int len, pos, vol, loop; } Channel;
 
 static char root[512];
@@ -123,11 +125,13 @@ static inline void put(uint32_t *d, uint32_t c, uint32_t sa, int op) {
         return;
     }
     if (da == 255 || sa == 255) {
+        uint32_t ia = 255 - sa, rb;
         if (sa == 255) { *d = 0xFF000000u | (c & 0xFFFFFF); return; }
-        r = div255(((c >> 16) & 255) * sa + ((dv >> 16) & 255) * (255 - sa));
-        g = div255(((c >> 8) & 255) * sa + ((dv >> 8) & 255) * (255 - sa));
-        b = div255((c & 255) * sa + (dv & 255) * (255 - sa));
-        *d = 0xFF000000u | r << 16 | g << 8 | b;
+        /* red and blue in one multiply (each in its own 16 bits), the same rounding as div255() */
+        rb = (c & 0xFF00FFu) * sa + (dv & 0xFF00FFu) * ia + 0x800080u;
+        rb = ((rb + ((rb >> 8) & 0xFF00FFu)) >> 8) & 0xFF00FFu;
+        g = div255(((c >> 8) & 255) * sa + ((dv >> 8) & 255) * ia);
+        *d = 0xFF000000u | rb | g << 8;
         return;
     }
     {   /* both partly see-through */
@@ -171,12 +175,25 @@ static void bounds(const Surf *d, const Mat *m, double x, double y, double w, do
 
 static uint32_t alpha_of(double a) { return a <= 0 ? 0 : a >= 1 ? 255 : (uint32_t)(a * 255 + 0.5); }
 
-static void fill_rect(Surf *d, double x, double y, double w, double h, const Mat *m, uint32_t rgba, double alpha, int op) {
+static void fill_rect(Surf *d, double x, double y, double w, double h, const Mat *m, uint32_t rgba, double alpha, int op,
+                      int checker) {
     uint32_t sa = div255((rgba >> 24) * alpha_of(alpha));
     int x0, y0, x1, y1, X, Y;
     Mat inv;
     if (!invert(m, &inv)) return;
     bounds(d, m, x, y, w, h, &x0, &y0, &x1, &y1);
+    if (checker > 0 && m->b == 0 && m->c == 0 && x1 - x0 <= SCALE_MAX) {
+        /* a repeating checker pattern (createPattern of checker x checker blocks, the arena's dimming): only its
+           solid blocks are touched, every other pixel is left as it is */
+        static unsigned char odd[SCALE_MAX];
+        for (X = x0; X < x1; ++X) odd[X - x0] = (unsigned char)((long)floor((inv.a * (X + 0.5) + inv.e) / checker) & 1);
+        for (Y = y0; Y < y1; ++Y) {
+            uint32_t *row = d->px + Y * d->w;
+            int ry = (int)((long)floor((inv.d * (Y + 0.5) + inv.f) / checker) & 1);
+            for (X = x0; X < x1; ++X) if (odd[X - x0] == ry) put(row + X, rgba, sa, op);
+        }
+        return;
+    }
     if (m->b == 0 && m->c == 0 && !no_fast) {  /* not rotated: the bounds are the rectangle */
         for (Y = y0; Y < y1; ++Y) {
             uint32_t *row = d->px + Y * d->w;
@@ -268,6 +285,21 @@ static void set_filter(double b, double s) {
     filter_m[6] = k * (0.213f - 0.213f * t); filter_m[7] = k * (0.715f - 0.715f * t); filter_m[8] = k * (0.072f + 0.928f * t);
 }
 
+
+/* bilinear() in whole numbers: four source pixels, the share of the right / lower ones in sixteenths */
+static inline uint32_t blend4(uint32_t c00, uint32_t c10, uint32_t c01, uint32_t c11, uint32_t fx, uint32_t fy) {
+    uint32_t w00, w10, w01, w11, a00, a10, a01, a11, A, h;
+    if (c00 == c10 && c00 == c01 && c00 == c11) return c00;
+    w00 = (16 - fx) * (16 - fy); w10 = fx * (16 - fy); w01 = (16 - fx) * fy; w11 = fx * fy;
+    a00 = (c00 >> 24) * w00; a10 = (c10 >> 24) * w10; a01 = (c01 >> 24) * w01; a11 = (c11 >> 24) * w11;
+    A = a00 + a10 + a01 + a11;
+    if (A < 128) return 0;
+    h = A / 2;
+#define CH(sh) ((((c00 >> sh) & 255) * a00 + ((c10 >> sh) & 255) * a10 + ((c01 >> sh) & 255) * a01 + ((c11 >> sh) & 255) * a11 + h) / A)
+    return ((A + 128) >> 8) << 24 | CH(16) << 16 | CH(8) << 8 | CH(0);
+#undef CH
+}
+
 static uint32_t filtered(uint32_t c) {
     float r = (float)((c >> 16) & 255), g = (float)((c >> 8) & 255), b = (float)(c & 255), o[3];
     int i;
@@ -318,6 +350,81 @@ static void draw_image(Surf *d, const Surf *s, double sx, double sy, double sw, 
             }
             return;
         }
+    }
+    if (scaled && m->b == 0 && m->c == 0 && !no_fast && x1 - x0 <= SCALE_MAX && y1 - y0 <= SCALE_MAX) {
+        /* scaled but not turned (Solo's half-size frames, the pets in the room): the same smoothing as bilinear(),
+           in whole numbers. Each column and row is worked out once: its two source pixels and the share of the
+           second (sixteenths); a spot whose four source pixels are the same is that pixel */
+        static int ci0[SCALE_MAX], ci1[SCALE_MAX], cf[SCALE_MAX], ri0[SCALE_MAX], ri1[SCALE_MAX], rf[SCALE_MAX];
+        static unsigned char cok[SCALE_MAX], rok[SCALE_MAX];
+        int k;
+        for (k = 0; k < x1 - x0; ++k) {
+            double p = sx + (inv.a * (x0 + k + 0.5) + inv.e - dx) * sw / dw, q = p - 0.5;
+            int i = (int)floor(q), f = (int)((q - i) * 16 + 0.5);
+            if (f == 16) { ++i; f = 0; }
+            cok[k] = p >= sx && p < sx + sw;
+            ci0[k] = clampi(i, sx0, sx1 - 1); ci1[k] = clampi(i + 1, sx0, sx1 - 1); cf[k] = f;
+        }
+        for (k = 0; k < y1 - y0; ++k) {
+            double p = sy + (inv.d * (y0 + k + 0.5) + inv.f - dy) * sh / dh, q = p - 0.5;
+            int i = (int)floor(q), f = (int)((q - i) * 16 + 0.5);
+            if (f == 16) { ++i; f = 0; }
+            rok[k] = p >= sy && p < sy + sh;
+            ri0[k] = clampi(i, sy0, sy1 - 1); ri1[k] = clampi(i + 1, sy0, sy1 - 1); rf[k] = f;
+        }
+        for (Y = y0; Y < y1; ++Y) {
+            const uint32_t *r0, *r1;
+            uint32_t *out = d->px + Y * d->w;
+            int fy;
+            if (!rok[Y - y0]) continue;
+            r0 = s->px + ri0[Y - y0] * s->w; r1 = s->px + ri1[Y - y0] * s->w; fy = rf[Y - y0];
+            for (X = x0; X < x1; ++X) {
+                int j = X - x0;
+                uint32_t c, a;
+                if (!cok[j]) continue;
+                c = blend4(r0[ci0[j]], r0[ci1[j]], r1[ci0[j]], r1[ci1[j]], (uint32_t)cf[j], (uint32_t)fy);
+                a = ga == 255 ? c >> 24 : div255((c >> 24) * ga);
+                if (a || op == OP_IN) put(out + X, filter_on ? filtered(c) : c, a, op);
+            }
+        }
+        return;
+    }
+    if (!no_fast && sx1 - sx0 < 30000 && sy1 - sy0 < 30000) {
+        /* anything else (turned, or moved by part of a pixel): the source point of a destination pixel is linear in
+           X and Y, so along a row it steps by a constant; kept in 16.16 fixed point, with blend4() for scaled draws */
+        const double kx = sw / dw, ky = sh / dh, F = 65536.0;
+        const double ax = inv.a * kx, cx = inv.c * kx, ex = sx + (inv.e - dx) * kx;   /* px = ax X + cx Y + ex */
+        const double by = inv.b * ky, dy2 = inv.d * ky, fy0 = sy + (inv.f - dy) * ky; /* py = by X + dy2 Y + fy0 */
+        const int64_t lox = (int64_t)ceil(sx * F), hix = (int64_t)ceil((sx + sw) * F);
+        const int64_t loy = (int64_t)ceil(sy * F), hiy = (int64_t)ceil((sy + sh) * F);
+        const int64_t stx = (int64_t)llround(ax * F), sty = (int64_t)llround(by * F);
+        for (Y = y0; Y < y1; ++Y) {
+            uint32_t *out = d->px + Y * d->w;
+            int64_t P = (int64_t)llround((ax * (x0 + 0.5) + cx * (Y + 0.5) + ex) * F);
+            int64_t Q = (int64_t)llround((by * (x0 + 0.5) + dy2 * (Y + 0.5) + fy0) * F);
+            for (X = x0; X < x1; ++X, P += stx, Q += sty) {
+                uint32_t c, a;
+                if (P < lox || P >= hix || Q < loy || Q >= hiy) continue;
+                if (scaled) {
+                    int64_t qx = P - 32768, qy = Q - 32768;              /* bilinear's "- 0.5" */
+                    int ix = (int)(qx >> 16), iy = (int)(qy >> 16);
+                    uint32_t fx = (uint32_t)(((qx & 0xFFFF) + 2048) >> 12), fy = (uint32_t)(((qy & 0xFFFF) + 2048) >> 12);
+                    int ix0, ix1, iy0, iy1;
+                    if (fx == 16) { ++ix; fx = 0; }
+                    if (fy == 16) { ++iy; fy = 0; }
+                    ix0 = clampi(ix, sx0, sx1 - 1); ix1 = clampi(ix + 1, sx0, sx1 - 1);
+                    iy0 = clampi(iy, sy0, sy1 - 1); iy1 = clampi(iy + 1, sy0, sy1 - 1);
+                    c = blend4(s->px[iy0 * s->w + ix0], s->px[iy0 * s->w + ix1], s->px[iy1 * s->w + ix0], s->px[iy1 * s->w + ix1], fx, fy);
+                } else {
+                    int ix = (int)(P >> 16), iy = (int)(Q >> 16);
+                    if (ix < sx0 || ix >= sx1 || iy < sy0 || iy >= sy1) continue;
+                    c = s->px[iy * s->w + ix];
+                }
+                a = ga == 255 ? c >> 24 : div255((c >> 24) * ga);
+                if (a || op == OP_IN) put(out + X, filter_on ? filtered(c) : c, a, op);
+            }
+        }
+        return;
     }
     for (Y = y0; Y < y1; ++Y)
         for (X = x0; X < x1; ++X) {
@@ -523,9 +630,10 @@ static int sound_of(const char *name) {
 
 static int load_sound(const char *rel, const char *name) {
     long len, p = 12;
-    uint8_t *b = read_file(rel, &len);
+    uint8_t *b;
     int k = sound_of(name);
-    if (k >= 0) { free(b); return k; }
+    if (k >= 0) return k;                    /* already in memory: the card is read only the first time */
+    b = read_file(rel, &len);
     if (!b || n_sounds >= MAX_SOUNDS || len < 44 || memcmp(b, "RIFF", 4)) { free(b); return -1; }
     while (p + 8 <= len) {
         long size = b[p + 4] | b[p + 5] << 8 | b[p + 6] << 16 | (long)b[p + 7] << 24;
@@ -605,6 +713,13 @@ static JSValue b_now(JSContext *ctx, JSValueConst t, int argc, JSValueConst *arg
     (void)t; (void)argc; (void)argv;
     return JS_NewFloat64(ctx, now_ms);
 }
+/* clock(): real milliseconds, also in the test harness (whose now() is the frame clock): for timing code */
+static JSValue b_clock(JSContext *ctx, JSValueConst t, int argc, JSValueConst *argv) {
+    struct timespec ts;
+    (void)t; (void)argc; (void)argv;
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+    return JS_NewFloat64(ctx, ts.tv_sec * 1e3 + ts.tv_nsec / 1e6);
+}
 static JSValue b_pad(JSContext *ctx, JSValueConst t, int argc, JSValueConst *argv) {
     (void)t; (void)argc; (void)argv;
     return JS_NewInt32(ctx, (int32_t)pad_bits);
@@ -621,6 +736,13 @@ static JSValue b_new_canvas(JSContext *ctx, JSValueConst t, int argc, JSValueCon
     surf[n_surf] = surf_new(ARG_I(0), ARG_I(1));
     return JS_NewInt32(ctx, n_surf++);
 }
+/* free(id): give a canvas's or picture's pixels back (Solo đối kháng frees a match's frames when it ends) */
+static JSValue b_free(JSContext *ctx, JSValueConst t, int argc, JSValueConst *argv) {
+    int id = ARG_I(0);
+    (void)t;
+    if (id > 0 && id < n_surf && surf[id]) { free(surf[id]->px); surf[id]->px = (uint32_t *)calloc(1, 4); surf[id]->w = surf[id]->h = 0; }
+    return JS_UNDEFINED;
+}
 static JSValue b_resize(JSContext *ctx, JSValueConst t, int argc, JSValueConst *argv) {
     Surf *s = surf_arg(ctx, argc, argv, 0);
     int w = ARG_I(1), h = ARG_I(2);
@@ -630,9 +752,19 @@ static JSValue b_resize(JSContext *ctx, JSValueConst t, int argc, JSValueConst *
         h = h < 0 ? 0 : h;
         if (w * h > s->w * s->h) { free(s->px); s->px = (uint32_t *)calloc((size_t)(w * h) + 1, 4); }
         else memset(s->px, 0, (size_t)(w * h) * 4);
-        s->w = w; s->h = h;
+        s->w = w; s->h = h; s->opaque = 0;
     }
     return JS_UNDEFINED;
+}
+/* seal(id): a canvas that will not change any more is checked for see-through pixels; with none, drawing it
+   1:1 is a plain copy of rows (as a background picture is) */
+static JSValue b_seal(JSContext *ctx, JSValueConst t, int argc, JSValueConst *argv) {
+    Surf *s = surf_arg(ctx, argc, argv, 0);
+    int i, n;
+    (void)t;
+    if (!s) return JS_FALSE;
+    for (s->opaque = 1, i = 0, n = s->w * s->h; i < n && s->opaque; ++i) s->opaque = s->px[i] >> 24 == 255;
+    return JS_NewBool(ctx, s->opaque);
 }
 static JSValue b_load_image(JSContext *ctx, JSValueConst t, int argc, JSValueConst *argv) {
     const char *path = argc ? JS_ToCString(ctx, argv[0]) : 0;
@@ -654,7 +786,8 @@ static JSValue b_fill_rect(JSContext *ctx, JSValueConst t, int argc, JSValueCons
     Surf *s = surf_arg(ctx, argc, argv, 0);
     Mat m = mat_args(ctx, argc, argv, 5);
     (void)t;
-    if (s) fill_rect(s, ARG_D(1), ARG_D(2), ARG_D(3), ARG_D(4), &m, u32_arg(ctx, argc, argv, 11), ARG_D(12), ARG_I(13));
+    if (s) fill_rect(s, ARG_D(1), ARG_D(2), ARG_D(3), ARG_D(4), &m, u32_arg(ctx, argc, argv, 11), ARG_D(12), ARG_I(13),
+                     argc > 14 ? ARG_I(14) : 0);
     return JS_UNDEFINED;
 }
 /* drawImage(dst, src, sx, sy, sw, sh, dx, dy, dw, dh, a, b, c, d, e, f, alpha, op, shadowRgba, shadowBlur,
@@ -731,6 +864,24 @@ static JSValue b_pixels(JSContext *ctx, JSValueConst t, int argc, JSValueConst *
     free(b);
     return r;
 }
+/* put(id, x, y, w, h, bytes): RGBA bytes (getImageData's layout) written over the surface, as putImageData does */
+static JSValue b_put(JSContext *ctx, JSValueConst t, int argc, JSValueConst *argv) {
+    Surf *s = surf_arg(ctx, argc, argv, 0);
+    int x = ARG_I(1), y = ARG_I(2), w = ARG_I(3), h = ARG_I(4), X, Y;
+    size_t n = 0;
+    uint8_t *b = argc > 5 ? JS_GetArrayBuffer(ctx, &n, argv[5]) : 0;
+    (void)t;
+    if (!s || !b || w <= 0 || h <= 0 || n < (size_t)w * h * 4) return JS_UNDEFINED;
+    for (Y = 0; Y < h; ++Y)
+        for (X = 0; X < w; ++X) {
+            int dx = x + X, dy = y + Y;
+            const uint8_t *i = b + 4 * ((size_t)Y * w + X);
+            if (dx < 0 || dy < 0 || dx >= s->w || dy >= s->h) continue;
+            s->px[dy * s->w + dx] = (uint32_t)i[3] << 24 | (uint32_t)i[0] << 16 | (uint32_t)i[1] << 8 | i[2];
+            if (i[3] != 255) s->opaque = 0;
+        }
+    return JS_UNDEFINED;
+}
 /* files under the game folder (or the save folder, by full path): readText(path) -> string or null,
    writeText(path, text) -> true when written (through a temporary file, so a save is never left half done) */
 static JSValue b_read_text(JSContext *ctx, JSValueConst t, int argc, JSValueConst *argv) {
@@ -790,7 +941,7 @@ static JSValue b_sfx(JSContext *ctx, JSValueConst t, int argc, JSValueConst *arg
     const char *name = argc ? JS_ToCString(ctx, argv[0]) : 0;
     (void)t;
     if (name) {
-        char rel[64];
+        char rel[96];
         int k;
         snprintf(rel, sizeof rel, "sfx/%s.wav", name);
         k = load_sound(rel, name);
@@ -803,7 +954,7 @@ static JSValue b_music(JSContext *ctx, JSValueConst t, int argc, JSValueConst *a
     const char *name = argc ? JS_ToCString(ctx, argv[0]) : 0;
     (void)t;
     if (name && *name) {
-        char rel[64], key[32];
+        char rel[96], key[48];
         snprintf(rel, sizeof rel, "nhac/%s.wav", name);
         snprintf(key, sizeof key, "nhac-%s", name);     /* music and chimes may share a file name */
         music_next = load_sound(rel, key);
@@ -849,10 +1000,10 @@ static int run_file(const char *rel) {
 
 int jsrt_init(const char *dir) {
     static const struct { const char *name; JSCFunction *f; int n; } fns[] = {
-        { "now", b_now, 0 }, { "pad", b_pad, 0 }, { "log", b_log, 1 }, { "newCanvas", b_new_canvas, 2 },
+        { "now", b_now, 0 }, { "clock", b_clock, 0 }, { "pad", b_pad, 0 }, { "log", b_log, 1 }, { "newCanvas", b_new_canvas, 2 },
         { "resize", b_resize, 3 }, { "loadImage", b_load_image, 1 }, { "fillRect", b_fill_rect, 14 },
         { "drawImage", b_draw_image, 22 }, { "ellipse", b_ellipse, 15 }, { "text", b_text, 17 },
-        { "measure", b_measure, 3 }, { "sfx", b_sfx, 2 }, { "music", b_music, 1 }, { "poly", b_poly, 13 }, { "pixels", b_pixels, 5 },
+        { "measure", b_measure, 3 }, { "sfx", b_sfx, 2 }, { "music", b_music, 1 }, { "poly", b_poly, 13 }, { "pixels", b_pixels, 5 }, { "put", b_put, 6 }, { "free", b_free, 1 }, { "seal", b_seal, 1 },
         { "readText", b_read_text, 1 }, { "writeText", b_write_text, 2 } };
     /* the scripts to run, in order: js/load.txt (one path a line, scripts/r36s_game.py), else the test page's set */
     static const char *scripts[] = { "js/shim.js", "js/data.js", "js/page.js", "js/am-thanh.js" };

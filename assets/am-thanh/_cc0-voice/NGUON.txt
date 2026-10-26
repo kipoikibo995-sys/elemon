@@ -1,0 +1,6 @@
+Tiếng thú / quái vật và giọng xướng ngôn, bản quyền CC0 (không cần ghi tên), tải ngày 25/10/2026:
+- creature1/  "80 CC0 creature SFX" - rubberduck   https://opengameart.org/content/80-cc0-creature-sfx
+- creature2/  "80 CC0 creature SFX #2" - rubberduck   https://opengameart.org/content/80-cc0-creture-sfx-2
+- fighter/    "Voiceover Pack (Fighter)" - Kenney   https://kenney.nl/assets/voiceover-pack-fighter  (dùng câu "fight")
+wav/ là bản 22050 Hz mono để script scripts/make_skill_sfx.py đọc.
+wav/ko_tts.wav: câu "K.O." đọc bằng giọng Windows "Microsoft David" (gói này không có câu K.O.), script làm trầm + vang.

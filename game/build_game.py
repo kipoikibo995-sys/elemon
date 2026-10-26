@@ -26,25 +26,28 @@ OUT = os.path.join(ROOT, 'build', 'game')
 PAGE = os.path.join(OUT, 'tien-hoa')
 PETS = os.path.join(OUT, 'pets')
 DEMO_BUILT = os.path.join(ROOT, 'preview', 'tien-hoa')
-KEEP = {'pets'}                      # the junction: never removed here (deleting through it would hit the frames)
+KEEP = {'pets', 'solo'}              # the junctions: never removed here (deleting through them would hit the sources)
+ARENA = os.path.join(ROOT, 'preview', 'dau-truong')       # the combat session's arena: Solo đối kháng (game/src/solo.js)
+SOLO = os.path.join(OUT, 'solo')
 
 # put in the page right before </body>: browser-only parts first (the R36S packer leaves them out), then the layers
 ADD = '''<script data-browser-only>
 // in a browser: the sounds through <audio> (on the R36S r36s/js/shim.js makes SOUND); music waits for a first key
 window.SOUND = (() => {
+  const V = '__SND_V__';                     // the build: a browser never plays an old copy from its cache
   const cache = {}, play = a => a.play().catch(() => {});
   let song = null;
   for (const ev of ['keydown', 'pointerdown']) addEventListener(ev, () => { if (song && song.paused) play(song); });
   return {
     sfx(name, vol) {
-      const a = (cache[name] = cache[name] || new Audio(`sfx/${name}.wav`)).cloneNode();
+      const a = (cache[name] = cache[name] || new Audio(`sfx/${name}.wav?v=${V}`)).cloneNode();
       a.volume = Math.min(1, vol / 256); play(a);
     },
     music(name) {
       if (song) song.pause();
       song = null;
       if (!name) return;
-      song = new Audio(`nhac/${name}.wav`); song.loop = true; song.volume = 0.5; play(song);
+      song = new Audio(`nhac/${name}.wav?v=${V}`); song.loop = true; song.volume = 0.5; play(song);
     },
   };
 })();
@@ -60,7 +63,11 @@ window.SOUND = (() => {
 })();
 </script>
 <script src="js/song-that.js"></script>
+<script src="js/di-bo.js"></script>
+<script src="js/ve-nhanh.js"></script>
 <script src="js/vo-duong.js"></script>
+<script src="js/solo-arena.js"></script>
+<script src="js/solo.js"></script>
 <script src="js/am-thanh.js"></script>
 <script src="js/set-huyen-thoai.js"></script>
 <script src="js/nen-chi-so.js"></script>
@@ -75,6 +82,9 @@ WORDING = [
     ("'R2 chơi · X vuốt ve · L2 tua nhanh'", "'R2 chơi · X vuốt ve'"),
     ("'Bản demo: tua nhanh ¼ giai đoạn; ở mốc cấp thì mở bảng tiến hóa'", "'Ở mốc cấp: mở bảng tiến hóa'"),
     ('<title>Elemon demo R36S - từ trứng tới Huyền thoại</title>', '<title>Elemon</title>'),
+    # the stroll eases in and out (game/src/di-bo.js)
+    ('    S.px = S.walk.from + (S.walk.to - S.walk.from) * t;',
+     "    S.px = S.walk.from + (S.walk.to - S.walk.from) * (typeof walkEase === 'function' ? walkEase(t, S.walk.dur) : t);"),
 ]
 
 
@@ -85,9 +95,9 @@ def clean():
             continue
         p = os.path.join(OUT, name)
         shutil.rmtree(p) if os.path.isdir(p) else os.remove(p)
-    if not os.path.exists(PETS):          # a junction needs no admin rights on Windows
-        subprocess.run(['cmd', '/c', 'mklink', '/J', PETS, os.path.join(ROOT, 'assets', 'creatures-640')],
-                       check=True, capture_output=True)
+    for link, target in ((PETS, os.path.join(ROOT, 'assets', 'creatures-640')), (SOLO, ARENA)):
+        if not os.path.exists(link) and os.path.exists(target):     # a junction needs no admin rights on Windows
+            subprocess.run(['cmd', '/c', 'mklink', '/J', link, target], check=True, capture_output=True)
 
 
 def build_page():
@@ -128,6 +138,166 @@ def cut_sparks():
                 sp = sp.resize((max(1, round(sp.width * k)), max(1, round(sp.height * k))), Image.LANCZOS)
                 sp.save(os.path.join(PAGE, 'img', f'tia_{n}.png'), optimize=True)
                 n += 1
+    return n
+
+
+SIDE_PX = 190                       # px, the larger side of the Solo pick screen's standing pet
+
+
+# the camouflage checker: whole runs of pixels cleared at once (same holes as the pixel-by-pixel loop, far fewer steps
+# for the R36S's interpreter)
+DITHER_LOOP = "for (let yy = 0; yy < o.height; yy++) for (let xx = 0; xx < o.width; xx++) if (((xx / b | 0) + (yy / b | 0)) % 2) p[(yy * o.width + xx) * 4 + 3] = 0;"
+DITHER_RUNS = ("{ const u = new Uint32Array(p.buffer, p.byteOffset, o.width * o.height), W = o.width; "
+               "for (let yy = 0; yy < o.height; yy++) { const r = yy * W; "
+               "for (let xx = (yy / b | 0) % 2 ? 0 : b; xx < W; xx += 2 * b) u.fill(0, r + xx, r + Math.min(W, xx + b)); } }")
+# the aiming funnel and arrow: drawn cell by cell every frame (~8000 cells, thousands of 2 px fills) they cost the
+# R36S more than the fight; here each funnel (its base angle) and arrow (its 32 directions) is drawn once into a
+# picture, put down on the same 2 px grid round the pet
+AIM = r'''const AIM_FUNNELS = new Map(), AIM_ARROWS = new Map(), AIM_SHAPES = new Map();
+function aimCanvas(n) { const c = document.createElement('canvas'); c.width = c.height = n * BLK; return c; }
+// a picture made in one go from cells: cells[i] = 0 (empty) or an RGBA colour, n x n cells of BLK x BLK pixels
+function aimPaint(n, cells) {
+  const c = aimCanvas(n), g = c.getContext('2d'), W = n * BLK, im = g.createImageData(W, W), u = new Uint32Array(im.data.buffer);
+  for (let ly = 0; ly < n; ly++) for (let lx = 0; lx < n; lx++) {
+    const v = cells[ly * n + lx];
+    if (v) for (let yy = 0; yy < BLK; yy++) u.fill(v, (ly * BLK + yy) * W + lx * BLK, (ly * BLK + yy) * W + lx * BLK + BLK);
+  }
+  g.putImageData(im, 0, 0);
+  return c;
+}
+const aimRgba = h => { const v = parseInt(h.slice(1), 16); return (255 << 24 | (v & 255) << 16 | (v >> 8 & 255) << 8 | v >> 16) >>> 0; };
+function drawAim(f) {
+  const a = f.aiming;
+  if (!a) return;
+  const pal = f.bot ? ['#8fd8ff', '#2a76b8', '#123a66', '#cff0ff'] : ['#ffb347', '#e0702a', '#8a3414', '#ffe08a'];
+  // the funnel's drawn direction in 64 steps (the hit test keeps a.base as it is): the bot faces any way at all
+  const ox = Math.round(f.x / BLK), oy = Math.round((f.y - 24) / BLK), r = 88 / BLK, R = Math.ceil(r) + 1;
+  const bs = Math.round(a.base / (Math.PI / 32)), b = bs * (Math.PI / 32);
+  const fk = (f.bot ? 'B' : 'P') + ((ox + oy) & 1) + ':' + (((bs % 64) + 64) % 64);
+  let fn = AIM_FUNNELS.get(fk);
+  if (!fn) {
+    // the shape for this direction (shared by both sides and both checker phases): 1 edge, 2 outer band, 3 inside
+    const n = 2 * R + 1, sk = ((bs % 64) + 64) % 64;
+    let shape = AIM_SHAPES.get(sk);
+    if (!shape) {
+      shape = new Uint8Array(n * n);
+      const angIn = t => { const d = ((t - b + Math.PI * 3) % (Math.PI * 2)) - Math.PI; return Math.abs(d) <= HALF; };
+      for (let ly = 0; ly < n; ly++) for (let lx = 0; lx < n; lx++) {
+        const dx = lx - R + 0.5, dy = ly - R + 0.5, d = Math.hypot(dx, dy);
+        if (d < 10 || d > r) continue;
+        const t = Math.atan2(dy, dx);
+        if (!angIn(t)) continue;
+        shape[ly * n + lx] = d > r - 1.2 || !angIn(t + 1.4 / d) || !angIn(t - 1.4 / d) ? 1 : d > r - 6 ? 2 : 3;
+      }
+      AIM_SHAPES.set(sk, shape);
+    }
+    const cells = new Uint32Array(n * n), par = (ox + oy) & 1, P = pal.map(aimRgba);
+    for (let ly = 0; ly < n; ly++) for (let lx = 0; lx < n; lx++) {
+      const v = shape[ly * n + lx];
+      if (v) cells[ly * n + lx] = v === 1 ? P[0] : (lx + ly + par) % 2 === 0 ? P[v - 1] : 0;
+    }
+    fn = { c: aimPaint(n, cells), R };
+    AIM_FUNNELS.set(fk, fn);
+    if (AIM_FUNNELS.size > 32) { const k0 = AIM_FUNNELS.keys().next().value; AIM_FUNNELS.delete(k0); }
+  }
+  ctx.drawImage(fn.c, (ox - fn.R) * BLK, (oy - fn.R) * BLK);
+  const step = Math.round(a.ang / (Math.PI / 16)), ak = (f.bot ? 'B' : 'P') + ((step % 32) + 32) % 32;
+  let ar = AIM_ARROWS.get(ak);
+  if (!ar) {
+    const sa32 = step * (Math.PI / 16), ca = Math.cos(sa32), sa = Math.sin(sa32), len = r * 0.66, L = Math.ceil(len) + 4;
+    const inArrow = (lx, ly) => {
+      const px = lx - L + 0.5, py = ly - L + 0.5, u = px * ca + py * sa, v = -px * sa + py * ca;
+      if (u >= 10 && u <= len - 5 && Math.abs(v) <= 0.75) return true;
+      return u > len - 6 && u <= len && Math.abs(v) <= (len - u) * 0.7;
+    };
+    const n = 2 * L + 1, on = new Uint8Array(n * n);
+    for (let ly = 0; ly < n; ly++) for (let lx = 0; lx < n; lx++) if (inArrow(lx, ly)) on[ly * n + lx] = 1;
+    const cells = new Uint32Array(n * n), dark = aimRgba('#1a0c06'), lit = aimRgba(pal[3]);
+    for (let ly = 0; ly < n; ly++) for (let lx = 0; lx < n; lx++) {
+      if (on[ly * n + lx]) { cells[ly * n + lx] = lit; continue; }
+      let near = false;
+      for (let yy = -1; yy <= 1 && !near; yy++) for (let xx = -1; xx <= 1; xx++) {
+        const X = lx + xx, Y = ly + yy;
+        if (X >= 0 && Y >= 0 && X < n && Y < n && on[Y * n + X]) { near = true; break; }
+      }
+      if (near) cells[ly * n + lx] = dark;
+    }
+    ar = { c: aimPaint(n, cells), L };
+    AIM_ARROWS.set(ak, ar);
+  }
+  ctx.drawImage(ar.c, (ox - ar.L) * BLK, (oy - ar.L) * BLK);
+  if (a.k === 'i') ring(a.tx, a.ty, pal[0], 0);
+}
+function drawAim0(f) {'''
+OUTLINED = r'''function drawOutlined(cell, x, y, flip, k) { const key = Math.round(k * 512), m = cell.__ol || (cell.__ol = new Map()); let o = m.get(key); if (!o) { if (m.size >= 4) return drawOutlined0(cell, x, y, flip, k); const b = black(cell), w = cell.w * k, h = cell.h * k, P = OUTLINE_PX + 1, c = document.createElement('canvas'); c.width = Math.ceil(w) + 2 * P; c.height = Math.ceil(h) + 2 * P; const g = c.getContext('2d'); for (const [dx, dy] of [[-1, 0], [1, 0], [0, -1], [0, 1], [-0.7, -0.7], [0.7, -0.7], [-0.7, 0.7], [0.7, 0.7]]) g.drawImage(b.c, P + Math.round(dx * OUTLINE_PX), P + Math.round(dy * OUTLINE_PX), w, h); g.drawImage(cell.c, P, P, w, h); o = { c, x: Math.round(-w / 2) - P, y: Math.round(-h) - P }; m.set(key, o); } ctx.save(); ctx.globalAlpha = 1; ctx.translate(Math.round(x), Math.round(y)); if (flip) ctx.scale(-1, 1); ctx.drawImage(o.c, o.x, o.y); ctx.restore(); }
+function drawOutlined0(cell, x, y, flip, k) {'''
+
+
+def solo_arena():
+    """The arena page's script wrapped in a function of its own (globalThis.__SOLO_SRC), run by game/src/solo.js with
+    stand-ins for the page around it; and a small portrait of each pet for the pick screen. Number of pets."""
+    import re
+    import numpy as np
+    from PIL import Image
+    page = os.path.join(ARENA, 'index.html')
+    if not os.path.exists(page):
+        return 0
+    src = re.search(r'<script>(.*)</script>', open(page, encoding='utf-8').read(), re.S).group(1).replace('\r\n', '\n')
+    # small changes, harmless in a browser: a sheet already cut (the R36S, scripts/solo_r36s.py) is handed back as
+    # it is; the bot always has its own pet here, so the tiger sheets are not recoloured for it; and a pet with its
+    # outline is put together once per pose and size (OUTLINED), then drawn in one go instead of nine scaled draws
+    for old, new in (('function cut(img, cols, rows) {', 'function cut(img, cols, rows) { if (img.__cells) return img.__cells;'),
+                     ('function recolourBot() {', 'function recolourBot() { if (BOTPET) return;'),
+                     ('function drawOutlined(cell, x, y, flip, k) {', OUTLINED),
+                     (DITHER_LOOP, DITHER_RUNS),
+                     ('function drawAim(f) {', AIM),
+                     # the screen shake by whole pixels: a part-pixel shift made the backdrop (and everything) a
+                     # pixel-by-pixel draw instead of a row copy, in exactly the frames where blows land
+                     ('if (shake > 0) { ctx.translate((Math.random() - 0.5) * shake * 2, (Math.random() - 0.5) * shake * 2);',
+                      'if (shake > 0) { ctx.translate(Math.round((Math.random() - 0.5) * shake * 2), Math.round((Math.random() - 0.5) * shake * 2));')):
+        if old in src:
+            src = src.replace(old, new, 1)
+        else:
+            print('  đấu trường: không thấy', old)
+    with open(os.path.join(PAGE, 'js', 'solo-arena.js'), 'w', encoding='utf-8', newline='\n') as fh:
+        fh.write("// preview/dau-truong/index.html (the combat session's arena), wrapped by game/build_game.py: do not edit\n"
+                 'globalThis.__SOLO_SRC = function (document, window, location, addEventListener, requestAnimationFrame, '
+                 'fetch, Image) {\n' + src + '\n};\n')
+    os.makedirs(os.path.join(PAGE, 'img', 'solo'), exist_ok=True)
+    n = 0
+    for d in os.listdir(os.path.join(ARENA, 'img')):
+        sheet = os.path.join(ARENA, 'img', d, 's.png')
+        if not os.path.exists(sheet):
+            continue
+        im = np.array(Image.open(sheet).convert('RGBA'))
+        cell = im[:im.shape[0] // 4, :im.shape[1] // 4].copy()           # facing us, standing
+        key = (cell[..., 0] > 150) & (cell[..., 1] < 120) & (cell[..., 2] > 150)
+        cell[key, 3] = 0
+        ys, xs = np.nonzero(cell[..., 3])
+        if not len(xs):
+            continue
+        p = Image.fromarray(cell[ys.min():ys.max() + 1, xs.min():xs.max() + 1])
+        p.thumbnail((76, 76), Image.LANCZOS)
+        p.save(os.path.join(PAGE, 'img', 'solo', d + '.png'), optimize=True)
+        n += 1
+        side = os.path.join(ARENA, 'img', d, 'e.png')               # facing the side, breathing: 4 frames, one box
+        if os.path.exists(side):
+            im = np.array(Image.open(side).convert('RGBA'))
+            ch, cw = im.shape[0] // 4, im.shape[1] // 4
+            cells = []
+            for k in range(4):
+                c = im[:ch, k * cw:(k + 1) * cw].copy()
+                c[(c[..., 0] > 150) & (c[..., 1] < 120) & (c[..., 2] > 150), 3] = 0
+                cells.append(c)
+            al = np.any(np.stack([c[..., 3] for c in cells]), axis=0)
+            ys, xs = np.nonzero(al)
+            if len(xs):
+                box = (xs.min(), ys.min(), xs.max() + 1, ys.max() + 1)
+                k2 = min(1.0, SIDE_PX / max(box[2] - box[0], box[3] - box[1]))
+                for k, c in enumerate(cells):
+                    q = Image.fromarray(c).crop(box)
+                    q = q.resize((round(q.width * k2), round(q.height * k2)), Image.LANCZOS)
+                    q.save(os.path.join(PAGE, 'img', 'solo', f'{d}_e{k}.png'), optimize=True)
     return n
 
 
@@ -258,8 +428,12 @@ def main():
     os.makedirs(os.path.join(PAGE, 'js'), exist_ok=True)
     shutil.copy(os.path.join(HERE, 'src', 'song-that.js'), os.path.join(PAGE, 'js'))
     shutil.copy(os.path.join(HERE, 'src', 'nut-thu.js'), os.path.join(PAGE, 'js'))       # test buttons (browser)
+    shutil.copy(os.path.join(HERE, 'src', 'di-bo.js'), os.path.join(PAGE, 'js'))
+    shutil.copy(os.path.join(HERE, 'src', 've-nhanh.js'), os.path.join(PAGE, 'js'))
     shutil.copy(os.path.join(HERE, 'src', 'vo-duong.js'), os.path.join(PAGE, 'js'))
+    shutil.copy(os.path.join(HERE, 'src', 'solo.js'), os.path.join(PAGE, 'js'))
     copy_dojo()
+    solo = solo_arena()
     shutil.copy(os.path.join(ROOT, 'r36s', 'js', 'am-thanh.js'), os.path.join(PAGE, 'js'))
     sparks = cut_sparks()
     src = open(os.path.join(HERE, 'src', 'set-huyen-thoai.js'), encoding='utf-8').read()
@@ -283,12 +457,12 @@ def main():
             skipped.append(old[:50])
     # a build stamp on the layers, so a browser never runs an old copy from its cache (the R36S packer drops it)
     i, stamp = html.rindex('</body>'), int(time.time())
-    html = html[:i] + ADD.replace('.js"', f'.js?v={stamp}"') + html[i:]
+    html = html[:i] + ADD.replace('.js"', f'.js?v={stamp}"').replace('__SND_V__', str(stamp)) + html[i:]
     open(path, 'w', encoding='utf-8', newline='\n').write(html)
     # the demo page this build was made from (check_minimon.py compares it with the demo now)
     shutil.copy(os.path.join(ROOT, 'scripts', 'evo_app.html'), os.path.join(HERE, 'minimon-base.html'))
     size = sum(os.path.getsize(os.path.join(dp, f)) for dp, _, fs in os.walk(PAGE) for f in fs)
-    print(f'{PAGE}: {how}, {size / 2 ** 20:.1f} MB (khung hình pet đọc qua build/game/pets), {sparks} tia sét')
+    print(f'{PAGE}: {how}, {size / 2 ** 20:.1f} MB (khung hình pet đọc qua build/game/pets), {sparks} tia sét, đấu trường {solo} pet')
     for s in skipped:
         print(f'  bỏ qua sửa chữ (demo không còn dòng này): {s}')
 

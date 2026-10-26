@@ -27,7 +27,7 @@ $root = Split-Path -Parent $PSScriptRoot
 $apps = @(
     @{ key = 'game'; src = (Join-Path $root 'dist\elemon'); sh = 'Elemon.sh'; folder = 'elemon'; exe = 'elemon'
        need = 'js\load.txt'; name = 'Elemon'
-       desc = 'Elemon: nuôi tinh linh Ngũ Hành từ quả trứng tới Huyền thoại. Tự lưu, chỉ số trôi theo giờ thật; nhạc và tiếng 8-bit. Giữ SELECT+START để thoát (game lưu trước khi thoát).' },
+       desc = 'Elemon: nuôi tinh linh Ngũ Hành từ quả trứng tới Huyền thoại. Tự lưu, chỉ số trôi theo giờ thật; Võ đường và Solo đối kháng. Giữ SELECT+START để thoát (game lưu trước khi thoát).' },
     @{ key = 'viewer'; src = (Join-Path $root 'dist\holua-r36s'); sh = 'HoLua.sh'; folder = 'holua'; exe = 'holua'
        need = 'data\list.txt'; name = 'HoLua (xem thử)'
        desc = 'HoLua: xem thử 17 phòng và 212 tinh linh Ngũ Hành, có nhạc 8-bit. L1/R1 đổi phòng, X/Y đổi pet, SELECT+START thoát.' }

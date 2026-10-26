@@ -224,6 +224,161 @@ Hiệu ứng: `chieu/HO-T2_hoa-quy_1` (cầu lửa: hàng 1 bay, hàng 2 nổ), 
 `_3` (xoay: hàng 1 vòng lửa lặp, hàng 2 bùng/tắt), `_4` 4x3 (0-1 bóng báo, 2-3 dậm nứt, 4-7 cột lửa, 8-11 tàn), `_aura`.
 Sheet hướng: hàng 3 = ngắm ném/ném/thu tay/rúc mai, hàng 4 = mai xoay/dậm/trúng đòn/choáng.
 
+## Đặc tính chiêu, combo và cân bằng (25/10/2026, đang thử ở mọi `?<pet>`)
+Code: `preview/dau-truong/index.html` (TRAITS, traitsFor, traitHit, KIT_POWER, KIT_DEF, drawAimGuide).
+- **Đặc tính**: J, K, L của mỗi con mang 1 đặc tính, bốc ngẫu nhiên MỘT LẦN theo tên con (cố định), theo ngân sách 8 điểm:
+  J chỉ lấy loại nhẹ (Ướt 2, Chậm 2, Đánh dấu 2), K + L lấy phần còn lại (Bỏng 3, Trói 3, Vỡ giáp 3, Choáng 4, Hất tung 4), 3 chiêu khác nhau.
+  Trúng là gắn lên đối thủ: Ướt (3 s, chậm nhẹ) · Chậm 1.5 s · Đánh dấu 4 s · Vỡ giáp 3 s (nhận thêm 15%) · Bỏng (đốt) · Trói 0.8 s · Choáng 0.45 s · Hất tung. Ult không gắn.
+- **Combo** (tối đa 1 lần / 0.9 s / mục tiêu): Ướt + đòn Kim = Giật điện (+6, choáng 0.4 s) · Ướt + Hỏa = Hơi nước (+5) ·
+  Bỏng + Mộc = Bùng cháy (+8) · Bỏng + Thủy = Dập lửa (+4, thành Ướt) · Chậm + Thổ = Lún đất (trói 0.6 s) ·
+  đòn nặng vào kẻ đang Choáng/Trói = Đập mạnh ×1.4 · đánh kẻ đang Hất tung = Trên không (+4) · Đánh dấu: đòn sau ×1.3.
+- **Ult khó né** (25/10/2026): lướt vào ult chỉ giảm nửa sát thương ("Né nửa!"), không né trọn được nữa. Kim Tê: vòng rune bám theo đối thủ tới 0.4 s trước sừng; Kim Ưng: khóa xong 0.3 s là bổ xuống; Kim Thạch Nhân: sóng gai lái theo đối thủ; Liêm Đao: vạch đỏ bám hàng đối thủ tới lúc quét; ult rơi theo điểm ngắm (Hỏa Hổ, Mộc Hùng, Hỏa Quy) trôi theo đối thủ trong lúc cut-in. Tỉ lệ ult trúng (bot) giờ thấp nhất ~43% (trước có con 9%).
+- **Ngắm K/L** (như K của Hỏa Hổ): chiêu bắn / lướt của các con mới giữ nút thì mũi tên quét qua lại trong phễu, thả ra là bắn theo góc đó
+  (trừ Kim Tê K và Liêm Đao L vì không cần hướng). Các chiêu khác không có phễu.
+- **Cân bằng**: bot đấu vòng tròn (`preview/dau-truong/_sim.js`, mỗi cặp 6 trận đổi bên, bot Vừa, có đặc tính): trước 9-96% thắng,
+  sau khi chỉnh hệ số mọi con 43-58% (chỉnh lại sau khi K/L ngắm, sân vòng đá và ult khó né, 10 trận mỗi cặp). POWER = nhân sát thương gây ra, DEF = nhân sát thương nhận vào.
+
+| Pet | J | K | L | POWER | DEF |
+|---|---|---|---|---|---|
+| Thủy Long | Đánh dấu | Hất tung | Ướt | 1.56 | 1 |
+| Mộc Hùng | Ướt | Vỡ giáp | Trói | 1.25 | 0.97 |
+| Thổ Ngưu | Ướt | Choáng | Chậm | 0.75 | 0.97 |
+| Tinh Kim Hiệp | Đánh dấu | Vỡ giáp | Trói | 0.9 | 0.99 |
+| Hỏa Hổ | Chậm | Hất tung | Đánh dấu | 0.96 | 1.04 |
+| Hỏa Quy | Ướt | Bỏng | Trói | 0.76 | 0.99 |
+| Hỏa Hồ | Chậm | Bỏng | Vỡ giáp | 1.03 | 0.95 |
+| Viêm Long | Chậm | Trói | Vỡ giáp | 1.52 | 1 |
+| Dung Nham Vệ | Ướt | Trói | Vỡ giáp | 0.58 | 1.52 |
+| Hỏa Linh | Chậm | Vỡ giáp | Bỏng | 0.62 | 1.04 |
+| Mộc Đường | Đánh dấu | Ướt | Hất tung | 1.28 | 0.99 |
+| Rêu Linh | Ướt | Vỡ giáp | Trói | 1.46 | 1 |
+| Mộc Trư | Ướt | Trói | Vỡ giáp | 1.12 | 0.96 |
+| Mộc Lộc | Ướt | Choáng | Chậm | 2.09 | 1.01 |
+| Thụ Nhân | Đánh dấu | Trói | Vỡ giáp | 1.39 | 1 |
+| Diệp Linh | Đánh dấu | Bỏng | Vỡ giáp | 0.92 | 1 |
+| Thủy Sa | Đánh dấu | Choáng | Chậm | 1.58 | 1 |
+| Thủy Giải | Chậm | Trói | Bỏng | 1.05 | 0.96 |
+| Thủy Chiến | Đánh dấu | Choáng | Chậm | 1.02 | 1.04 |
+| Bão Thủy | Chậm | Trói | Bỏng | 0.65 | 0.98 |
+| Thủy Giao | Chậm | Choáng | Đánh dấu | 0.62 | 0.99 |
+| Thổ Tượng | Chậm | Bỏng | Vỡ giáp | 1.29 | 1.01 |
+| Thổ Tích | Đánh dấu | Choáng | Chậm | 2.12 | 0.82 |
+| Thạch Nhân | Đánh dấu | Vỡ giáp | Bỏng | 1.16 | 0.99 |
+| Thành Trì | Đánh dấu | Chậm | Choáng | 1.46 | 1 |
+| Thổ Long | Đánh dấu | Hất tung | Ướt | 1.21 | 0.95 |
+| Kim Tê | Chậm | Hất tung | Đánh dấu | 1.39 | 1.02 |
+| Kim Giáp | Đánh dấu | Trói | Vỡ giáp | 1.64 | 0.99 |
+| Kim Ưng | Chậm | Trói | Vỡ giáp | 1.01 | 0.96 |
+| Kim Thạch Nhân | Chậm | Hất tung | Đánh dấu | 1.75 | 0.76 |
+| Liêm Đao | Đánh dấu | Trói | Bỏng | 1 | 0.98 |
+
+## Thủy Sa Nhi — Lv2, hệ Thủy, SÁT THỦ (25/10/2026, ĐÃ DUYỆT, thử ở `?sa`)
+Sheet: `arena/TH-T1_thuy-sa_child_{xoay,s,se,e,ne,n,chung}.png`, `arena/TH-T1_thuy-sa_cutin.png`, `chieu/TH-T1_thuy-sa_{1,2,3,4,aura}.png`. Không chiêu nào phải ngắm.
+- Nội tại Mùi Máu: đối thủ dưới 40% máu thì chạy nhanh hơn, cắn ×1.3, vây đỏ trên đầu đối thủ.
+- J Cắn: cận chiến 7. Hồi 0.45 s.
+- K Lặn: chìm 1.2 s (chỉ còn vây, không bị đánh trúng, bơi nhanh); trồi lên đớp 8, đứng gần bị hất tung. Hồi 7 s.
+- L Xoáy Nước: xoáy quanh chỗ đứng 2.5 s, hút đối thủ vào, 2 mỗi nhịp. Hồi 8 s.
+- I Hàm Cá Mập: vây khổng lồ lượn quanh đối thủ, bóng đen dưới chân rồi cá mập phóng lên đớp 22 + choáng; chạy khỏi bóng là né.
+
+## Thủy Giải Nhi — Lv2, hệ Thủy, ĐỠ ĐÒN (25/10/2026, ĐÃ DUYỆT, thử ở `?giai`)
+Sheet: `arena/TH-T2_thuy-giai_child_{xoay,s,se,e,ne,n,chung}.png`, `arena/TH-T2_thuy-giai_cutin.png`, `chieu/TH-T2_thuy-giai_{1,2,3,4,aura}.png`. Không chiêu nào phải ngắm.
+- J Kẹp Càng: cận chiến 8. Hồi 0.5 s.
+- K Gai Vỏ: 3 gai xòe quạt, mỗi gai 4. Hồi 3.5 s.
+- L Thủ Mai: 1.5 s rụt vào mai, đòn phía trước bị chặn, kẻ đánh bị tia nước 6 + choáng. Hồi 8 s.
+- I Càng Thần: càng khổng lồ đuổi theo, kẹp nhấc bổng, đập 3 lần (8, 8, 10 + choáng); lướt né lúc sắp kẹp.
+
+## Thủy Chiến Nhi — Lv2, hệ Thủy, ĐẤU SĨ COMBO (25/10/2026, ĐÃ DUYỆT, thử ở `?chien`)
+Sheet: `arena/TH-N1_thuy-chien_child_{xoay,s,se,e,ne,n,chung}.png`, `arena/TH-N1_thuy-chien_cutin.png`, `chieu/TH-N1_thuy-chien_{1,2,3,4,aura}.png`. Không chiêu nào phải ngắm.
+- J Chém Nước: 3 nhát liên tiếp (5, 5, 7), nhát 3 phóng sóng kiếm 4. Hồi 0.28 s.
+- K Cưỡi Sóng: lướt trên sóng, lái được, trúng 6 cuốn đối thủ theo rồi hất văng. Hồi 6 s.
+- L Thủy Thuẫn: khiên đỡ trọn 2 đòn rồi nổ 5 đẩy văng đối thủ gần. Hồi 10 s.
+- I Thủy Kiếm Trận: 6 kiếm cắm vòng quanh đối thủ (trói, 10), cột nước giữa vòng 16 + choáng.
+
+## Bão Thủy Nhi — Lv2, hệ Thủy, KHỐNG CHẾ (25/10/2026, ĐÃ DUYỆT, thử ở `?bao`)
+Sheet: `arena/TH-N2_bao-thuy_child_{xoay,s,se,e,ne,n,chung}.png`, `arena/TH-N2_bao-thuy_cutin.png`, `chieu/TH-N2_bao-thuy_{1,2,3,4,aura}.png`. Không chiêu nào phải ngắm.
+- J Bong Bóng: bóng trôi chậm bám theo, nổ 6. Hồi 0.5 s.
+- K Nhốt Bóng: bóng lớn, trúng thì nhốt lơ lửng 1.2 s + 4. Hồi 8 s.
+- L Phồng Lăn: lăn 0.9 s, lái được, dội tường, đâm 7 + bật văng. Hồi 6 s.
+- I Hồng Thủy: mưa bong bóng quanh đối thủ (2 mỗi quả), rồi bóng khổng lồ bao lấy và nổ 14 + choáng; lướt né được.
+
+## Thủy Giao Nhi — Lv2, hệ Thủy, PHÁP SƯ TẦM XA (25/10/2026, ĐÃ DUYỆT, thử ở `?giao`)
+Sheet: `arena/TH-N3_thuy-giao_child_{xoay,s,se,e,ne,n,chung}.png`, `arena/TH-N3_thuy-giao_cutin.png`, `chieu/TH-N3_thuy-giao_{1,2,3,4,aura}.png`. Không chiêu nào phải ngắm.
+- J Thủy Tiễn: tia nước thẳng nhanh 6. Hồi 0.55 s.
+- K Vòng Xoáy: xoáy phía trước 3 s, chậm + hút + 2 mỗi nhịp. Hồi 7 s.
+- L Hóa Sương: tan thành sương vụt đi, không bị trúng; chỗ cũ để màn sương chặn đạn 2.5 s. Hồi 7 s.
+- I Giao Long Xuất Hải: rồng nước bay vòng sân (đụng 4), rồi lao xuống chỗ đối thủ thành cột nước 18 + hất tung.
+
+## Thổ Tượng Nhi — Lv2, hệ Thổ, ĐẤU SĨ (25/10/2026, ĐÃ DUYỆT, thử ở `?tuong`)
+Sheet: `arena/TO-T2_tho-tuong_child_{xoay,s,se,e,ne,n,chung}.png`, `arena/TO-T2_tho-tuong_cutin.png`, `chieu/TO-T2_tho-tuong_{1,2,3,4,aura}.png`. Không chiêu nào phải ngắm.
+- Nội tại Da Dày: không bị đẩy lùi bởi đòn thường.
+- J Vung Chùy: cận chiến 9. Hồi 0.65 s.
+- K Phun Bùn: vòi bùn phía trước 3 + chậm 2 s, để vũng bùn làm chậm 3 s. Hồi 6 s.
+- L Dậm Đất: vòng 95 px, 6 + choáng 0.8 s. Hồi 9 s.
+- I Voi Chiến Ma Mút: voi khổng lồ từ mép sân lao ngang theo hàng đối thủ, húc 22 + hất tung; lướt né được.
+
+## Thổ Tích Nhi — Lv2, hệ Thổ, LÉM LỈNH (25/10/2026, ĐÃ DUYỆT, thử ở `?tich`)
+Sheet: `arena/TO-T3_tho-tich_child_{xoay,s,se,e,ne,n,chung}.png`, `arena/TO-T3_tho-tich_cutin.png`, `chieu/TO-T3_tho-tich_{1,2,3,4,aura}.png`. Không chiêu nào phải ngắm.
+- J Quất Đuôi: cận chiến nhanh 6. Hồi 0.4 s.
+- K Đá Nảy: hòn đá dội tường 3 lần, trúng đối thủ thì bật ngược, mỗi lần 4. Hồi 3.5 s.
+- L Lột Xác: bỏ xác làm mồi nhử, tàng hình vụt đi 1.5 s (bot mất dấu). Hồi 9 s.
+- I Mưa Thiên Thạch: 6 thiên thạch nhỏ có vòng báo rơi đúng chỗ đối thủ (3 mỗi viên), rồi thiên thạch khổng lồ 14 + choáng.
+
+## Thạch Nhân Nhi — Lv2, hệ Thổ, ĐỠ ĐÒN (25/10/2026, ĐÃ DUYỆT, thử ở `?thach`)
+Sheet: `arena/TO-N1_thach-nhan_child_{xoay,s,se,e,ne,n,chung}.png`, `arena/TO-N1_thach-nhan_cutin.png`, `chieu/TO-N1_thach-nhan_{1,2,3,4,aura}.png`. Không chiêu nào phải ngắm.
+- J Đấm Đá: cận chiến 8. Hồi 0.55 s.
+- K Lăn Tảng: tảng đá lăn trên đất 9 + văng xa. Hồi 5 s.
+- L Giáp Đá: 5 s, 3 viên đá quay quanh; mỗi đòn trúng chỉ còn 30% và 1 viên bay ngược vào kẻ đánh (3). Hồi 10 s.
+- I Núi Lở: dậm 3 lần, mỗi lần một vòng trụ đá lan ra (7, 7, 10 + choáng); lướt qua vòng là né.
+
+## Thành Trì Nhi — Lv2, hệ Thổ, PHÁO ĐÀI (25/10/2026, ĐÃ DUYỆT, thử ở `?thanh`)
+Sheet: `arena/TO-N2_thanh-tri_child_{xoay,s,se,e,ne,n,chung}.png`, `arena/TO-N2_thanh-tri_cutin.png`, `chieu/TO-N2_thanh-tri_{1,2,3,4,aura}.png`. Không chiêu nào phải ngắm.
+- J Khiên Đập: cận chiến 7 + đẩy văng. Hồi 0.55 s.
+- K Dựng Tường: tường đá phía trước 4 s, chặn đạn và đường đi. Hồi 8 s.
+- L Tháp Pháo: tháp dưới chân 5 s, tự bắn đá 3 mỗi 0.9 s vào đối thủ trong 300 px. Hồi 10 s.
+- I Thành Lũy: tường vây quanh đối thủ nhốt lại, máy bắn đá nã 3 viên vào trong (7, 7, 10 + choáng).
+
+## Thổ Long Nhi — Lv2, hệ Thổ, PHÁP SƯ ĐẤT (25/10/2026, ĐÃ DUYỆT, thử ở `?tholong`)
+Sheet: `arena/TO-N3_tho-long_child_{xoay,s,se,e,ne,n,chung}.png`, `arena/TO-N3_tho-long_cutin.png`, `chieu/TO-N3_tho-long_{1,2,3,4,aura}.png`. Không chiêu nào phải ngắm.
+- J Phun Cát: luồng cát ngắn phía trước 6. Hồi 0.55 s.
+- K Gai Đất: hàng gai đá chạy thẳng theo hướng nhìn 7. Hồi 4.5 s.
+- L Địa Chấn: khe nứt phía trước 2.5 s, trúng 4, đứng trên bị chậm. Hồi 7 s.
+- I Long Quyển Sa: rồng bay lên (không bị trúng), đá rơi có vòng báo quanh đối thủ (3 mỗi viên), rồi lao xuống chỗ đối thủ 16 + choáng.
+
+## Kim Tê Nhi — Lv2, hệ Kim, ĐẤU SĨ (25/10/2026, ĐÃ DUYỆT, thử ở `?kimte`)
+Sheet: `arena/KI-T1_kim-te_child_{xoay,s,se,e,ne,n,chung}.png`, `arena/KI-T1_kim-te_cutin.png`, `chieu/KI-T1_kim-te_{1,2,3,4,aura}.png`. Không chiêu nào phải ngắm.
+- J Húc Sừng: cận chiến 8. Hồi 0.55 s.
+- K Xòe Kim: bờm bắn 8 kim thép tỏa mọi phía, mỗi kim 3. Hồi 5 s.
+- L Nhảy Húc: nhảy ~170 px về trước, đáp sừng xuống vòng 70 px gây 8. Hồi 7 s.
+- I Vạn Châm Giáng: vòng phù chú dưới chân đối thủ, mưa kim 4 nhịp (3 mỗi nhịp), rồi sừng thép khổng lồ trồi lên 16 + hất tung; chạy khỏi vòng là né.
+
+## Kim Giáp Nhi — Lv2, hệ Kim, ĐỠ ĐÒN (25/10/2026, ĐÃ DUYỆT, thử ở `?kimgiap`)
+Sheet: `arena/KI-T2_kim-giap_child_{xoay,s,se,e,ne,n,chung}.png`, `arena/KI-T2_kim-giap_cutin.png`, `chieu/KI-T2_kim-giap_{1,2,3,4,aura}.png`. Không chiêu nào phải ngắm.
+- J Cào Thép: cận chiến 7. Hồi 0.55 s.
+- K Bắn Vảy: 3 vảy thép tỏa quạt, mỗi vảy 4. Hồi 4 s.
+- L Cuộn Giáp: 1.5 s cuộn tròn đứng yên, đòn đánh chỉ còn 20%, đạn trúng bị dội ngược (đổi chủ). Hồi 8 s.
+- I Cầu Thép Phá Thành: hóa cầu thép khổng lồ lăn đuổi đối thủ 2 s (không bị trúng), trúng 18 + hất tung; lướt né được.
+
+## Kim Ưng Nhi — Lv2, hệ Kim, XẠ THỦ BAY (25/10/2026, ĐÃ DUYỆT, thử ở `?kimung`)
+Sheet: `arena/KI-T3_kim-ung_child_{xoay,s,se,e,ne,n,chung}.png`, `arena/KI-T3_kim-ung_cutin.png`, `chieu/KI-T3_kim-ung_{1,2,3,4,aura}.png`. Không chiêu nào phải ngắm.
+- J Lông Thép: phóng lông vũ thép 5. Hồi 0.45 s.
+- K Cuồng Phong: luồng gió hình nón 170 px, 3 + đẩy văng xa. Hồi 5 s.
+- L Bổ Nhào: lao bổ tới trước tối đa 150 px, vòng 66 px gây 8. Hồi 6.5 s.
+- I Thiết Ưng Vồ Mồi: bóng đại bàng bám theo đối thủ 1.5 s, vòng ngắm khóa lại, đại bàng thép bổ xuống 18 + hất tung; chạy khỏi vòng là né.
+
+## Kim Thạch Nhân Nhi — Lv2, hệ Kim, PHÁP SƯ PHA LÊ (25/10/2026, ĐÃ DUYỆT, thử ở `?kimthach`)
+Sheet: `arena/KI-N2_kim-thach-nhan_child_{xoay,s,se,e,ne,n,chung}.png`, `arena/KI-N2_kim-thach-nhan_cutin.png`, `chieu/KI-N2_kim-thach-nhan_{1,2,3,4,aura}.png`. Không chiêu nào phải ngắm.
+- J Đấm Pha Lê: cận chiến 9. Hồi 0.55 s.
+- K Gai Pha Lê: ký hiệu báo dưới chân đối thủ, 0.5 s sau gai trồi lên 9 + chậm 1.5 s. Hồi 4.5 s.
+- L Trụ Pha Lê: dựng trụ phía trước, 2 s sau nổ 6 mảnh bay tứ phía (3 mỗi mảnh). Hồi 8 s.
+- I Ngục Pha Lê: sóng gai chạy về phía đối thủ, trúng thì nhốt trong ngục 1.8 s rồi vỡ 14.
+
+## Liêm Đao Nhi — Lv2, hệ Kim, SÁT THỦ (25/10/2026, ĐÃ DUYỆT, thử ở `?liemdao`)
+Sheet: `arena/KI-N3_liem-dao_child_{xoay,s,se,e,ne,n,chung}.png`, `arena/KI-N3_liem-dao_cutin.png`, `chieu/KI-N3_liem-dao_{1,2,3,4,aura}.png`. Không chiêu nào phải ngắm.
+- J Chém Liềm: cận chiến nhanh 7. Hồi 0.38 s.
+- K Liềm Bay: ném liềm đuôi như boomerang, bay 0.5 s rồi quay về, trúng được 2 lần (5 mỗi lần). Hồi 4 s.
+- L Ảnh Bộ: biến mất, hiện ra sau lưng đối thủ và chém chữ X 10. Hồi 7 s.
+- I Tàn Nguyệt Trảm: vạch báo trên hàng đối thủ, lưỡi trăng khuyết quét ngang qua (11) rồi quét về (11); né khỏi hàng là thoát.
+
 ## Mộc Lộc Nhi — bậc 1, hệ Mộc, HỒI MÁU (25/10/2026, đang thử ở `?loc`)
 Sheet: `arena/MO-T2_moc-loc_child_{xoay,s,se,e,ne,n,chung}.png`, `arena/MO-T2_moc-loc_cutin.png`, `chieu/MO-T2_moc-loc_{1,2,3,4,aura}.png`
 (1: hàng 1 vệt húc gạc, hàng 2 hạt bay ×2 + hoa nở + hoa khép; 2: hàng 1 thảm hoa hồi máu, hàng 2 cánh hoa tan / tụ lại;
