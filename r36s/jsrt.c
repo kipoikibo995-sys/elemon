@@ -13,6 +13,7 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <time.h>
+#include <unistd.h>
 
 #define MAX_SURF 32768                       /* slots only; a match's pictures are freed after it (free) */
 #define MAX_FONTS 64
@@ -897,7 +898,7 @@ static JSValue b_read_text(JSContext *ctx, JSValueConst t, int argc, JSValueCons
         long n;
         char *b;
         fseek(f, 0, SEEK_END); n = ftell(f); fseek(f, 0, SEEK_SET);
-        b = (char *)malloc((size_t)n + 1);
+        b = n >= 0 ? (char *)malloc((size_t)n + 1) : 0;
         if (b && fread(b, 1, (size_t)n, f) == (size_t)n) r = JS_NewStringLen(ctx, b, (size_t)n);
         free(b);
         fclose(f);
@@ -919,6 +920,8 @@ static JSValue b_write_text(JSContext *ctx, JSValueConst t, int argc, JSValueCon
         f = fopen(tmp, "wb");
         if (f) {
             ok = fwrite(text, 1, len, f) == len;
+            /* on the card before the rename: power cut right after a save (FAT, no journal) must not leave it empty */
+            ok = ok && fflush(f) == 0 && fsync(fileno(f)) == 0;
             ok = fclose(f) == 0 && ok;
             ok = ok && rename(tmp, full) == 0;
         }

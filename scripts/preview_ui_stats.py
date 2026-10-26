@@ -28,6 +28,13 @@ BOUNCE = {'loop': True, 'keys': [{'f': 'idle-0', 'ms': 300, 'br': -1}, {'f': 'id
                                  {'f': 'idle-0', 'ms': 350, 'y': 0}, {'f': 'idle-0', 'ms': 300}]}
 FONT = 'C:/Windows/Fonts/tahomabd.ttf'
 FONT_REGULAR = 'C:/Windows/Fonts/tahoma.ttf'
+# no Tahoma (Linux, macOS): DejaVu Sans from assets/font, the game's own font on the R36S. It is about 11 % wider,
+# so it is drawn that much smaller to keep the layout
+FONT_SHRINK = 1.0
+if not os.path.exists(FONT):
+    FONT = os.path.join(creatures.ROOT, 'assets', 'font', 'DejaVuSans-Bold.ttf')
+    FONT_REGULAR = os.path.join(creatures.ROOT, 'assets', 'font', 'DejaVuSans.ttf')
+    FONT_SHRINK = 0.89
 # below 9 px Vietnamese marks run into the letters, so nothing on the small screen is smaller
 
 # ---- the pet shown (later: read from the save file) ----
@@ -158,7 +165,7 @@ def food_icon(name, size):
 
 def font(style, s):
     size, bold = SIZES[style]
-    return ImageFont.truetype(FONT if bold else FONT_REGULAR, max(9, round(size * s)))
+    return ImageFont.truetype(FONT if bold else FONT_REGULAR, max(9, round(size * s * FONT_SHRINK)))
 
 
 def glyph_set(sizes, s):

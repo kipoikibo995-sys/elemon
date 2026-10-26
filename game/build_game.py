@@ -58,7 +58,7 @@ window.SOUND = (() => {
   r.insertAdjacentHTML('afterend', ' <button class="restart" id="xoaLuu">Xóa bản lưu</button>');
   document.getElementById('xoaLuu').onclick = () => {
     if (!confirm('Xóa bản lưu của game?')) return;
-    window.__noSave = true; localStorage.removeItem('holua-save-1'); location.reload();
+    window.__noSave = true; for (const k of ['holua-save-1', 'holua-save-1-bak']) localStorage.removeItem(k); location.reload();
   };
 })();
 </script>
@@ -97,7 +97,10 @@ def clean():
         shutil.rmtree(p) if os.path.isdir(p) else os.remove(p)
     for link, target in ((PETS, os.path.join(ROOT, 'assets', 'creatures-640')), (SOLO, ARENA)):
         if not os.path.exists(link) and os.path.exists(target):     # a junction needs no admin rights on Windows
-            subprocess.run(['cmd', '/c', 'mklink', '/J', link, target], check=True, capture_output=True)
+            if os.name == 'nt':
+                subprocess.run(['cmd', '/c', 'mklink', '/J', link, target], check=True, capture_output=True)
+            else:
+                os.symlink(target, link, target_is_directory=True)
 
 
 def build_page():

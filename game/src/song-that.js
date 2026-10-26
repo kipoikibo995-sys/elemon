@@ -43,9 +43,20 @@
   globalThis.requestAnimationFrame = cb => raf0(() => cb(performance.now()));
 
   // ---------- the save ----------
+  // KEY + '-bak': the save as it was when this run opened it (a save cut off on the card falls back on it);
+  // KEY + '-hong': a save that could not be read, set aside before a new game writes over it
   let SAVE = null, loading = false, pending = null, newAsk = 0, savedAt = -1e9, saveKey = '', poolDry = false;
-  try { const t = localStorage.getItem(KEY); if (t) { SAVE = JSON.parse(t); if (!SAVE || !SAVE.S || !SAVE.pet) SAVE = null; } }
-  catch (e) { SAVE = null; }
+  const readSave = k => {
+    try { const t = localStorage.getItem(k), sv = t ? JSON.parse(t) : null; return sv && sv.S && sv.pet ? sv : null; }
+    catch (e) { return null; }
+  };
+  SAVE = readSave(KEY);
+  try {
+    const t = localStorage.getItem(KEY);
+    if (!SAVE && t) { localStorage.setItem(KEY + '-hong', t); console.log('song-that.js: the save is broken, kept as ' + KEY + '-hong'); }
+    if (!SAVE && (SAVE = readSave(KEY + '-bak'))) console.log('song-that.js: the save is broken, opening the backup');
+    else if (SAVE) localStorage.setItem(KEY + '-bak', t);
+  } catch (e) {}
   if (SAVE) S.titleSel = 1;
   const inGame = () => !OUT.includes(S.mode) && !loading && !!S.need;
   function save() {

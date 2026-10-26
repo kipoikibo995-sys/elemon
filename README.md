@@ -52,6 +52,22 @@ python scripts/build_assets.py moc-loc egg     # một con, một cấp
 
 Các bước: cắt khung, căn chân, khung chớp trắng (và `src/anim_data.h` cho Hỏa Hổ), ảnh động, trang xem và bảng kiểm kê.
 
+## Game Elemon cho R36S (Linux / WSL / macOS)
+
+Cần Python 3 với `pillow numpy ziglang` (thêm `scipy` thì bước cắt khung nhanh hơn rất nhiều) và `curl`. Trên Windows dùng `scripts/build-r36s.ps1` như cũ.
+
+```bash
+pip install pillow numpy scipy ziglang
+HOLUA_SCREEN=640 python3 scripts/build_assets.py   # cắt pet cỡ 640 (~8 phút)
+python3 game/build_game.py                          # trang game -> build/game/
+python3 scripts/r36s_game.py                        # gói dữ liệu -> dist/elemon/
+scripts/build-r36s.sh game                          # file chạy ARM64 -> dist/elemon/elemon/elemon
+```
+
+Chép `dist/elemon/Elemon.sh` và thư mục `dist/elemon/elemon/` vào `ports/` của thẻ nhớ (phân vùng EASYROMS), rồi mở **Ports → Elemon**. Bản lưu nằm ở `ports/elemon-save/`, cài bản mới không mất. Giữ SELECT+START để thoát (game lưu trước khi thoát).
+
+Không có Tahoma (máy không phải Windows): màn chỉ số dùng DejaVu Sans trong `assets/font/`.
+
 ## Biên dịch (WSL, SDK MiyooCFW ở /opt/miyoo)
 
 ```bash

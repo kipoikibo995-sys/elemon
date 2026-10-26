@@ -636,8 +636,11 @@ def save_creatures():
     """pets/<id>.json per creature (its stages' frame lists, anchors and moves) and the list for the egg / pet pick."""
     import subprocess
     if not os.path.exists(PETS_LINK):            # a junction needs no admin rights on Windows
-        subprocess.run(['cmd', '/c', 'mklink', '/J', PETS_LINK, os.path.join(creatures.ROOT, 'assets', 'creatures-640')],
-                       check=True, capture_output=True)
+        target = os.path.join(creatures.ROOT, 'assets', 'creatures-640')
+        if os.name == 'nt':
+            subprocess.run(['cmd', '/c', 'mklink', '/J', PETS_LINK, target], check=True, capture_output=True)
+        else:
+            os.symlink(target, PETS_LINK, target_is_directory=True)
     os.makedirs(os.path.join(OUT, 'pets'), exist_ok=True)
     out = []
     for cid, c in creatures.CREATURES.items():

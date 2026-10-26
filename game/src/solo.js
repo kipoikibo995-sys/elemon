@@ -307,9 +307,11 @@
     const v = S.vd;
     if (v.view === 'solo-pick') return pickPress(btn);
     if (btn === 'SELECT') {
-      S.need.nl = Math.max(0, S.need.nl - 8); S.need.no = Math.max(0, S.need.no - 4);
-      const xp0 = S.xp; gainExp(20);
-      toast(`Rời sân đấu · EXP +${Math.round(Math.max(0, S.xp - xp0))}`);
+      if (arena && arena.started) {                               // left before the fight began: nothing gained, nothing spent
+        S.need.nl = Math.max(0, S.need.nl - 8); S.need.no = Math.max(0, S.need.no - 4);
+        const xp0 = S.xp; gainExp(20);
+        toast(`Rời sân đấu · EXP +${Math.round(Math.max(0, S.xp - xp0))}`);
+      }
       stop(); fadeTo(() => { S.vd = { view: 'menu', sel: 1 }; });
     }
     // everything else reaches the arena through the held buttons (feedKeys)

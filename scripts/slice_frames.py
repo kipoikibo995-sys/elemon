@@ -110,7 +110,21 @@ def split_by_columns(fg, layout, ch):
 
 
 def label(fg):
-    """Connected pixels (8 neighbours) share a label; 0 is background."""
+    """Connected pixels (8 neighbours) share a label; 0 is background. A part's label is 1 + the flat index of its
+    first pixel (row by row). With scipy installed the same labels come out of ndimage, many times faster."""
+    try:
+        from scipy import ndimage
+    except ImportError:
+        return label_numpy(fg)
+    lab, n = ndimage.label(fg, structure=np.ones((3, 3), bool))
+    first = np.full(n + 1, lab.size, np.int64)
+    flat = lab.ravel()
+    np.minimum.at(first, flat, np.arange(1, lab.size + 1))
+    first[0] = 0
+    return first[lab]
+
+
+def label_numpy(fg):
     h, w = fg.shape
     big = h * w + 1
     lab = np.where(fg, np.arange(1, h * w + 1).reshape(h, w), big)
