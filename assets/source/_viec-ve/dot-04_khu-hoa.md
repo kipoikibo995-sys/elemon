@@ -27,7 +27,7 @@ là chỗ đường đất chạm mép ảnh, pet đi qua đó để sang khu kh
 ---
 
 ## Việc 1 — Khu 1 · Chân núi lửa
-- [ ]
+- [x] (1536x1024)
 - **Đích:** `assets/source/nen/vung/MAP_hoa_1.png`
 - **Lời nhắc:**
 ```
