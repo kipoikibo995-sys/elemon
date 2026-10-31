@@ -1,0 +1,14 @@
+{
+ "1": "Row 1 (frames 1-4, plays once): 1 = a bright eight-pointed white star flash centred with six crystal shards around it, 2 = bigger burst with large crystal shards flying outward, 3 = shards streaking diagonally down-right with speed lines, 4 = scattered small shards and four-point sparkle stars fading. Row 2 (frames 5-8, plays once, on the ground): 5 = flat oval ring of crystal diamond ornaments on the ground, 6 = ring with tall spikes rising from it, 7 = big crystal cluster erupting from the ground with rubble, 8 = cluster breaking up with shards flying.",
+ "2": "Row 1 (frames 1-4, plays once, on the ground, centred): a cluster of blue crystals growing out of the ground with rocks and sparkles: 1 = small cluster, 2 = tall central crystal with side crystals, 3 = same cluster slightly cracked, 4 = cluster shatters into a burst with big flying shards. Row 2 (frames 5-8, plays once): 5 = a single diamond-shaped crystal projectile flying right with streaking spikes trailing left, 6 = crystal hits and bursts into a white starburst with shards, 7 = four-point sparkle stars and a few crystal diamonds swirling, 8 = a few shards and sparkles fading.",
+ "3": "Row 1 (frames 1-4, seamless loop): an upright hollow wreath of tall pointed crystals around an empty middle, rocks at its base and golden sparks; sparkles and electric wisps change each frame. Row 2 (frames 5-8, plays once): 5 = same crystal wreath with lightning wisps, 6 = wreath explodes into large flying shards around a white burst, 7 = big shards spreading outward with empty centre, 8 = scattered shards, rocks and sparkle stars fading.",
+ "4": "Ultimate, 4x3 grid, plays once, on the ground. Row 1: crystals erupting from the left in a diagonal wave over rubble, growing bigger each frame (1 = small shards, 4 = tall slanted crystals with sparks). Row 2: 5 = hollow ring of crystals with tall central crystal, 6 = ring taller with spires, 7 = crystals shatter around a white burst, 8 = floating shards and sparkle stars. Row 3: a flat oval of ice/crystal floor tiles with golden electricity: 9 = intact with small diamonds floating above, 10 = tall ice spikes rise from it, 11 = floor cracks with shards flying up, 12 = cracked floor with sparkles fading.",
+ "aura": "Row 1 (frames 1-4, seamless loop-ish): a flat oval crystal ring crown on the ground (diamond ornaments inside), with crystals and spikes rising from the rim, taller each frame (1 = short spikes, 4 = tall crystals around the rim with sparkle stars), drawn behind the creature. Row 2 (frames 5-8, spirit beast above head): 5 = whirlpool of crystal shards and sparks around a small star, 6 = shards assemble into a crystal beast head facing right with glowing eyes, 7 = head opens its mouth and fires a white-blue beam right, 8 = collapses into a white burst with radiating shards.",
+ "grid": {
+  "1": "4x2",
+  "2": "4x2",
+  "3": "4x2",
+  "4": "4x3",
+  "aura": "4x2"
+ }
+}

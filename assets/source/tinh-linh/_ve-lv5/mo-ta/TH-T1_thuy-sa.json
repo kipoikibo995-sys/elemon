@@ -1,0 +1,14 @@
+{
+ "1": "Row 1 (1-4, once): a pair of giant shark jaws with teeth, open at left and right, snapping at the centre (1-2), bursting into a splash (3), droplets and crystals scatter (4). Row 2 (5-8, seamless loop): a shark dorsal fin rising from foamy wave water with debris, centred, foam shifting each frame.",
+ "2": "Row 1 (1-4, once): a rocky water dome rises from the ground (1), becomes a tall geyser (2), crown splash (3), then a ring of waves (4). Row 2 (5-8, once): flat ellipse water ring with gold pattern grows (5-6), breaks into foam (7), droplets scatter (8).",
+ "3": "Row 1 (1-4, seamless loop): a horizontal circular whirl ring of water with gold patterns rotating, hollow centre; centred. Row 2 (5-8, once): 5-6 = a shark fin inside the whirl ring, 7 = splash, 8 = scattered droplets.",
+ "4": "Row 1 (1-4, seamless loop): a shark dorsal fin carving through foamy water, spray behind. Row 2 (5-8, once): 5 = round pool with shark silhouette, 6 = shark leaping with open jaws, 7 = shark head facing front with splash, 8 = shark diving, tail in a vertical splash column. Row 3 (9-12, once): flat whirlpool (9-10), wave curling over (11), foam puffs (12).",
+ "aura": "Row 1 (1-4, once/grows): an S-shaped water column rises from a ground ripple, growing taller. Row 2 (5-8, once): 5 = splash with ripple on the ground, 6 = shark leaping up with open jaws, 7 = shark facing right spraying water, 8 = foamy splash.",
+ "grid": {
+  "1": "4x2",
+  "2": "4x2",
+  "3": "4x2",
+  "4": "4x3",
+  "aura": "4x2"
+ }
+}

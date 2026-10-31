@@ -1,0 +1,14 @@
+{
+ "1": "Row 1 (frames 1-4, seamless loop): a feather-spear projectile flying right, arrow-shaped bundle of blue feathers with grey tip, loose feathers and speed streaks trailing; 3-4 are larger with wing-like sweep lines. Row 2 (frames 5-8, plays once): 5 = bright star burst of feathers and grey rocks; 6 = four-point sparkles with feathers around; 7 = feathers drifting; 8 = few feathers and tiny sparkles fading.",
+ "2": "Row 1 (frames 1-4): a swept volley of feathers and wind streaks flying right and curving downward, a big curved wing-gust; grows larger each frame, centred. Row 2 (frames 5-8): 5 = spiky feather burst on ground; 6 = ring of dust cloud with feathers and sparkles; 7 = feathers spiral; 8 = scattered feathers fading.",
+ "3": "Row 1 (frames 1-4, seamless loop): a big eagle with spread wings circling in an orbit of wind streaks and feathers, wings alternately spread (1, 3) and wings folded forward (2, 4). Row 2 (frames 5-8): 5-6 = oval ground ring with four-point flares top and bottom and feathers; 7 = four-point star burst with radial feathers; 8 = feathers and sparkles fading.",
+ "4": "Ultimate. Row 1 (frames 1-4, loop): a large golden-white eagle flying right, wings raised, feathers trailing. Row 2 (frames 5-8): 5 = eagle diving down head first with talons; 6 = impact with upward light spikes and feathers; 7 = shockwave oval ring with feathers; 8 = a few big feathers fading. Row 3 (frames 9-12): eagle with spread wings facing forward rising, wings flap (9-11), then feathers drift away (12).",
+ "aura": "Row 1 (frames 1-4, seamless loop): ring of white-blue feathers standing around the creature with a flat glowing ground ellipse; feathers swirl and densify each frame. Row 2 (frames 5-8): 5 = star burst inside feather ring; 6-7 = spirit eagle head with fierce yellow eyes and open beak turned right (7 beak open, light shriek); 8 = feathers and sparks fading.",
+ "grid": {
+  "1": "4x2",
+  "2": "4x2",
+  "3": "4x2",
+  "4": "4x3",
+  "aura": "4x2"
+ }
+}

@@ -1,0 +1,14 @@
+{
+ "1": "Row 1 (frames 1-4): 1 = three big curved silver claw slashes diagonal, centred; 2 = four-point star burst with radial spikes and thin ring; 3 = thin radial spike burst, empty centre; 4 = only faint streaks and sparkles. Row 2 (frames 5-8): 5 = scaled armadillo/pangolin ball rolling, speed lines behind; 6 = the ball unrolling into a curled tail in a swirling wind ring; 7 = explosion of large shard petals with rubble; 8 = cluster of four-point sparkles fading.",
+ "2": "Row 1 (frames 1-4): armoured scale ball centred, wrapped in wind ring; 1 = ball intact, 2 = scales peel open into a ring, 3-4 = scales become separate big shards orbiting in a circle with swirling wind. Row 2 (frames 5-8): 5-6 = X burst with big shards flying out from bright core; 7 = ring of shards around big four-point star flash; 8 = sparkles of varied sizes fading.",
+ "3": "Row 1 (frames 1-4, seamless loop): a scale-covered ball projectile flying right at the right of the cell with a trail of speed streaks and shards behind it, trail growing longer. Row 2 (frames 5-8, impact, plays once): 5 = star-shaped shard explosion on the ground; 6 = ring of dust clouds with wind swirl; 7 = bright flash with radial shards; 8 = dust puffs and rubble fading.",
+ "4": "Ultimate. Row 1 (frames 1-4): big scaled ball in a wind trail from the left, growing. Row 2 (frames 5-8): 5 = ball falling from above-right with a streak; 6 = ball slamming ground with spikes of light and rock; 7 = shockwave ring with upward spikes; 8 = dust cloud and rocks. Row 3 (frames 9-12, ground-level): cracked crater on ground with debris, glinting (9-10), spreading cracks (11), then sparkles and few rock bits fading (12).",
+ "aura": "Row 1 (frames 1-4, seamless loop): a ring/wreath of silver scale-leaves rising around the creature from a glowing oval ground disc, open in the middle. Row 2 (frames 5-8): 5 = swirling spiral vortex of scales; 6 = spirit pangolin curled in a crescent inside a wind ring; 7 = rolled scaled ball rushing right with speed streaks; 8 = radial star burst of shards fading.",
+ "grid": {
+  "1": "4x2",
+  "2": "4x2",
+  "3": "4x2",
+  "4": "4x3",
+  "aura": "4x2"
+ }
+}

@@ -1,0 +1,14 @@
+{
+ "1": "Row 1 (frames 1-4): burst of wooden splinters, leaves and petals radiating from a bright centre; 2 is largest with yellow flowers, 3 scattering, 4 = a few leaves fading. Row 2 (frames 5-8, seamless loop): a horizontal ground mound of tangled roots, thorns, rocks and a flower lying low in the cell, writhing slightly each frame.",
+ "2": "Row 1 (frames 1-4): 1 = ground cracks with rocks and leaves; 2 = thick roots rising; 3 = roots form a ring with flowers; 4 = ring opening. Row 2 (frames 5-8): low bed of rising roots and leaves (5), tall root spikes (6-7), settling back to rubble and leaves (8). All on the ground, centred.",
+ "3": "Row 1 (frames 1-4, seamless loop): an oval wreath of twisted roots and moss with a flower, rotating. Row 2 (frames 5-8): 5 = spiky root star burst; 6 = brown seed shards flying outward; 7 = bright green star flash with big shards; 8 = root ring with hanging roots at the bottom.",
+ "4": "Ultimate. Row 1 (frames 1-4): cracks spreading on ground with lightning (1-2), crater ring of rock (3), crater with dust (4). Row 2 (frames 5-8): a giant wooden fist smashing down from the top of the cell (5-6), ring of root spikes and dust (7), dust and rocks fading (8). Row 3 (frames 9-12): row of wooden spikes rising from ground with leaves (9), tallest (10), then shrinking (11-12).",
+ "aura": "Row 1 (frames 1-4, seamless loop): U-shaped wreath of leafy twigs and white flowers around the creature, base of leaves on the ground. Row 2 (frames 5-8): 5 = leaf swirl; 6-7 = spirit ent/wood-spirit head of bark and leaves with glowing green eye, facing right; 8 = leaves fading.",
+ "grid": {
+  "1": "4x2",
+  "2": "4x2",
+  "3": "4x2",
+  "4": "4x3",
+  "aura": "4x2"
+ }
+}

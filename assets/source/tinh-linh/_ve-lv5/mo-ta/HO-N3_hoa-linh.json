@@ -1,0 +1,14 @@
+{
+ "1": "Row 1 (frames 1-4, seamless loop, growing): a round fireball flying right with a white-hot rounded front on the right and wavy flame tongues streaming left, thin arcs and spark wisps around; ball gets slightly larger each frame. Row 2 (frames 5-8, plays once): 5 = spiky white starburst inside a faint ring, 6 = starburst of leaf-shaped flame petals, 7 = flame petals and rocks bursting outward over a cracked ground, 8 = brown smoke clouds with sparks and cracked ground.",
+ "2": "Row 1 (frames 1-4, seamless loop): a flame-spirit magic seal flying right: a round rune ring (double circle with small glyphs) with a flame icon inside and four pointed diamond blades at north, south, east, west, rotating a little each frame, long flame tail streaming left. Row 2 (frames 5-8, plays once): 5 = bright star burst over the rune ring, 6 = rune ring with flame icon, blades and sparks, centred, 7 = same with rocks on the ground and flame wisps, 8 = ring gone, flame petals and white burst with rubble.",
+ "3": "Row 1 (frames 1-4, seamless loop): a hollow circle of five comet-like teardrop fireballs with curved tails chasing each other around, thin flame wisps between them; they rotate each frame. Row 2 (frames 5-8, seamless loop): a single teardrop fireball flying right, round white-hot head on the right with wavy flame tongues streaming left, a few sparks behind; tail wiggles frame to frame.",
+ "4": "Ultimate, 4x3 grid, plays once, on the ground. Row 1 (frames 1-4): a flat oval of cracked molten ground with rocks around it, small in frame 1 and growing wider each frame, flame spikes and rocks bursting from its rim. Row 2 (frames 5-8): a flame column rising from the centre: 5 = small flame with rocks, 6 = tall column, 7 = tallest, widest white-hot pillar full of flame spikes, 8 = column with curling arcs beginning to fall. Row 3 (frames 9-12): 9 = flames collapsing with rocks falling, 10 = lower flames on the ground oval, 11 = smoke puffs rising, 12 = dark cooled cracked ground oval with rocks only.",
+ "aura": "Row 1 (frames 1-4, seamless loop): an arch of flame tongues rising around an empty middle, over a flat glowing magic circle on the ground with small glyphs and a pointed star at the front; drawn behind the creature, flames sway each frame. Row 2 (frames 5-8, spirit beast above head): 5 = spiral vortex of flame, 6 = vortex forms a fox-like flame spirit head facing right with red forehead marking and curling flame body, 7 = head opens mouth and breathes a flame puff right, 8 = dissolves into diagonal streaming flame leaves.",
+ "grid": {
+  "1": "4x2",
+  "2": "4x2",
+  "3": "4x2",
+  "4": "4x3",
+  "aura": "4x2"
+ }
+}

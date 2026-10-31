@@ -1,0 +1,14 @@
+{
+ "1": "Row 1 (frames 1-4, plays once): a leafy sprout grows from a small ground mound (1), becomes a round moss-haired mushroom-faced sprite with sleepy eyes peeking out of the mound (2), tosses a small leaf ball to the right (3), then settles back (4); centred on the ground. Row 2 (5-8, once): 5 = leafy bush ball flying right with trailing leaves, 6 = radial burst of leaves and flowers from the centre, 7 = swirling leafy clump sweeping right, 8 = green slime tendrils splashing upward from the ground.",
+ "2": "Row 1 (1-4, once): 1 = leaf spikes shoot up from the ground in a fan, 2 = low flat ring of leaves with a hollow oval centre, 3 = leafy clump bursting outward, 4 = few leaves falling and fading. Row 2 (5-8, once, flat ground patch): a swamp pond with lily pads, flowers and ripples grows from a small oval (5) to a large oval (6-7), then dries into cracked brown mud (8).",
+ "3": "Row 1 (1-4, seamless loop): a flat ellipse wreath lying on the ground made of leaves, small mushrooms and yellow flowers, with glowing sparkles orbiting; the ring slowly shifts each frame. Row 2 (5-8): 5-6 = a glowing mushroom glyph pulsing in the centre of the leaf ring, 7 = a real mushroom sprouts up from soil with leaves flying, 8 = back to the glowing glyph in the ring.",
+ "4": "Row 1 (1-4): a low crouching beast of leaves and thorny roots with mushrooms on its back rises (1) into a huge hunched moss monster with long claws and a snarling leaf-fanged maw (2-4). Row 2 (5-8): the monster rears and lunges with vines and claws, jaws opening wide. Row 3 (9-12, once): 9 = flat glowing swamp disc ringed by curled roots, 10 = radial burst of rays and roots, 11 = beast collapsing low, 12 = flat pool with ripples fading.",
+ "aura": "Row 1 (1-4, seamless loop): an upright oval hoop standing on the ground, made of leaves, mushrooms and glowing fireflies, pulsing slightly. Row 2 (5-8, once): 5 = leaf vortex spiral, 6-7 = a moss monster head with mushrooms on top and open fanged maw, snarling and rising, 8 = it breaks apart into scattered leaves and mushrooms.",
+ "grid": {
+  "1": "4x2",
+  "2": "4x2",
+  "3": "4x2",
+  "4": "4x3",
+  "aura": "4x2"
+ }
+}

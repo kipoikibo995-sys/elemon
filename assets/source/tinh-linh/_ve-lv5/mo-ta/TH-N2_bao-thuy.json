@@ -1,0 +1,14 @@
+{
+ "1": "Row 1 (1-4, seamless loop): a glass-like water bubble sphere with gold fish-shaped ornament and swirling water streaks, small bubbles around, wobbling slightly; centred. Row 2 (5-8, once): 5 = white starburst flash, 6 = teardrops radiating like a flower, 7 = water crown splash with ripples on the ground, 8 = four sparkle stars.",
+ "2": "Row 1 (1-4, seamless loop): a large glass bubble sphere with gold ornament, bubbles around, filling most of the cell, wobbling subtly. Row 2 (5-8, once): 5 = starburst flash with gold fins, 6 = teardrop flower burst, 7 = flat ring of foam bubbles with hollow centre, 8 = sparkle stars.",
+ "3": "Row 1 (1-4, once): a small wave builds from the ground and curls over, growing from low (1) to a tall curl with bubbles (4). Row 2 (5-8, once): 5 = water crown splash, 6 = flat swirling water ring, 7 = teardrop flower burst, 8 = foam clouds and bubbles.",
+ "4": "Row 1 (1-4, seamless loop): a cluster of glass bubbles falling with thin light needle streaks. Row 2 (5-8, once): 5-6 = bubbles popping into starbursts, 7 = water crown splash, 8 = foam clouds with bubbles. Row 3 (9-12, once): 9-10 = one big glass bubble centred, 11 = starburst flash, 12 = raindrops falling.",
+ "aura": "Row 1 (1-4, once/grows): a curling water ribbon with bubbles rises from a foam base on the ground, growing to a big crescent arc. Row 2 (5-8, once): 5 = pufferfish appearing in bubbles, 6 = round spiky blue pufferfish with angry face, 7 = pufferfish blowing a bubble to the right, 8 = bubbles scatter.",
+ "grid": {
+  "1": "4x2",
+  "2": "4x2",
+  "3": "4x2",
+  "4": "4x3",
+  "aura": "4x2"
+ }
+}

@@ -1,0 +1,14 @@
+{
+ "1": "Row 1 (frames 1-4, plays once): an impact burst at the cell centre. 1 = bright spiky starburst with small rocks around; 2 = large eruption of rocks and dust column rising; 3 = round dust puffs billowing with rocks; 4 = sparse dust puffs and pebbles fading. Row 2 (frames 5-8): a projectile spray flying right: a cluster of teardrop-shaped rock chunks fanning out to the right from a small dense knot at the left edge, tails pointing left; frames 5-7 similar and loop-like, 8 = thinner, scattered, fading.",
+ "2": "Row 1 (frames 1-4, seamless loop): a wide flat mud/quicksand pool on the ground (flat ellipse with swirling ripple lines), with rounded mud bumps and rocks bobbing up and sinking back, spiky rock bits flying at the edge; frame 3 has a taller mud column. Row 2 (frames 5-8, plays once): 5 = ground shatter starburst, cracked rock shards radiating outward in a flat ellipse; 6 = shards spread into a ring with an empty middle; 7 = ring with dust puffs around it; 8 = dust clouds and a few shards fading.",
+ "3": "Row 1 (frames 1-4, seamless loop): a round ring of orbiting rocks with swirling streaks and star-shaped sparkles, empty centre, rocks rotating position each frame. Row 2 (frames 5-8, plays once): 5 = upward eruption of pointed rock teardrops from the ground, radiating; 6 = rock chunks streaking diagonally up-right; 7 = big dust cloud billowing with rocks bursting; 8 = loose dust puffs and pebbles fading.",
+ "4": "Ultimate, 12 frames. Row 1 (frames 1-4, seamless loop): a stone mammoth with big curved ivory tusks, side view facing right, standing/stomping on the ground with dust behind, legs stepping forward each frame, cracked glowing rock body with spiky mane. Row 2 (frames 5-8): 5 = mammoth rearing back, tusks high; 6 = huge upward eruption of rocks and spikes (mammoth gone); 7 = rocks flying outward; 8 = dust puffs and rocks settling. Row 3 (frames 9-12, plays once): flat wide ground shockwave of jagged rock shards spread horizontally (9-10), becoming a radial star cracks (11), shrinking sparse cracks and pebbles (12).",
+ "aura": "Row 1 (frames 1-4, seamless loop): an upright round ring of brown rocks wrapped with green leaves, empty centre, round pebbles and dust piled at the bottom, slowly rotating. Row 2 (frames 5-8): a spirit beast above the head: 5-7 = a shaggy leaf-and-rock covered mammoth head in profile facing right, with a curved white-ivory tusk, emerging out of the ring (6 eyes glowing, 7 trunk/mouth open); 8 = beast dissolving into dust puffs, rocks and leaves.",
+ "grid": {
+  "1": "4x2",
+  "2": "4x2",
+  "3": "4x2",
+  "4": "4x3",
+  "aura": "4x2"
+ }
+}

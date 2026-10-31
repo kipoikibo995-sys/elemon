@@ -1,0 +1,14 @@
+{
+ "1": "Row 1 (frames 1-4, plays once): impact burst centred. 1 = bright spiky starburst with rocks; 2 = dense round dust puffs and big rocks exploding; 3 = rocks flying apart with a few dust puffs; 4 = scattered puffs and small rocks fading. Row 2 (frames 5-8): a round cracked boulder projectile flying up-right in an arc, with a trail of dust puffs and rocks behind to the lower-left, smaller and further each frame (8 smallest, high at right).",
+ "2": "Row 1 (frames 1-4, plays once): a stone castle wall growing from the ground, centred: 1 = short two-battlement wall rising from dust with spikes of light; 2 = full crenellated brick wall with three merlons and a diamond emblem; 3 = wall cracking with a diagonal fracture; 4 = wall collapsing, right half breaking into falling blocks. Row 2 (frames 5-8): a round stone tower with battlements and a cannon barrel sticking out to the right; 5 = idle; 6 = cannon fires a round cannonball with a smoke puff to the right; 7 = tower cracking; 8 = tower collapsed into a rubble heap with a broken top ring.",
+ "3": "Row 1 (frames 1-4, seamless loop): a flat elliptical ring of thin stone bricks on the ground with a four-pointed star at centre and four small stars at north/south/east/west, dashed inner circle, pulsing glow at frame 3. Row 2 (frames 5-8, plays once): 5 = tall spiky eruption of stone spikes and rocks; 6 = ring of dust puffs with rocks around an empty centre; 7 = chunks flying outward in a loose ring; 8 = sparse puffs and rocks fading.",
+ "4": "Ultimate, 12 frames, isometric look. Row 1 (frames 1-4): four stone blocks rising in a square with light spikes (1), a square castle fortress of brick walls with corner towers rising around an open courtyard (2-3), then collapsing into a heap of blocks and dust (4). Row 2 (frames 5-8): a huge cracked boulder meteor falling diagonally from upper left (5), crashing into the fortress with a spiky burst (6), blocks flying with dust (7), dust and scattered blocks (8). Row 3 (frames 9-12, plays once): a glowing golden castle-tower emblem inside a round star ring, centred (9-10), cracking and breaking apart (11), blocks and puffs fading (12).",
+ "aura": "Row 1 (frames 1-4, seamless loop): a flat ring of stacked stone blocks on the ground with rocks and dust puffs orbiting up above it in swirling wind curves, open centre, ring of rocks growing denser each frame. Row 2 (frames 5-8): a spirit beast above the head: 5 = burst of rock spikes and flying boulders; 6-7 = a crumbling castle with a tall brick tower and a flag banner leaning, dust around, firing a beam to the right in 7; 8 = the tower toppling into blocks and dust.",
+ "grid": {
+  "1": "4x2",
+  "2": "4x2",
+  "3": "4x2",
+  "4": "4x3",
+  "aura": "4x2"
+ }
+}

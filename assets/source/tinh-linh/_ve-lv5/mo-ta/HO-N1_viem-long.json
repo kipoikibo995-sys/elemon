@@ -1,0 +1,14 @@
+{
+ "1": "Row 1 (frames 1-4, plays once): two tall curved flame blades slashing up from the ground, tips touching the ground at bottom, white-hot centres, small rocks and ground sparks at the base; blades grow in frame 2, then break into scattered flame leaves by frame 4. Row 2 (frames 5-8, seamless loop): a horizontal jet of dragon fire flying right, white-hot blunt front on the right and ragged flame tongues streaming left, a few small rocks along the bottom edge; tongues flicker each frame.",
+ "2": "Row 1 (frames 1-4, seamless loop): a flat horizontal fire vortex lying on the ground, spiralling flame blades around a dark empty oval hole in the middle, rocks and tan dust puffs orbiting; spiral rotates each frame. Row 2 (frames 5-8, plays once): 5 = spiky white-hot starburst erupting upward with rocks, 6 = tall flames shooting up with rocks, 7 = flames falling apart with rocks flying, 8 = tan dust clouds and rocks with a few sparks over small ground cracks.",
+ "3": "Row 1 (frames 1-4, seamless loop): a flat oval ground zone seen at an angle: a magic-circle with diamond rune at centre on cracked molten floor, surrounded by a wall of flames rising all around, two small rocks at the lower corners; flames flicker each frame. Row 2 (frames 5-8, plays once): 5 = thin spiked glowing oval ring only, 6 = flames and magic circle flare up again, 7 = flames lower, circle visible on dark cracked ground, 8 = flames low with brown smoke puffs at the corners.",
+ "4": "Ultimate, 4x3 grid, plays once, centred. Row 1 (frames 1-4, seamless loop): a spiralling ball of fire shaped like a coiled dragon with a pointed crested head on the right, swirling body with a bright centre, wisps trailing left. Row 2 (frames 5-8): 5 = huge spiky white starburst, 6 = round cloud-like fiery explosion with petal-like lobes, 7 = curling flame swirls flying outward, 8 = brown smoke puffs with sparks. Row 3 (frames 9-12): a flat oval of scorched cracked ground ringed by low flames and rocks with curling brown smoke at the sides; flames shrink and ground cools frame by frame.",
+ "aura": "Row 1 (frames 1-4, seamless loop): a tall wall of flame tongues arching around an empty middle, thin glowing oval on the ground at the bottom, small rocks at the lower corners; flames sway each frame. Row 2 (frames 5-8, spirit beast above head): 5 = spiral vortex of flame, 6 = vortex forms a crested fire dragon head facing right with a long flame body curling below, 7 = dragon opens its mouth with fangs and breathes a bright fire jet to the right, 8 = dissolves into diagonal streaming flame leaves.",
+ "grid": {
+  "1": "4x2",
+  "2": "4x2",
+  "3": "4x2",
+  "4": "4x3",
+  "aura": "4x2"
+ }
+}

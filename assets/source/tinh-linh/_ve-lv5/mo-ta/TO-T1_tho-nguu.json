@@ -1,0 +1,14 @@
+{
+ "1": "Row 1 (frames 1-4): two large curved crescent claw-slashes of earth sweeping diagonally down-right, studded with brown oval rocks, centred; frame 1 thin blades, 2-3 bigger and heavier with more rocks, 4 dissolving into dust clouds and rocks. Row 2 (frames 5-8, plays once): 5 = bright starburst impact with radial spikes and rocks flying outward, centred; 6 = burst with rocks and crackling cracks; 7 = rocks scattering with dust puffs; 8 = sparse floating rocks and tan dust fading.",
+ "2": "Row 1 (frames 1-4, seamless loop): a tall oval wreath/ring of floating brown boulders orbiting an empty centre, standing upright on the ground with a flat cracked glowing ellipse at its base; boulders shift position slightly each frame. Row 2 (frames 5-8, plays once): a charging projectile facing right: 5-6 = a pair of pointed horn/tusk-shaped rock jaws at the right tip with a trail of rocks and streaks behind to the left; 7 = big rock burst impact with a radial spike spray; 8 = rubble heap and dust settling on the ground.",
+ "3": "Row 1 (frames 1-4, seamless loop): a round ring of rocks, centred, boulders packed in a hoop around an empty middle, cracks glowing between them, slight rotation each frame. Row 2 (frames 5-8, plays once): 5 = large rocks flying apart with spiky radial cracks; 6 = rocks packed into one solid round boulder shield with glowing seams; 7 = the boulder with a bright spark flash at upper right; 8 = boulder breaking into rocks falling onto a dust pile.",
+ "4": "Ultimate, 12 frames, ground-centred. Row 1 (frames 1-4): a flat cracked stone disc on the ground with glowing seams and small pebbles; 2 = a pebble pops up; 3 = rock spikes begin poking up; 4 = cluster of tall stone spikes erupting with dust. Row 2 (frames 5-8): a fan of tall pointed stone spikes thrusting up from the ground, growing taller, a tallest central spire at 7, flying rocks around. Row 3 (frames 9-12, plays once): spikes crumble into a big dust cloud with falling rocks (9-10), shrinking dust and rocks (11), flat cracked stone disc remaining (12).",
+ "aura": "Row 1 (frames 1-4, seamless loop): a tall upright ring of orbiting brown boulders joined by swirling sandy wind, empty centre, flat glowing cracked ellipse at the bottom, slowly rotating. Row 2 (frames 5-8): a spirit beast above the head: 5 = a smaller rock ring swirl; 6-7 = a stone bull head with two big curved golden horns, facing right, snout open in 7, emerging from dust; 8 = bull dissolving into drifting rocks and dust.",
+ "grid": {
+  "1": "4x2",
+  "2": "4x2",
+  "3": "4x2",
+  "4": "4x3",
+  "aura": "4x2"
+ }
+}

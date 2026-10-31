@@ -1,0 +1,14 @@
+{
+ "1": "Row 1 (frames 1-4, seamless loop): a volley of four large curved crescent claw-slashes of water sweeping diagonally down-right, centred in cell; frame 1 sharp thin blades, frames 2-4 gain more foamy wave crests and splashing droplets around them. Row 2 (frames 5-8, plays once): 5 = bright starburst impact with spiky radial water shards, centred low on ground, rubble at base; 6 = starburst slightly narrower and taller; 7 = burst collapsing into a curling wave and flying droplets; 8 = few scattered droplets and dark crystal shards fading.",
+ "2": "Row 1 (frames 1-4, seamless loop): a horizontal beam segment of rushing water spanning the full cell width (tiles left-right, band centred vertically), with two golden-scaled water dragons coiling around it in a double helix, heads at right facing right, spray and droplets; coils shift slightly each frame. Row 2 (frames 5-8, plays once): 5 = bright glowing orb at the beam end with a dragon head wrapping it; 6 = beam narrowing into a radiating flare at the right; 7 = tall splash fountain of spikes bursting from the ground with dark crystals; 8 = scattered droplets and shards fading.",
+ "3": "Row 1 (frames 1-4): a rising wall of water on the ground, centred. 1 = a small central spike of water with splashes and dark crystals at base; 2 = flat curtain of falling water appearing between two small golden dragon heads on pillars; 3-4 = curtain grows taller and wider, dragon-headed scaly pillars at both sides, spray. Row 2 (frames 5-8, plays once): 5 = bright star flash in the middle of the waterfall; 6 = glowing swirling orb in centre; 7 = waterfall tilting and breaking apart, one pillar visible; 8 = splash of droplets and crystals collapsing on the ground.",
+ "4": "Ultimate, 12 frames, ground-centred. Row 1 (frames 1-4): a flat elliptical ring of golden runes on the ground with splashes at the rim (1-2), a water spout rises from its middle (3), becoming a funnel whirlpool tornado above the ring (4). Row 2 (frames 5-8): large swirling water tornado centred; a dragon head emerges from the vortex facing right (6-7), then the dragon rears up roaring, tornado base bursting into spikes (8). Row 3 (frames 9-12, plays once): the ring bursts into splashes (9); wide puddle with ripples and rocks, many raindrops falling (10-11); small puddle with a few drops fading (12).",
+ "aura": "Row 1 (frames 1-4, seamless loop): a ring of swirling water waves around an empty centre (a hoop viewed from front, round), with four gold diamond-shaped gems at top, bottom, left and right, foamy crests and droplets, gently pulsing. Row 2 (frames 5-8): a spirit beast above the head: 5 = a round water whirlpool swirl; 6-7 = a blue water dragon head roaring to the right emerging from the swirl, spiky horns; 8 = dragon dissolved into streaming droplets.",
+ "grid": {
+  "1": "4x2",
+  "2": "4x2",
+  "3": "4x2",
+  "4": "4x3",
+  "aura": "4x2"
+ }
+}

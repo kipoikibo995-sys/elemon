@@ -1,0 +1,14 @@
+{
+ "1": "Row 1 (1-4, once): 1 = four-point star flash with droplets, 2 = cross-shaped burst of teardrop petals, 3 = petals spreading, 4 = tiny droplets fading. Row 2 (5-8, once): 5-6 = spiked blue shell ball with water trail flying right, 7 = ball hits the ground with a splash, 8 = crystal shards scatter.",
+ "2": "Row 1 (1-4, seamless loop): a crab-shell shield shaped like a half dome facing right, hexagon pattern with gold spikes and splashes on the left; centred. Row 2 (5-8, once): 5 = starburst flash, 6-7 = spiked water blast stream rushing right, thinning, 8 = fading droplets.",
+ "3": "Row 1 (1-4, seamless loop): a hollow ellipse ring of water ribbons with bubbles orbiting, ring slowly rotating. Row 2 (5-8, once): 5 = water spout with droplets, 6 = sparkling droplets, 7 = a single bubble in the middle, 8 = foam clouds.",
+ "4": "Row 1 (1-4): 1 = low water dome on the ground, 2 = giant crab claws open rising up from the ground, 3 = claw snapping with flash, 4 = single claw raised. Row 2 (5-8): 5 = claw slamming diagonally down, 6 = water geyser, 7 = splash with ripple ring, 8 = bubbles and foam. Row 3 (9-12): 9 = flat hex-patterned pool, 10 = concentric ripples, 11 = claw dropping in with splash, 12 = fading ripples.",
+ "aura": "Row 1 (1-4, seamless loop): an S-shaped water ribbon column with bubbles and gold spikes rising from a splash base, pulsing. Row 2 (5-8, once): 5 = small geyser, 6 = a blue crab facing front with claws raised, 7 = crab turning right and firing a water jet, 8 = crystal shards.",
+ "grid": {
+  "1": "4x2",
+  "2": "4x2",
+  "3": "4x2",
+  "4": "4x3",
+  "aura": "4x2"
+ }
+}

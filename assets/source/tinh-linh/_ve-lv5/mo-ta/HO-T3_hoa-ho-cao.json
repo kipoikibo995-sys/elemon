@@ -1,0 +1,14 @@
+{
+ "1": "Row 1 (frames 1-4): a multi-claw slash of fire: four or five long curved flame blades with bright white-hot edges raking diagonally from upper-left down to lower-right, filling the cell, flame wisps around; blades grow longer in frame 2, then break into streaks with falling rock bits by frame 4. Row 2 (frames 5-8, plays once): 5 = spiky white starburst, 6 = starburst of pointed leaf-shaped flames with rocks and ground spikes, 7 = leaf-shaped flames thrown outward with rocks, centre emptying, 8 = a few flame leaves and rocks fading above jagged ground.",
+ "2": "Row 1 (frames 1-4, seamless loop): a heart-shaped fireball flying right, with a bright white-yellow notched heart core at the front and long curling flame tails streaming left, small curls on top and bottom; flicker each frame. Row 2 (frames 5-8, plays once): 5 = big white starburst with small flame hearts around, 6 = many heart-shaped flames radiating outward, 7 = ring of three flame hearts with trails circling a hollow oval, 8 = ring rotates (same ring, hearts at new positions) and fades.",
+ "3": "Row 1 (frames 1-4, seamless loop): a hollow circle of four teardrop fireballs with curved tails chasing each other clockwise, thin lightning-like wisps between them, empty centre; fireballs rotate a little each frame. Row 2 (frames 5-8, seamless loop): a dense fire whirlpool, spiral flame blades curling clockwise toward a bright white centre, filling the cell with a few sparks on the left; spiral turns slightly each frame.",
+ "4": "Ultimate, 4x3 grid, plays once. Row 1 (frames 1-4): a nine-tailed fire fox standing side-view facing right, large fan of flame tails behind it, pawing the ground with fire at its feet; tails sway each frame. Row 2 (frames 5-8): the fox, same pose, opens its mouth and breathes a growing jet of bright flame to the right (small flicker at the mouth in 5, long flame cone by 7-8). Row 3 (frames 9-12): fox is gone; a flat oval of molten cracked ground with a ring of rocks, tall flames on it in 9, flames shrinking in 10, then smoke puffs rise in 11, and dark cooled cracked ground with smoke in 12.",
+ "aura": "Row 1 (frames 1-4, seamless loop): an upright wreath of fire tongues with a few curling tail-flames at the top, wide flat glowing oval ring on the ground at the bottom, empty middle; drawn behind the creature, flames flicker each frame. Row 2 (frames 5-8, spirit beast above head): 5 = spiral vortex of flame, 6 = vortex forms a fox head in flame facing right with red forehead mark and flame tails curling below, 7 = fox head opens mouth breathing a flame puff right, 8 = fox dissolves into diagonal streaming flame leaves.",
+ "grid": {
+  "1": "4x2",
+  "2": "4x2",
+  "3": "4x2",
+  "4": "4x3",
+  "aura": "4x2"
+ }
+}

@@ -1,0 +1,14 @@
+{
+ "1": "Row 1 (frames 1-4, plays once): a large curved crescent blade slash sweeping down-right, centred in cell; 1 = narrow crescent, 2 = widest crescent with sharp tips, 3 = crescent splitting into thin parallel streaks, 4 = streaks shatter into scattered diamond shards. Row 2 (frames 5-8, seamless loop then fade): a spinning double-crescent axe (two curved blades on a short knobbed handle) whirling inside swirling wind rings above a ground rubble burst; 5-7 rings stay wide, 8 = flatter, smaller, fading.",
+ "2": "Row 1 (frames 1-4): flurry of sharp crescent blades flying right in a cluster; 1 = small group of 6 crescents, 2 = long thin spear-like blade streaks pointing right, 3 = nested stack of big crescents, 4 = big star-burst of long spikes with ground cracks. Row 2 (frames 5-8): 5-6 = X-shaped crossing double slash centred, bright core, rubble on ground; 7 = X breaks into diamond shards flying outward; 8 = few shards left, fading.",
+ "3": "Row 1 (frames 1-4, seamless loop): a horizontal chevron/arrow-train projectile pointing right, a row of stacked '>' blade chevrons with speed streaks, alternating thin and fat chevron every other frame; shards orbit around. Row 2 (frames 5-8, plays once, impact): 5 = big crescent slash arc, 6 = four-point star flash with small sparkles, 7 = horizontal streak with spikes bursting, 8 = scattered diamond shards fading.",
+ "4": "Ultimate. Row 1 (frames 1-4): large crescent slash sweeping down at the left-centre, gaining thin trailing blades; 4 = breaking into diamond shards. Row 2 (frames 5-8): 5 = crescent again, 6 = big X cross slash, 7 = radial burst of long diamond blades from a point, 8 = drifting shards fading. Row 3 (frames 9-12, ground-level): a long flat horizontal spiky blade line along the ground, widest at 9-10 with crescent arcs rising at 10, shrinking and breaking into small dots by 12.",
+ "aura": "Row 1 (frames 1-4, seamless loop): ring of curved crescent blades and diamond shards standing in an oval around the creature (open in the middle, base glow on ground), blades swirl and fill the ring more each frame. Row 2 (frames 5-8): 5 = ring of swirling blades around a bright star core; 6-7 = spirit lion head with curled blade horns and open roaring mouth facing right, wind streaks behind; 8 = lion fades into scattered diamond shards.",
+ "grid": {
+  "1": "4x2",
+  "2": "4x2",
+  "3": "4x2",
+  "4": "4x3",
+  "aura": "4x2"
+ }
+}

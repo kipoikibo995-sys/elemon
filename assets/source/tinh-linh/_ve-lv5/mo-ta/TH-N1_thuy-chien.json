@@ -1,0 +1,14 @@
+{
+ "1": "Row 1 (1-4, once): a crescent-shaped water slash curving open to the right with foam, growing larger (1-3), then breaking into teardrops (4). Row 2 (5-8, once): 5-6 = horizontal spiky ice-water arrow flying right, longer in 6, 7 = spiky crystal splash on the ground, 8 = scattered droplets with a few streaks.",
+ "2": "Row 1 (1-4, once): a wave rises from the ground and grows taller, crest curling to the right, foam and gold-trimmed pattern; centred on the ground. Row 2 (5-8, once): 5 = wave at full height, 6 = collapsing into a spiky crystal splash, 7 = low foamy splash, 8 = flat puddle with ripples.",
+ "3": "Row 1 (1-4, seamless loop): a round water orb ringed in a thin gold band, with swirling water inside and small waves at the bottom, centred. Row 2 (5-8, once): 5 = orb cracking in cells, 6 = spiky burst with hollow centre, 7 = scattered droplets radiating, 8 = flat ellipse of ripples on the ground.",
+ "4": "Row 1 (1-4): a large upright sword floating centred, wrapped in water ribbons (1-2 loop-like), 3 = ice shards falling in vertical streaks, 4 = splash at its base. Row 2 (5-8): a ring of seven upright swords on a ground ellipse (5-6), 7 = central ice spike with swords around, 8 = ripples with falling blade streaks. Row 3 (9-12): flat swirling magic circle with diamonds at four sides, 11 = splash, 12 = ripple swirl fading.",
+ "aura": "Row 1 (1-4, once/grows): sharp water blades and ribbons build from the ground into a tall rounded swirl column. Row 2 (5-8, once): 5 = swirl with a faint armoured figure, 6 = a golden-armoured water knight formed from waves, 7 = knight holding a large sword at its right side, 8 = dissolving into water blades.",
+ "grid": {
+  "1": "4x2",
+  "2": "4x2",
+  "3": "4x2",
+  "4": "4x3",
+  "aura": "4x2"
+ }
+}

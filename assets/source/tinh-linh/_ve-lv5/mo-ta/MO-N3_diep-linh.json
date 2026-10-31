@@ -1,0 +1,14 @@
+{
+ "1": "Row 1 (1-4, loop-like): curved crescent wind blades made of leaves swirling around the centre, growing larger and sweeping clockwise with leaves orbiting. Row 2 (5-8, once): 5 = four-pointed star burst of leaf blades, 6 = leaf shards streaking to the right, 7 = flat lotus-like leaf ring on the ground with petal spikes, 8 = leaf fronds sprouting upward from the ring.",
+ "2": "Row 1 (1-4, seamless loop): a horizontal leaf-wind projectile pointing right, a twisted ribbon of leaves with trailing swirl, growing from small to large; centred. Row 2 (5-8, once): a vertical twisting ribbon-and-leaf spiral column standing on the ground, growing taller (5-7), then dissolving into loose scattered leaves (8).",
+ "3": "Row 1 (1-4, seamless loop): a vertical rain of leaves and blossoms falling in columns with thin light needles, filling the cell. Row 2 (5-8, once): 5 = flat bed of leaves with spikes on the ground, 6-7 = bed grows with white blossoms and a swirling leaf ribbon around it, 8 = radial star burst of leaves.",
+ "4": "Row 1 (1-4): 1 = low leaf ring on the ground with small spikes, 2 = low spiral, 3-4 = tall tornado of leaf ribbons growing. Row 2 (5-8, seamless loop): full-height leaf tornado, spiral bands and blossoms rotating. Row 3 (9-12, once): tornado shrinks and breaks into scattered swirling leaves, fading to a few petals.",
+ "aura": "Row 1 (1-4, once/grows): a wreath of leaves rises from the ground as an open arch (1) and closes into a full upright circle with a swirling ribbon (4). Row 2 (5-8, once): 5 = leaf vortex, 6 = a green wind dragon, S-curved, rises with horned head facing right, 7 = dragon roaring and breathing wind to the right, 8 = scattered leaves.",
+ "grid": {
+  "1": "4x2",
+  "2": "4x2",
+  "3": "4x2",
+  "4": "4x3",
+  "aura": "4x2"
+ }
+}

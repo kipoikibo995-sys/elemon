@@ -1,0 +1,14 @@
+{
+ "1": "Row 1 (frames 1-4, seamless loop-ish, growing): a swirling sand-and-rock cyclone slash flying right: curved crescent wind blades with rocks, a tapered tail streaming left and a wider head at right; each frame larger and denser than the last. Row 2 (frames 5-8, plays once): 5 = round dust cloud ball with big rocks; 6 = starburst pop with rocks radiating outward; 7 = spiky eruption of pointed rocks and shards rising; 8 = dust clouds billowing with rocks.",
+ "2": "Row 1 (frames 1-4, seamless loop, growing): a wide low band of jagged rock spikes erupting along the ground left-to-right, spanning the cell width, with pebbles and light flashes; each frame the spikes grow taller on the right side. Row 2 (frames 5-8, plays once): a flat jagged ground crack with debris and sparks across the width: 5 = thin crack with pebbles; 6 = crack with rocks pushing up; 7 = crack bursting with dust puffs and rocks; 8 = back to thin crack and pebbles fading.",
+ "3": "Row 1 (frames 1-4, seamless loop): a flat elliptical target disc on the ground with a downward arrow in the middle and cracks, rock crystals around the rim; thin light spikes grow taller each frame. Row 2 (frames 5-8, plays once): 5 = a large pointed crystal-shaped rock rising with thin light spikes behind it; 6 = crystal in a fan of spikes with rocks flying; 7 = crystal shrinking into dust puffs and rocks; 8 = big billowing dust cloud with rock crystals.",
+ "4": "Ultimate, 12 frames. Row 1 (frames 1-4, seamless loop): a spiky dragon of rock shards and sand wind flying right, side view, body of pointed rock plates with streaming tail at lower left; head at right, jaws open more by frame 4. Row 2 (frames 5-8): 5 = dragon diving head-down toward the ground seen from the front; 6 = rock spikes erupting from below as a large fan; 7 = flat ring shockwave with rock plates flying up and lightning; 8 = big dust cloud with rocks. Row 3 (frames 9-12, plays once): a wide crater on the ground seen from above, brown walls with glowing cracks (9-10), shattering into cracks and flying rocks (11), dust puffs settling (12).",
+ "aura": "Row 1 (frames 1-4, seamless loop): a big round ring of swirling sandy wind with rocks and clumps of moss/leaves orbiting it, open centre, faint cracked ground below; clumps rotate each frame. Row 2 (frames 5-8): a spirit beast above the head: 5 = a round swirl of sand with pebbles and moss; 6 = a horned earth dragon head with green moss scales in profile facing right, rising from the swirl; 7 = the dragon roaring with mouth wide open, breathing a sand blast to the right; 8 = blast trailing off into rocks and a dust cloud to the right.",
+ "grid": {
+  "1": "4x2",
+  "2": "4x2",
+  "3": "4x2",
+  "4": "4x3",
+  "aura": "4x2"
+ }
+}

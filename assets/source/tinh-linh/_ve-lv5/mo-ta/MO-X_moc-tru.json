@@ -1,0 +1,14 @@
+{
+ "1": "Row 1 (1-4, once): 1 = bright starburst flash with leaf shards, 2 = explosion of dust puffs, brown rocks, leaves and petals, 3 = puffs and rocks flying outward, 4 = sparse puffs and leaves fading. Row 2 (5-8, once): a low wide mound of dust puffs, rocks and thorn spikes on the ground, debris spreading to the right and thinning out until almost empty.",
+ "2": "Row 1 (1-4, once): 1 = starburst flash with large rocks and leaves, 2 = ring of dust puffs and rocks with hollow centre, 3 = ring larger and thinner, 4 = faint puffs and rocks fading. Row 2 (5-8): flat ground ellipses of spinning leaf ribbons growing from small (5) to large (6-7), 8 = scattering sharp shards and leaves.",
+ "3": "Row 1 (1-4, seamless loop): a flat ellipse ring of thorny brambles on the ground with curling flame swirls rising from it, flickering each frame. Row 2 (5-8, once): 5 = two cartoon dust puffs with pointed tails, 6 = a four-way inward-pointing impact burst, 7 = puffs again, 8 = curling flame wisps rising.",
+ "4": "Row 1 (1-4, seamless loop): a wide flat slab of cracked earth with leaf and thorn spikes along top and bottom edges, rocks jittering; spans the cell width. Row 2 (5-8, once): 5 = big burst of dust puffs and rocks with a spike, 6-7 = puffs spreading, 8 = few puffs fading. Row 3 (9-12, once): a flaming maned beast head facing right bites forward (9-10), fades translucent (11), sparks only (12).",
+ "aura": "Row 1 (1-4, seamless loop): a flat ellipse of thorny ring on the ground with a flame arc flickering up around it. Row 2 (5-8, once): a flaming lion-like beast head facing right with fiery mane rises (5-6), roars with open mouth (7), then breaks into swirling fire wisps and dust (8).",
+ "grid": {
+  "1": "4x2",
+  "2": "4x2",
+  "3": "4x2",
+  "4": "4x3",
+  "aura": "4x2"
+ }
+}

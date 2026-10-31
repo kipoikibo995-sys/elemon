@@ -1,0 +1,14 @@
+{
+ "1": "Row 1 (frames 1-4, plays once): impact burst centred. 1 = bright spiky starburst with small rock shards; 2 = starburst with three big angular rocks flying out; 3 = big rocks scattering, burst faded; 4 = tan dust cloud and swirls with a few rocks. Row 2 (frames 5-8, seamless loop): a large round faceted boulder with glowing cracks rolling right along the ground, centred, dust cloud and wind swirl trailing left, small rocks bouncing; rock slightly rotates each frame.",
+ "2": "Row 1 (frames 1-4, seamless loop): a round ring of five large angular rocks orbiting an empty centre in swirling wind streaks, rotating each frame, small pebbles. Row 2 (frames 5-8, plays once): a thrown rock projectile facing right: 5 = a single cracked rock flying right with speed streaks and pebbles trailing left; 6 = rock exploding on impact into starburst with big rock chunks; 7 = chunks hanging mid-air with vertical spike streaks; 8 = large tan dust clouds with pebbles.",
+ "3": "Row 1 (frames 1-4, seamless loop): a flat elliptical ring of tall pointed stone pillars standing up around an empty middle, glowing at the base, subtle shimmer between frames. Row 2 (frames 5-8, plays once): 5 = a cluster of pointed stones erupting from the ground; 6 = one tall central stone pillar rising with smaller ones around; 7 = a stack of rocks with big rocks flying up; 8 = collapsed pile of rubble with a rock on top.",
+ "4": "Ultimate, 12 frames, ground-centred. Row 1 (frames 1-4): a flat ring of cracked stone slabs bursts open (1), pointed stone spikes shoot up around the ring (2-3), a crowd of spikes with big rocks launched above (4). Row 2 (frames 5-8): a big faceted boulder rises up in the middle with light spikes (5), sinking half into the ground (6), shatters into rocks flying radially (7), leaving big dust clouds (8). Row 3 (frames 9-12, plays once): a wide cracked crater on the ground seen from above, glowing in the middle (9-10), collapsing flat cracked slabs (11), dust puffs and rocks (12).",
+ "aura": "Row 1 (frames 1-4, seamless loop): a loose ring of mossy rock slabs and floating shards standing up around an empty centre (a flat stone ring on the ground), spiralling wind streaks, rising taller each frame. Row 2 (frames 5-8): a spirit beast above the head: 5 = swirl of rocks forming a ball; 6 = a mossy stone golem face/head, big and blocky, facing right; 7 = the stone head roaring mouth open with a bright blast to the right; 8 = head crumbling back into swirling rocks.",
+ "grid": {
+  "1": "4x2",
+  "2": "4x2",
+  "3": "4x2",
+  "4": "4x3",
+  "aura": "4x2"
+ }
+}

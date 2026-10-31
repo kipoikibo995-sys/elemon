@@ -1,0 +1,14 @@
+{
+ "1": "Row 1 (frames 1-4, seamless loop): bundle of thorny green vines with leaves and flowers sweeping diagonally from upper left down to right, centred; frame 2-3 with brown seed pods. Row 2 (frames 5-8, impact): 5-6 = star burst of leaves, thorny vines and flowers; 7 = burst loosening, leaves and rocks; 8 = scattered leaves, petals and rock bits fading.",
+ "2": "Row 1 (frames 1-4, seamless loop): a thorny vine with a flower bud head flying right, vine body undulating behind it, leaves and wind streaks trailing. Row 2 (frames 5-8): 5 = vines tangling into a knot with bud; 6-7 = vines closed into a thorny wreath ring with a pink flower on top; 8 = ring unravels into pieces and leaves fading.",
+ "3": "Row 1 (frames 1-4, seamless loop): a round wreath of vines, leaves and flowers with small green plus-signs around, vines rotating slightly each frame. Row 2 (frames 5-8): 5 = large pink lotus bloom amid leaves and roots; 6 = a vine spiral twisting up a vertical green light column; 7-8 = vertical light streaks, plus signs and falling leaves fading.",
+ "4": "Ultimate. Row 1 (frames 1-4): 1-2 = oval ring of vines with diamond leaf-gems at four points on ground; 3 = vine tendrils rising; 4 = tangled mass of vines. Row 2 (frames 5-8): a large flowering tree grows up (5-6), the trunk shows an angry face (7), then collapses into a burst of leaves (8). Row 3 (frames 9-12): broken trunk stump and roots (9), falling leaves with light streaks (10), small vine ring on ground (11), leaves fading (12).",
+ "aura": "Row 1 (frames 1-4, seamless loop): a ring of leafy vines with pink flowers and plus-sparkles around the creature, rotating. Row 2 (frames 5-8): 5 = spiral of vines in a green light column; 6-7 = spirit beast head (bear/lion made of leaves and branches, glowing green eyes, open roaring mouth) facing right; 8 = leaves and sparkles fading.",
+ "grid": {
+  "1": "4x2",
+  "2": "4x2",
+  "3": "4x2",
+  "4": "4x3",
+  "aura": "4x2"
+ }
+}

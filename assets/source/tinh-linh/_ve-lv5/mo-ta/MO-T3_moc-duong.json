@@ -1,0 +1,14 @@
+{
+ "1": "Row 1 (frames 1-4): a big green leaf-blade slash curving down-right with leaves and a yellow flower; 4 = leaves and sparks. Row 2 (frames 5-8): 5 = X-shaped crossing slash with leaves and rocks on ground; 6 = leaf burst with flowers; 7 = leaves drifting; 8 = few leaves and rocks fading.",
+ "2": "Row 1 (frames 1-4, seamless loop): a sweeping gust of green leaves and wind streaks curving from left to right, growing bigger. Row 2 (frames 5-8): 5 = radial leaf burst with flowers around a bright core; 6 = smaller leaf burst; 7-8 = leaves swirling away and fading.",
+ "3": "Row 1 (frames 1-4, seamless loop): an oval ring of leaves, petals and flowers rotating around the centre. Row 2 (frames 5-8): 5-6 = X-shaped light cross with leaves and flowers around; 7 = leaves flying outward; 8 = few leaves and petals fading.",
+ "4": "Ultimate. Row 1 (frames 1-4): oval leaf ring (1), wider (2), rising into a tall leaf tornado (3), then collapsing into a leaf bush burst (4). Row 2 (frames 5-8): big curved blade slash down-right (5), arcing to horizontal (6-7), X cross slash (8). Row 3 (frames 9-12): radial leaf burst (9-10), leaves flying outwards (11), few leaves fading (12).",
+ "aura": "Row 1 (frames 1-4, seamless loop): ring of leaves and golden sparks arching around the creature with a low ground glow, open at the top. Row 2 (frames 5-8): spiral vortex of leaf blades (5), leaf spiral with a faint leafy beast shape in the middle (6-7), scattered leaves and petals fading (8).",
+ "grid": {
+  "1": "4x2",
+  "2": "4x2",
+  "3": "4x2",
+  "4": "4x3",
+  "aura": "4x2"
+ }
+}

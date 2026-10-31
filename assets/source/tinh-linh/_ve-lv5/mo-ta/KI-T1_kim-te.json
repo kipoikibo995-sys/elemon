@@ -1,0 +1,14 @@
+{
+ "1": "Row 1 (frames 1-4): 1 = X-shaped sharp spike burst with halo ring, centred; 2 = explosion of large metal shards radiating from bright core; 3-4 = shards drifting apart, fewer and smaller, with wind streaks, fading. Row 2 (frames 5-8): 5-6 = a metallic drill/spike (cone with collar rings) flying right with speed streaks (loop pair); 7 = impact explosion of shards on ground with rubble; 8 = flat cracked ground disc ringed by dust clouds.",
+ "2": "Row 1 (frames 1-4): ten metal cone-spikes arranged in a circle pointing outward from a bright centre; 1 = spikes close and bright, 2-3 = spikes move outward, 4 = just small shards and streaks left, fading. Row 2 (frames 5-8): dust clouds and white wind streak sweeping low; 6 = spikes erupting upward from dust; 7 = ring of dust around a cracked ground disc; 8 = small dust puffs fading.",
+ "3": "Row 1 (frames 1-4): a cluster of about 12 metal spikes (various sizes, points down) falling from above with vertical streaks; 4 = they hit ground with sparks. Row 2 (frames 5-8): 5-6 = circle of upright crystal spikes ringing the ground, tall at back; 7 = spikes breaking apart; 8 = scattered shards and sparkles fading. All centred, ground effect.",
+ "4": "Ultimate. Row 1 (frames 1-4): 1 = ground flash of shards; 2-3 = a huge curved crystal horn rising from a bed of crystals (3 with orbiting rings); 4 = cluster of crystal spikes. Row 2 (frames 5-8): dense field of falling long spikes (5-6), landing/impact on ground (7), sparkles and few shards (8). Row 3 (frames 9-12): ground magic circle (oval double ring) with a four-point metal star in the middle, spikes at its tips; 9-10 loop, 11 = cracking, 12 = shards and sparkles fading.",
+ "aura": "Row 1 (frames 1-4, seamless loop): a tall burst of many crystal spikes fanning up from a glowing ground magic circle, behind the creature. Row 2 (frames 5-8): 5-6 = spirit rhinoceros of crystal-plated armour facing right with a golden horn, crouching then lowering head (6 starts spraying a shard beam from its mouth); 7-8 = horizontal beam of crystal shards pointing right, tileable left-right, filling the full cell width.",
+ "grid": {
+  "1": "4x2",
+  "2": "4x2",
+  "3": "4x2",
+  "4": "4x3",
+  "aura": "4x2"
+ }
+}

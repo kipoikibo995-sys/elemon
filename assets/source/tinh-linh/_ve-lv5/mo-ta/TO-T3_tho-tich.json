@@ -1,0 +1,14 @@
+{
+ "1": "Row 1 (frames 1-4): a single large crescent slash of earth energy arcing up-right, ground-anchored at the bottom with dust and flying rock shards; 1 small, 2-3 biggest and widest, 4 thinning into streaks and shards. Row 2 (frames 5-8): a projectile facing right: 5-6 = a cracked round boulder flying right with long speed streaks trailing left and small pebbles; 7 = impact on ground, spiky burst with a pebble at centre and rock shards; 8 = bigger starburst explosion with large rock chunks flying outward, centred.",
+ "2": "Row 1 (frames 1-3, then 4): a cute chubby sand-golem lizard creature, sitting upright facing the viewer with spiky leaf-like head crest and tail, centred on the ground, ringed by shaking cracks and floating rock shards (1-2 steady, 3 starting to crumble); 4 = creature gone, only floating rock shards and a small mound. Row 2 (frames 5-8): a rolling-ball attack: 5 = creature curled into a lumpy ball with rocks around it on the ground; 6 = ball flying right with horizontal speed streaks; 7 = ball with large rocks bursting out, big streaks; 8 = settling rocks and mounds.",
+ "3": "Row 1 (frames 1-4, seamless loop): a flat horizontal elliptical ring of broken stone slabs on the ground with a four-pointed glowing star at the centre and four small stars at the compass points; the star and glow pulse bigger at frame 3. Row 2 (frames 5-8, plays once): 5 = a rock inside an upward flame-like spike burst, narrow, upright; 6 = a wide eruption of pointed rock spikes and large shards erupting up; 7 = shards raining down above a dark cracked ground disc; 8 = big billowing dust cloud with a few shards.",
+ "4": "Ultimate meteor, 12 frames. Row 1 (frames 1-4): a flaming rock meteor falling diagonally from top-right down to the lower-left, big blazing flame tail up-right, rocks around it; frames shrink slightly 1->4 as it gets far/fades. Row 2 (frames 5-8, plays once): impact on the ground: 5 = tall flame-spike explosion with a large rock chunk centre; 6 = flat glowing ring shockwave with spikes up; 7 = rocks and shards flying up around the point; 8 = a large tan dust cloud with rocks. Row 3 (frames 9-12): a wide cracked crater seen from above on the ground, glowing lava cracks in the middle (9-10), crater fades into thin cracks and shards (11), dust cloud puffs remain (12).",
+ "aura": "Row 1 (frames 1-4, seamless loop): a loose circular ring of swirling fiery-golden energy streaks with floating pointed rock crystals, dust puffs along the bottom, open centre, rotating each frame. Row 2 (frames 5-8): a spirit beast above the head: 5-6 = a spiky-crested rock dragon/lizard head in profile facing right, jaw closed rising from the bottom, gradually turning up; 7 = mouth wide open breathing a flame blast to the right; 8 = dissolving into streaks, rock shards and dust.",
+ "grid": {
+  "1": "4x2",
+  "2": "4x2",
+  "3": "4x2",
+  "4": "4x3",
+  "aura": "4x2"
+ }
+}

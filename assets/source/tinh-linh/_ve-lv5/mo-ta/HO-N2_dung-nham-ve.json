@@ -1,0 +1,14 @@
+{
+ "1": "Row 1 (frames 1-4, growing): a comet-like fire trail flying right, cracked lava rocks embedded in a streaming flame body with long flame spikes trailing left; the head end at right is a clean round cut-out (empty circle) with a bright crescent edge; rocks and flames get bigger each frame. Row 2 (frames 5-8, plays once): 5 = bright spiky starburst with big lava rocks flying out over ground spikes, 6 = big rocks scattering with flame, 7 = flames thinning, rocks drifting, 8 = brown smoke puffs, a few rocks and flame streaks.",
+ "2": "Row 1 (frames 1-4, plays once): a flat oval patch of ground covered by molten lava rocks and flames with glowing cracks; flames on top die down each frame until frame 4 is mostly cooled brown cracked rock with thin glowing seams. Row 2 (frames 5-8, seamless loop): a hollow ring of curved flame blades spinning around an empty oval centre, with tan dust puffs and small rocks orbiting; ring rotates each frame.",
+ "3": "Row 1 (frames 1-4, seamless loop): a flat oval ring (low wreath) of flames with cracked lava boulders riding in it, hollow centre, sparkles around; boulders and flames shift each frame. Row 2 (frames 5-8, plays once): 5 = thin oval ring with five small spiky bursts and rocks, 6 = large starburst in the middle with rocks flying, 7 = smaller starburst with rocks, 8 = fading flame ring with brown smoke puffs.",
+ "4": "Ultimate, 4x3 grid, plays once. Row 1 (frames 1-4): 1 = tall white spiky flame burst with rocks on the ground, 2 = round fiery explosion cloud with rocks flying, 3 = narrower burst with rocks and flame, 4 = big brown smoke clouds with sparks over cracked ground. Row 2 (frames 5-8, seamless loop): a round, cute lava-rock creature (spiky dark cracked shell with red glowing cracks, a spiral mark on forehead, glowing yellow eyes, stubby stone feet) rolling/charging right with flame streaks trailing behind it. Row 3 (frames 9-12): 9 = the creature glowing bright orange and about to burst, 10 = white explosion with big lava rocks flying around, 11 = rocks and curling flame arcs, 12 = smoke cloud above small rubble and cracked ground.",
+ "aura": "Row 1 (frames 1-4, seamless loop): an upright ring of fire with many cracked lava boulders orbiting in it, hollow centre, and a flat ring of rocks forming a ground platform at the bottom; drawn behind the creature, rocks and flames shift each frame. Row 2 (frames 5-8, spirit beast above head): 5 = swirling vortex of flame and rocks, 6 = vortex forms a rock-armoured lava eagle/dragon head facing right with crest of rocks and open beak, 7 = head opens its toothed mouth breathing a bright fire blast to the right, 8 = dissolves into diagonal streaming rocks and flame.",
+ "grid": {
+  "1": "4x2",
+  "2": "4x2",
+  "3": "4x2",
+  "4": "4x3",
+  "aura": "4x2"
+ }
+}

@@ -1,0 +1,14 @@
+{
+ "1": "Row 1 (frames 1-4): a large curved green blade-leaf slash with a thorny vine wrapped around it, sweeping down-right; 4 = just leaves and sparks. Row 2 (frames 5-8): 5-6 = small green orb on a twig flying right with leaves and sparks, burst of light at 6; 7 = big pink flower blooming surrounded by leaves; 8 = flower closes into a bud, petals fading.",
+ "2": "Row 1 (frames 1-4, seamless loop): a low mound of grass with pink flowers and buds, glowing plus-signs rising above, flowers bloom more each frame. Row 2 (frames 5-8): 5-6 = floating leaves and petals scattering; 7 = swirling ring of leaf-petals; 8 = ground ring with a vertical light crystal rising in the centre.",
+ "3": "Row 1 (frames 1-4, seamless loop): a horizontal sprig of leaves and a pink flower flying right with golden streaks trailing, getting longer. Row 2 (frames 5-8): 5 = vertical yellow light beam rising from ground leaves; 6 = beam wrapped by vine, flowers and leaves; 7 = beam thins with sparkles; 8 = ring of vines and flowers on ground.",
+ "4": "Ultimate. Row 1 (frames 1-4, loop): a glowing yellow stag with leafy antlers leaping right, leaves around. Row 2 (frames 5-8): 5 = stag rearing; 6-7 = stag lunging down and forward with antlers spread; 8 = stag becomes a bright white burst. Row 3 (frames 9-12): 9-10 = oval ground ring with four-point flare; 11 = ring of four pink flowers and leaves; 12 = leaves and petals fading.",
+ "aura": "Row 1 (frames 1-4, seamless loop): a U-shaped wreath of leaves and pink flowers around the creature, with glowing ground ellipse; leaves sweep upward. Row 2 (frames 5-8): 5-7 = spirit stag head with antlers, leafy mane and flowers facing right, 7 breathing out a yellow burst; 8 = falling leaves fading.",
+ "grid": {
+  "1": "4x2",
+  "2": "4x2",
+  "3": "4x2",
+  "4": "4x3",
+  "aura": "4x2"
+ }
+}

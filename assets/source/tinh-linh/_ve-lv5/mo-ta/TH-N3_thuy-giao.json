@@ -1,0 +1,14 @@
+{
+ "1": "Row 1 (1-4, once): a water spear pointing right with a swirl wake, growing from small (1) to large (4); centred. Row 2 (5-8, once): 5 = tall ice-crystal spikes bursting from the ground with rock bits, 6 = narrower splash, 7 = foam clouds with rocks, 8 = thin wispy foam fading.",
+ "2": "Row 1 (1-4, seamless loop-like): a spinning water vortex disc with swirling arms and gold bands, growing from small to large; centred. Row 2 (5-8, once): 5 = small vortex, 6 = big vortex, 7 = foam cloud burst with rocks, 8 = flat ellipse ring with spikes on the ground.",
+ "3": "Row 1 (1-4, once): a puffy foam cloud with golden ribbons and sparkles growing from small to large. Row 2 (5-8, once): 5 = a small light-blue creature silhouette inside swirling water, 6 = horizontal speed streaks dashing right, 7-8 = foam clouds with gold ribbons.",
+ "4": "Row 1 (1-4): a water dragon facing right with a ribbon body coils and swoops, in 4 roaring with open fanged jaws. Row 2 (5-8): a vertical spiky water column on the ground grows taller (5-7), then collapses into falling streams (8). Row 3 (9-12, once): a wide flat whirlpool with waves on the ground (9-10), hollow ring (11), foam clouds ring dispersing (12).",
+ "aura": "Row 1 (1-4, seamless loop-like): an S-shaped water ribbon column with gold bands rises from a splash base, growing taller. Row 2 (5-8, once): 5 = spiky water column, 6 = a water dragon head coiled facing right, 7 = dragon breathing a water stream right, 8 = leftover wave fragments.",
+ "grid": {
+  "1": "4x2",
+  "2": "4x2",
+  "3": "4x2",
+  "4": "4x3",
+  "aura": "4x2"
+ }
+}
