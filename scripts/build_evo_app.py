@@ -255,6 +255,23 @@ def activity_icon():
     slot.save(path, pnginfo=info)
 
 
+def store_icon():
+    """The 'Kho đồ' menu button (in Dọn's place, 28/10/2026), made like the Vệ sinh one until a drawn one replaces
+    it: the empty slot with the Túi đồ backpack on it."""
+    path = os.path.join(SRC, 'ui', 'cat', 'nut_kho-do.png')
+    if os.path.exists(path) and not Image.open(path).info.get('auto'):
+        return
+    from PIL.PngImagePlugin import PngInfo
+    slot = Image.open(os.path.join(SRC, 'ui', 'cat', 'o_trong.png')).convert('RGBA')
+    W0, H0 = slot.size
+    bag = Image.open(os.path.join(SRC, 'ui', 'tui-do', 'goc', 'tui.png')).convert('RGBA')
+    bag = bag.crop(bag.getbbox())
+    bag.thumbnail((round(W0 * 0.62), round(H0 * 0.6)), Image.LANCZOS)
+    slot.alpha_composite(bag, ((W0 - bag.width) // 2, H0 - bag.height - round(H0 * 0.15)))
+    info = PngInfo(); info.add_text('auto', '1')
+    slot.save(path, pnginfo=info)
+
+
 def save_minigames():
     """Fishing (assets/r36s/mini-game/cau-ca, fish in ca/) and the farm (assets/r36s/farm, crops in cay/, soil in
     o-dat-tron/), already at R36S size: saved as cc_<name> and fm_<name>."""
@@ -609,6 +626,10 @@ def save_shop():
     save(cat('o_hang-chon', 48, 48), 'tab_sel')
     for n in ('o_hang', 'o_hang-chon', 'o_hang-khoa'):
         save(cat(n, 64, 64), 'shelf_' + n)
+    # the Túi đồ's slots: the plain wooden frame with its thin gold rim (the user, 28/10/2026: o_hang's carved corners,
+    # 24 at once, were too heavy); td_: loaded with that screen (game/src/tai-dan.js)
+    save(cat('o_trong', 58, 58), 'td_khung')
+    save(cat('o_chon', 58, 58), 'td_khung-chon')
     save(hslice(cat('nhan-gia'), 78, 24, 0.27, 0.10), 'nhan-gia')
     save(ui_nine('khung_panel', 364, 104, 1.0, 22, mid=46, thin=0.5), 'shop_desc')
     save(hslice(cat('nut_mua'), 120, 32, 0.15, 0.15), 'nut_mua')
@@ -678,7 +699,12 @@ def main():
     save(cat('huy-hieu_lv', 32), 'badge')
     hygiene_icon()
     activity_icon()
-    for n in MENU_ICON + ['nut_ve-sinh', 'nut_hoat-dong']:
+    store_icon()
+    # Hoạt động in the game's own frames (the user, 28/10/2026: its cream cards did not match): Võ đường's menu set
+    for n in ('the_thuong', 'the_chon', 'bang-tieu-de', 'bang-chu', 'khoa'):
+        save(img(os.path.join(R36, 'vo-duong', 'menu', n + '.png')), 'hd_vd_' + n)
+    save(cat('o_trong', 52, 52), 'hd_vd_o')
+    for n in MENU_ICON + ['nut_ve-sinh', 'nut_hoat-dong', 'nut_kho-do']:
         save(wide_button(n, 100, 50), n)
     save_minigames()
     save(cat('o_chon', 60, 60), 'o_chon')

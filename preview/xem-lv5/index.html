@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Xem chiêu Huyền thoại</title>
+<style>
+  :root { --bg: #111318; --card: #1b1e26; --line: #2a2f3a; --text: #e8e6e1; --dim: #8b909c; --gold: #f2c14e;
+          --HO: #ff6b3d; --TH: #3db8ff; --KI: #c9d1dc; --MO: #6bd16b; --TO: #d59a4a; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.4 system-ui, sans-serif; }
+  header { position: sticky; top: 0; z-index: 5; background: rgba(17,19,24,.95); border-bottom: 1px solid var(--line);
+           padding: 12px 16px; display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; }
+  h1 { margin: 0; font-size: 18px; color: var(--gold); }
+  .tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+  .tabs button, .tog { background: var(--card); color: var(--text); border: 1px solid var(--line); border-radius: 6px;
+                       padding: 5px 10px; cursor: pointer; font: inherit; }
+  .tabs button.on { border-color: var(--gold); color: var(--gold); }
+  label { color: var(--dim); display: flex; align-items: center; gap: 6px; }
+  #count { color: var(--dim); margin-left: auto; }
+  main { padding: 16px; display: grid; gap: 14px; }
+  .pet { background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--el); border-radius: 8px; padding: 10px 12px; }
+  .pet h2 { margin: 0 0 8px; font-size: 15px; }
+  .pet h2 small { color: var(--dim); font-weight: normal; margin-left: 6px; }
+  .row { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
+  .cell { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+  .cell span { color: var(--dim); font-size: 12px; }
+  .pair { display: grid; gap: 4px; }
+  canvas { width: 100%; aspect-ratio: 1; background: #0a0b0e; border-radius: 6px; image-rendering: pixelated; cursor: zoom-in; }
+  .lv2 canvas { opacity: .9; }
+  .tag { font-size: 11px; color: var(--dim); }
+  .miss { display: grid; place-items: center; aspect-ratio: 1; border: 1px dashed var(--line); border-radius: 6px; color: #e66; font-size: 12px; }
+  #zoom { position: fixed; inset: 0; background: rgba(0,0,0,.85); display: none; place-items: center; z-index: 10; cursor: zoom-out; }
+  #zoom.on { display: grid; }
+  #zoom canvas { width: min(80vw, 80vh); cursor: zoom-out; }
+  #zoom p { position: absolute; bottom: 20px; width: 100%; text-align: center; color: var(--dim); margin: 0; }
+  @media (max-width: 800px) { .row { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+</style>
+</head>
+<body>
+<header>
+  <h1>Chiêu Huyền thoại (Lv5)</h1>
+  <div class="tabs" id="tabs"></div>
+  <label>Tốc độ <input type="range" id="fps" min="4" max="20" value="10"> <b id="fpsv">10</b> fps</label>
+  <label><input type="checkbox" id="cmp"> So với bậc 2</label>
+  <span id="count"></span>
+</header>
+<main id="list"></main>
+<div id="zoom"><canvas width="512" height="512"></canvas><p></p></div>
+<script>
+const DIR = '/assets/source/tinh-linh/chieu/';
+const ELEMENTS = { HO: 'Hỏa', TH: 'Thủy', KI: 'Kim', MO: 'Mộc', TO: 'Thổ' };
+const SKILLS = [['1', 'Đòn thường'], ['2', 'Chiêu chính'], ['3', 'Chiêu phụ'], ['4', 'Tuyệt kỹ'], ['aura', 'Hào quang']];
+let fps = 10, compare = false, filter = 'all';
+const players = [];
+
+async function names() {
+  const src = await (await fetch('/scripts/creatures.py')).text();
+  const block = src.slice(src.search(/^NAMES = \{/m));
+  const out = {};
+  for (const m of block.slice(0, block.indexOf('}')).matchAll(/'([a-z-]+)':\s*'([^']+)'/g)) out[m[1]] = m[2];
+  return out;
+}
+
+async function files() {
+  const html = await (await fetch(DIR)).text();
+  return new Set([...html.matchAll(/href="([^"]+\.png)"/g)].map(m => decodeURIComponent(m[1])));
+}
+
+// magenta background keyed to transparent, then split into equal cells (4x3 when the sheet is about 4:3, else 4x2)
+const cache = {};
+function load(name) {
+  return cache[name] ||= new Promise(ok => {
+    const im = new Image();
+    im.onload = () => {
+      const c = document.createElement('canvas'); c.width = im.width; c.height = im.height;
+      const g = c.getContext('2d'); g.drawImage(im, 0, 0);
+      const d = g.getImageData(0, 0, c.width, c.height), p = d.data;
+      for (let i = 0; i < p.length; i += 4) {
+        const r = p[i], gg = p[i + 1], b = p[i + 2], key = Math.min(r, b) - gg;
+        if (key > 90 && r > 150 && b > 150) p[i + 3] = 0;
+        else if (key > 40 && r > 120 && b > 120) p[i + 3] = Math.round(p[i + 3] * (1 - (key - 40) / 50));
+      }
+      g.putImageData(d, 0, 0);
+      const cols = 4, rows = im.width / im.height < 1.6 ? 3 : 2;
+      ok({ c, cols, rows, cw: im.width / cols, ch: im.height / rows, n: cols * rows });
+    };
+    im.onerror = () => ok(null);
+    im.src = DIR + name;
+  });
+}
+
+function drawFrame(cv, sh, i) {
+  const g = cv.getContext('2d');
+  g.clearRect(0, 0, cv.width, cv.height);
+  if (!sh) return;
+  const col = i % sh.cols, row = Math.floor(i / sh.cols);
+  const k = Math.min(cv.width / sh.cw, cv.height / sh.ch);
+  const w = sh.cw * k, h = sh.ch * k;
+  g.imageSmoothingEnabled = false;
+  g.drawImage(sh.c, col * sh.cw, row * sh.ch, sh.cw, sh.ch, (cv.width - w) / 2, (cv.height - h) / 2, w, h);
+}
+
+function canvasFor(name, label) {
+  const cv = document.createElement('canvas'); cv.width = cv.height = 256;
+  const p = { cv, name, sh: null, label };
+  load(name).then(sh => { p.sh = sh; });
+  cv.onclick = () => openZoom(p);
+  players.push(p);
+  return cv;
+}
+
+function build(nm, have) {
+  const pets = [...new Set([...have].filter(f => f.endsWith('_lv5.png')).map(f => f.replace(/_(1|2|3|4|aura)_lv5\.png$/, '')))]
+    .sort((a, b) => Object.keys(ELEMENTS).indexOf(a.slice(0, 2)) - Object.keys(ELEMENTS).indexOf(b.slice(0, 2)) || a.localeCompare(b));
+  const list = document.getElementById('list');
+  let done = 0, total = 0;
+  for (const pre of pets) {
+    const el = pre.slice(0, 2), slug = pre.split('_')[1];
+    const card = document.createElement('section');
+    card.className = 'pet'; card.dataset.el = el; card.style.setProperty('--el', `var(--${el})`);
+    card.innerHTML = `<h2>${nm[slug] || slug}<small>${ELEMENTS[el]} · ${pre.split('_')[0]}</small></h2>`;
+    const row = document.createElement('div'); row.className = 'row';
+    for (const [n, label] of SKILLS) {
+      const cell = document.createElement('div'); cell.className = 'cell';
+      cell.innerHTML = `<span>${label}</span>`;
+      const pair = document.createElement('div'); pair.className = 'pair';
+      const f5 = `${pre}_${n}_lv5.png`, f2 = `${pre}_${n}_lv2.png`;
+      if (have.has(f5) || have.has(`${pre}_${n}.png`)) total++;
+      if (have.has(f5)) { done++; pair.appendChild(canvasFor(f5, `${nm[slug] || slug} · ${label} · Lv5`)); }
+      else if (have.has(`${pre}_${n}.png`)) { const m = document.createElement('div'); m.className = 'miss'; m.textContent = 'chưa có lv5'; pair.appendChild(m); }
+      else continue;
+      if (have.has(f2)) {
+        const w = document.createElement('div'); w.className = 'lv2'; w.hidden = true;
+        w.innerHTML = '<div class="tag">bậc 2</div>';
+        w.appendChild(canvasFor(f2, `${nm[slug] || slug} · ${label} · bậc 2`));
+        pair.appendChild(w);
+      }
+      cell.appendChild(pair); row.appendChild(cell);
+    }
+    card.appendChild(row); list.appendChild(card);
+  }
+  document.getElementById('count').textContent = `${done}/${total} sheet lv5 · ${pets.length} pet`;
+}
+
+function tabs() {
+  const t = document.getElementById('tabs');
+  for (const [k, v] of [['all', 'Tất cả'], ...Object.entries(ELEMENTS)]) {
+    const b = document.createElement('button'); b.textContent = v; b.className = k === filter ? 'on' : '';
+    b.onclick = () => { filter = k; [...t.children].forEach(x => x.classList.toggle('on', x === b));
+      document.querySelectorAll('.pet').forEach(p => p.hidden = k !== 'all' && p.dataset.el !== k); };
+    t.appendChild(b);
+  }
+}
+
+let zoomP = null;
+function openZoom(p) { zoomP = p; document.querySelector('#zoom p').textContent = p.label + ' (bấm để đóng)'; document.getElementById('zoom').classList.add('on'); }
+document.getElementById('zoom').onclick = () => { zoomP = null; document.getElementById('zoom').classList.remove('on'); };
+document.getElementById('fps').oninput = e => { fps = +e.target.value; document.getElementById('fpsv').textContent = fps; };
+document.getElementById('cmp').onchange = e => { compare = e.target.checked; document.querySelectorAll('.lv2').forEach(w => w.hidden = !compare); };
+
+let t0 = performance.now();
+function tick(now) {
+  const step = Math.floor((now - t0) * fps / 1000);
+  for (const p of players) {
+    if (!p.sh || p.cv.offsetParent === null) continue;
+    const r = p.cv.getBoundingClientRect();
+    if (r.bottom < 0 || r.top > innerHeight) continue;
+    drawFrame(p.cv, p.sh, step % p.sh.n);
+  }
+  if (zoomP && zoomP.sh) drawFrame(document.querySelector('#zoom canvas'), zoomP.sh, step % zoomP.sh.n);
+  requestAnimationFrame(tick);
+}
+
+(async () => {
+  const [nm, have] = await Promise.all([names(), files()]);
+  tabs(); build(nm, have); requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>

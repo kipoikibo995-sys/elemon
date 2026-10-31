@@ -43,7 +43,7 @@ function Build($name, $sources, $flags, $dist, $need) {
     & python -m ziglang cc -target $target -shared '-Wl,-soname,libSDL2-2.0.so.0' $stubC -o $stub
     if ($LASTEXITCODE -ne 0) { throw 'stub failed' }
     $binary = Join-Path $out $name
-    & python -m ziglang cc -target $target -s -o $binary @objects $stub -lm
+    & python -m ziglang cc -target $target -s -o $binary @objects $stub -lm -lpthread
     if ($LASTEXITCODE -ne 0) { throw 'link failed' }
     Copy-Item $binary (Join-Path $dist $name) -Force
     Write-Host "Built $(Join-Path $dist $name) ($([math]::Round((Get-Item $binary).Length / 1KB)) KB)"

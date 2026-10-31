@@ -11,17 +11,14 @@
   const MODE = 'voduong', PUNCHES = 10;
   const IM = {};
   const pics = ['menu/bang-chu', 'menu/bang-tieu-de', 'menu/khoa', 'menu/the_chon', 'menu/the_thuong',
-    ...['tap-luyen', 'solo', 'ne-chieu'].flatMap(n => [`menu/hinh_${n}`, `menu/hinh_${n}_lon`]),
+    ...['tap-luyen', 'solo'].flatMap(n => [`menu/hinh_${n}`, `menu/hinh_${n}_lon`]),
     'tap/nen_vo-duong', 'tap/thanh-nhip', 'tap/kim-nhip', ...[0, 1, 2, 3].flatMap(i => [`tap/bao-cat_${i}`, `tap/fx-trung_${i}`]),
-    ...[0, 1, 2, 3, 4, 5, 6, 7].flatMap(i => [`tap/bao-cat8_${i}`, `tap/fx-trung8_${i}`]),
-    ...['bao_cham-than', 'bao_len', 'bao_trai', 'bao_xuong', 'dan_bong-go', 'dan_cau-lua', 'dan_cau-nuoc', 'dan_con-xoay',
-        'fx_bui', 'fx_ne-hoan-hao', 'fx_trung-don', 'tim_day', 'tim_rong', 'su-phu_cuoi', 'su-phu_dung', 'su-phu_lay-da',
-        'su-phu_nem-cao', 'su-phu_nem-thap', 'su-phu_nem', 'su-phu_ngac-nhien', 'su-phu_that-vong', 'nen_san-da'].map(n => 'ne/' + n)];
+    ...[0, 1, 2, 3, 4, 5, 6, 7].flatMap(i => [`tap/bao-cat8_${i}`, `tap/fx-trung8_${i}`])];   // (the dodge lesson's ne/*: off the menu)
   for (const n of pics) { const i = new Image(); i.onload = () => { IM[n] = i; }; i.src = `img/vd/${n}.png`; }
+  // Học né chiêu is off the menu (the user, 28/10/2026: another lesson will take its place; its code below stays)
   const CARDS = [{ key: 'tap-luyen', name: 'Tập luyện', open: true },
-                 { key: 'solo', name: 'Solo đối kháng', get open() { return typeof __soloOpen === 'function'; } },   // solo.js
-                 { key: 'ne-chieu', name: 'Học né chiêu', open: true }];
-  const CARD_X = [140, 320, 500], CARD_Y = 210, LABEL_Y = 352;
+                 { key: 'solo', name: 'Solo đối kháng', get open() { return typeof __soloOpen === 'function'; } }];   // solo.js
+  const CARD_X = [230, 410], CARD_Y = 210, LABEL_Y = 352;
   const HIT = { strong: { exp: 8, bag: [2, 3, 1, 0], fx: 1, word: 'Mạnh!' }, ok: { exp: 4, bag: [1, 3, 0], fx: 0.75, word: 'Trúng' },
                 weak: { exp: 1, bag: [1, 0], fx: 0.5, word: 'Hụt nhịp' } };
   const sfx = (n, v) => { if (typeof SOUND === 'object' && SOUND) SOUND.sfx(n, v); };
@@ -52,7 +49,7 @@
     ctx.drawImage(pic('tap/nen_vo-duong'), 0, 0);
     // a pastel wash so the cards stand out, as the user's mock-up of this menu (measured on it: 37 % of a light
     // blue-cream, half the colour left)
-    ctx.fillStyle = 'rgba(206,219,228,0.37)'; ctx.fillRect(0, 0, 640, 480);
+    ctx.fillStyle = 'rgba(14,9,6,0.42)'; ctx.fillRect(0, 0, 640, 480);   // darkened: the light wash glared on the device
     centre(pic('menu/bang-tieu-de'), 320, 48);
     title('VÕ ĐƯỜNG', 320, 46, 26, '#ffe6a8', 4);
     CARDS.forEach((c, i) => {
@@ -65,8 +62,8 @@
       if (!c.open && k) ctx.drawImage(k, CARD_X[i] - 62, LABEL_Y - 14, k.width * 0.34, k.height * 0.34);   // not open yet
       text(c.name, tx, LABEL_Y, c.name.length > 12 ? 13 : 15, c.open ? '#ffe6a8' : '#d8c8a8', 'center', true, 3);
     });
-    text(['Đấm theo nhịp, lướt tới đánh theo mũi tên: nhiều EXP', CARDS[1].open ? 'Đấu 1-1 với bot: 15 pet Lv2' : 'Sắp có',
-          'Sư phụ ném đòn: nhảy, lùi, cúi cho đúng lúc'][v.sel], 320, 404, 14, '#fff2d8', 'center', true, 3);
+    text(['Đấm theo nhịp, lướt tới đánh theo mũi tên: nhiều EXP', CARDS[1].open ? 'Đấu 1-1 với bot cùng Level' : 'Sắp có'][v.sel],
+         320, 404, 14, '#fff2d8', 'center', true, 3);
     text('◀ ▶ chọn · A: vào · B: ra bản đồ', 320, 462, 13, '#f0e4ce', 'center', false, 3);
   }
 
@@ -155,7 +152,8 @@
 
   function startTraining(now) {
     if (S.stage === 'baby') return toast('Tiến hóa lên Nhi để mở Tập luyện');
-    if (S.sick || S.need.nl < 25) return toast(`${DATA.pet.name} ${S.sick ? 'đang ốm' : 'mệt quá'}, về nghỉ đã`);
+    const why = __chiSo.fit(25);
+    if (why) return toast(`${DATA.pet.name} chưa tập được: ${why}, về nghỉ đã`);
     fadeTo(() => { S.vd = { view: 'train', sel: S.vd.sel, t0: performance.now(), period: 1300, n: 0, exp: 0, hit: null, end: 0 }; });
   }
   function newTarget(t) {                                         // the bag's height for the next dash
@@ -164,9 +162,8 @@
   }
   function score(kind) {
     const t = S.vd;
-    S.need.nl = Math.max(0, S.need.nl - 2); S.need.no = Math.max(0, S.need.no - 1);
     const xp0 = S.xp; gainExp(HIT[kind].exp); t.exp += Math.max(0, S.xp - xp0);
-    if (t.n >= PUNCHES || S.need.nl < 5) t.end = performance.now() + 900;
+    if (t.n >= PUNCHES) t.end = performance.now() + 900;
   }
   function punch(now) {
     const t = S.vd;
@@ -267,7 +264,10 @@
     text(t.end ? 'Xong buổi tập!' : round2 ? (now < t.t0 ? 'Hiệp 2: mũi tên tự quét, pet lướt tới theo mũi tên' : 'A: lướt tới đánh khi mũi tên vào điểm xanh · B: thôi')
       : 'A: đấm khi kim vào vùng xanh · B: thôi', 320, 46, 13, '#f0e4ce', 'center', false, 3);
     if (t.end > 0 && now > t.end + 600 && S.fade === 0) {
-      toast(`Tập xong: EXP +${Math.round(t.exp)}`);
+      // the lesson's cost and, once a day, its attribute (game/src/chi-so.js)
+      __chiSo.cost('train');
+      const up = __tapXong('dam');
+      toast(`Tập xong: EXP +${Math.round(t.exp)}${up ? ' · ' + up : ''}`);
       emote('bc_mo-hoi-nho'); S.bubble = 'tt_khat';
       fadeTo(() => { S.vd = { view: 'menu', sel: 0 }; });
       t.end = -1;                                                  // only once
@@ -287,7 +287,8 @@
   const lerp = (a, b, x) => a + (b - a) * Math.max(0, Math.min(1, x));
   function startNe(now) {
     if (S.stage === 'baby') return toast('Tiến hóa lên Nhi để học né chiêu');
-    if (S.sick || S.need.nl < 25) return toast(`${DATA.pet.name} ${S.sick ? 'đang ốm' : 'mệt quá'}, về nghỉ đã`);
+    const why = __chiSo.fit(25);
+    if (why) return toast(`${DATA.pet.name} chưa tập được: ${why}, về nghỉ đã`);
     fadeTo(() => {
       S.vd = { view: 'ne', sel: S.vd.sel, n: 0, hearts: NE_HEARTS, combo: 0, best: 0, dodged: 0, exp: 0, next: performance.now() + 1200,
                warn: null, shots: [], dodge: null, react: null, fxs: [], words: [], end: 0 };
@@ -318,7 +319,6 @@
       t.n++; t.react = { img: THROW_POSE[h], t: now, ms: 280 }; t.warn = null;
       sfx('chieu', 150);
       t.next = t.n >= 8 && Math.random() < 0.3 ? now + 380 : now + fly + 550;   // later on: a second throw at once
-      S.need.nl = Math.max(0, S.need.nl - 1);
     }
     // contact: dodged (the right key pressed during the throw), PERFECT (close to contact) or hit
     for (const s of t.shots) {
@@ -354,7 +354,9 @@
       t.react = { img: t.dodged >= 14 ? 'ne/su-phu_cuoi' : 'ne/su-phu_that-vong', t: now, ms: 99999 };
     }
     if (t.end > 0 && now - t.end > 1600 && S.fade === 0) {
-      toast(`Né được ${t.dodged}/${NE_THROWS} · combo ${t.best} · EXP +${Math.round(t.exp)}`);
+      __chiSo.cost('train');
+      const up = __tapXong('ne');
+      toast(`Né được ${t.dodged}/${NE_THROWS} · combo ${t.best} · EXP +${Math.round(t.exp)}${up ? ' · ' + up : ''}`);
       emote(t.dodged >= 14 ? 'bc_tim' : 'bc_mo-hoi'); S.bubble = 'tt_khat';
       fadeTo(() => { S.vd = { view: 'menu', sel: 2 }; });
       t.end = -1;
@@ -414,7 +416,7 @@
     if (!S.vd) S.vd = { view: 'menu', sel: 0 };
     if (!pic('tap/nen_vo-duong')) { ctx.fillStyle = '#000'; ctx.fillRect(0, 0, 640, 480); return; }
     if (S.vd.view === 'train') drawTrain(now); else if (S.vd.view === 'ne') drawNe(now);
-    else if (/^solo/.test(S.vd.view) && typeof __soloDraw === 'function') return __soloDraw(now);
+    else if (/^solo/.test(S.vd.view) && typeof __soloDraw === 'function') __soloDraw(now);   // toasts over it too
     else drawMenu(now);
     if (S.toast && now - S.toastT < 1800) {                        // the demo draws toasts only on its own screens
       ctx.fillStyle = 'rgba(18,11,9,0.85)'; ctx.fillRect(140, 190, 360, 40); text(S.toast, 320, 210, 14, '#f0e4ce', 'center');
@@ -430,11 +432,11 @@
     if (S.fade > 0) return;
     const v = S.vd || (S.vd = { view: 'menu', sel: 0 });
     if (v.view === 'menu') {
-      if (btn === 'LEFT') v.sel = (v.sel + 2) % 3;
-      if (btn === 'RIGHT') v.sel = (v.sel + 1) % 3;
+      if (v.sel >= CARDS.length) v.sel = 0;                  // a save from when the menu had a third card
+      if (btn === 'LEFT') v.sel = (v.sel + CARDS.length - 1) % CARDS.length;
+      if (btn === 'RIGHT') v.sel = (v.sel + 1) % CARDS.length;
       if (btn === 'B') fadeTo(() => { S.mode = 'map'; });
-      if (btn === 'A') !CARDS[v.sel].open ? toast(`${CARDS[v.sel].name}: sắp có`) : v.sel === 2 ? startNe(now)
-        : v.sel === 1 ? __soloOpen() : startTraining(now);
+      if (btn === 'A') !CARDS[v.sel].open ? toast(`${CARDS[v.sel].name}: sắp có`) : v.sel === 1 ? __soloOpen() : startTraining(now);
       return;
     }
     if (/^solo/.test(v.view) && typeof __soloPress === 'function') return __soloPress(btn);

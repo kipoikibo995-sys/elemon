@@ -50,6 +50,11 @@ def picture(src, dst):
     elif im.width * im.height > 4096:
         q, err = r36s_pak.to_palette(im.convert('RGBA'))
         if q is not None:
+            # an opaque picture stays opaque: the quantizer leaves some colours at alpha 254, and one such pixel
+            # makes the runtime blend the whole picture pixel by pixel instead of copying its rows
+            pal = q.getpalette('RGBA')
+            pal[3::4] = [255] * (len(pal) // 4)
+            q.putpalette(pal, 'RGBA')
             im = q
     write_hli(dst, im)
 

@@ -1,0 +1,1028 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Elemon</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Elemon: game nuôi tinh linh Ngũ Hành pixel cho máy cầm tay R36S, Anbernic và PocketGo.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,700;0,800;0,900;1,500&display=swap">
+<style>
+/* Layout: mở bằng đúng màn hình tựa của game (trời xanh, đồi cỏ), mỗi phần một nền sáng lấy từ thế giới game
+   (giấy kem, trời, cỏ); chỉ đoạn truyền thuyết Hư Ảnh là đêm tím. Khung gỗ, bảng treo, nút L/R/A/B lấy từ bộ UI gốc.
+   Một bộ màu cố định, không đổi theo chế độ sáng/tối. */
+:root {
+  --paper: #fff3d9;        /* giấy kem, như ô logo màn hình tựa */
+  --sky: #c4ebff;          /* trời màn hình tựa */
+  --grass: #dff3c4;        /* đồi cỏ */
+  --night: #1d1240;        /* đêm Hư Ảnh */
+  --ink: #4a250e;          /* chữ nâu gỗ trên nền sáng */
+  --ink-dim: #7d5330;
+  --hoa-d: #d4470f; --kim-d: #4f7593; --moc-d: #3a8a1e; --thuy-d: #1577c4; --tho-d: #a86d14;
+  --lacquer: #170905;      /* gỗ sơn mài tối: thanh tab, chân trang */
+  --panel: #2c140e;        /* lòng khung_panel */
+  --panel-2: #3a1a10;
+  --cream: #f8e6c0;        /* chữ chính trong game */
+  --cream-dim: #c9a47a;
+  --bronze: #d59a45;
+  --ember: #ff8a1f;        /* màu tab đang chọn */
+  --outline: #1a0c06;      /* viền tối 2 px của pet và chữ */
+  --smoke: #b061ff;
+  --hoa: #ff6b35; --kim: #dfe9f3; --moc: #79c955; --thuy: #49b4ff; --tho: #e3a94f;
+  --f: "Be Vietnam Pro", "DejaVu Sans", "Segoe UI", system-ui, sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 64px; }
+body {
+  margin: 0; background: var(--paper); color: var(--ink);
+  font-family: var(--f); font-size: 17px; line-height: 1.6; overflow-x: hidden;
+}
+img { max-width: 100%; display: block; }
+.px { image-rendering: pixelated; }
+p { margin: 0; }
+h1, h2, h3 { margin: 0; font-weight: 900; line-height: 1.15; text-wrap: balance; }
+:focus-visible { outline: 3px solid var(--ember); outline-offset: 3px; }
+.wrap {
+  max-width: 1160px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+/* chữ kiểu game: kem, viền tối */
+.ol { text-shadow: 2px 0 0 var(--outline), -2px 0 0 var(--outline), 0 2px 0 var(--outline), 0 -2px 0 var(--outline), 2px 2px 0 var(--outline), -2px 2px 0 var(--outline), 2px -2px 0 var(--outline), -2px -2px 0 var(--outline); }
+
+/* khung_panel 9 mảnh */
+.panel {
+  border: 28px solid transparent;
+  border-image: url(img/ui-panel9.png) 84 fill / 28px / 0 stretch;
+  image-rendering: pixelated;
+  min-width: 0;
+}
+.panel > * { image-rendering: auto; }
+.panel { color: var(--cream); --fg-dim: var(--cream-dim); }
+
+/* nền từng phần */
+section { --fg-dim: var(--ink-dim); }
+.t-paper { background: var(--paper); }
+.t-sky { background: linear-gradient(180deg, var(--sky), #e6f6ff); }
+.t-grass { background: linear-gradient(180deg, #eef9df, var(--grass)); }
+.t-night { background: radial-gradient(ellipse at 50% 0%, #3b2378 0%, var(--night) 60%); color: var(--cream); --fg-dim: #c9b8ef; }
+.hint {
+  display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 16px;
+  font-size: 13px; color: var(--cream-dim); margin-top: 14px;
+}
+.hint b { color: var(--cream); font-weight: 700; }
+
+/* ---------- Thanh tab ---------- */
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 30; background: var(--lacquer); }
+.tabs {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20;
+  background: var(--lacquer);
+  border-bottom: 3px solid #4a2414;
+}
+.tabs .wrap { display: flex; align-items: center; gap: 10px; padding-block: 8px; }
+.tabs .lr { flex: none; width: 34px; height: 33px; border: 0; padding: 0; background: none; cursor: pointer; }
+.tabs .lr img { width: 100%; height: 100%; }
+.tabs .lr:hover img { filter: brightness(1.2); }
+.tabs nav { flex: 1; min-width: 0; display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; }
+/* căn giữa khi vừa, còn khi tràn thì cuộn được tới tận tab đầu và cuối */
+.tabs nav > :first-child { margin-left: auto; }
+.tabs nav > :last-child { margin-right: auto; }
+.tabs nav::-webkit-scrollbar { display: none; }
+.tab {
+  flex: none; display: grid; place-items: center; height: 32px; padding: 0 2px;
+  border: solid transparent; border-width: 0 13px;
+  border-image: url(img/ui-tab_thuong.png) 0 34 fill / 0 13px stretch;
+  color: var(--cream-dim); font-weight: 700; font-size: 13.5px; text-decoration: none; white-space: nowrap;
+}
+.tab:hover { color: var(--cream); }
+.tab[aria-current="true"] { border-image-source: url(img/ui-tab_chon.png); color: #fff; }
+.tab[aria-current="true"] span { text-shadow: 1px 1px 0 #6a1d06; }
+
+/* ---------- Mở đầu: màn hình tựa của game ---------- */
+.hero { position: relative; isolation: isolate; overflow: hidden; padding-block: clamp(12px, 2vw, 24px); background: #9fd6f5 url(img/title-amb.webp) center / cover no-repeat; }
+.tscreen { position: relative; width: min(1000px, 100%); margin: 0 auto; aspect-ratio: 1448 / 1086; container-type: inline-size; box-shadow: 0 10px 40px rgba(30, 80, 120, .35); }
+.tscreen > img { width: 100%; height: 100%; }
+.tscreen .logo-slot { position: absolute; left: 19.5%; right: 19.5%; top: 9.6%; height: 18.4%; display: grid; place-items: center; }
+.tscreen .logo-slot img { max-width: 100%; max-height: 100%; }
+.tscreen .tbtn { position: absolute; left: 37.3%; width: 25.4%; height: 7.2%; display: flex; align-items: center; justify-content: center; gap: 1.2cqw;
+  text-decoration: none; font-weight: 900; font-size: 2.15cqw; white-space: nowrap; transition: transform .1s; }
+.tscreen .tbtn img { height: 4.4cqw; width: auto; }
+.tscreen .tbtn:hover { transform: translateY(2px); }
+.tscreen .tbtn.a { top: 75.5%; color: #7a3c10; }
+.tscreen .tbtn.b { top: 84.4%; color: #2c6a24; }
+.tscreen .hint-line { position: absolute; left: 0; right: 0; bottom: 1.6%; text-align: center; font-size: 1.5cqw; font-weight: 800; color: #fff; text-shadow: 0 1px 2px rgba(20, 60, 20, .8); }
+
+.intro { padding-block: clamp(40px, 6vw, 72px); }
+.intro .wrap { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: clamp(24px, 4vw, 56px); align-items: center; }
+.intro h1 { font-size: clamp(28px, 3.6vw, 44px); color: var(--ink); }
+.intro h1 em { font-style: normal; color: var(--hoa-d); }
+.intro .sub { margin-top: 14px; max-width: 48ch; font-size: 17px; color: var(--ink-dim); }
+.screen { position: relative; }
+.screen .panel { padding: 0; }
+.screen img.shot { width: 100%; aspect-ratio: 640 / 456; object-fit: cover; image-rendering: pixelated; }
+.screen .cap { position: absolute; left: 50%; bottom: -14px; transform: translateX(-50%); white-space: nowrap; font-size: 13px; font-weight: 700; padding: 3px 14px; background: var(--hoa-d); border: 2px solid #7a2508; color: #fff; }
+.facts { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; font-size: 14px; color: var(--ink-dim); }
+.facts span { padding: 4px 12px; background: #fff; border: 2px solid #e8cfa0; }
+.facts b { color: var(--ink); font-size: 18px; font-weight: 900; margin-right: 4px; }
+.intro .sub + .sub { margin-top: 10px; }
+.intro .wrap + .wrap { display: block; }
+
+/* ---------- Kết bài ---------- */
+.outro { position: relative; isolation: isolate; background: #9fd6f5 url(img/title-amb.webp) center / cover no-repeat; }
+.outro::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(180deg, rgba(255,243,217,.15), rgba(255,243,217,.55)); }
+.outro .card-end { max-width: 820px; margin: 0 auto; background: #fffaf0; border: 3px solid #4a2414; border-radius: 14px; box-shadow: 0 6px 0 #4a2414; padding: clamp(22px, 4vw, 40px); text-align: center; display: grid; gap: 16px; justify-items: center; }
+.outro blockquote { margin: 0; font-size: clamp(18px, 2.2vw, 22px); font-style: italic; font-weight: 600; color: var(--ink); max-width: 40ch; }
+.outro blockquote cite { display: block; margin-top: 6px; font-size: 14px; font-style: normal; font-weight: 800; color: var(--hoa-d); }
+.outro p { color: var(--ink-dim); max-width: 60ch; }
+.chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.chips span { font-size: 13px; font-weight: 800; padding: 5px 12px; border-radius: 999px; background: #e4f3ee; border: 2px solid #5aa898; color: #2f6a5e; }
+.chips span.now { background: #ffd9b8; border-color: #d8804a; color: #7a3a10; }
+.cta { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 6px; }
+.cta a { display: inline-flex; align-items: center; gap: 10px; padding: 10px 20px; border: 3px solid #4a2414; border-radius: 10px; box-shadow: 0 4px 0 #4a2414; font-weight: 900; text-decoration: none; color: var(--ink); background: #fbd8a4; transition: transform .1s; }
+.cta a.alt { background: #c9edb5; }
+.cta a:hover { transform: translateY(2px); box-shadow: 0 2px 0 #4a2414; }
+.cta img { width: 26px; height: 26px; }
+
+/* ---------- Ủng hộ ---------- */
+/* Bác Sóc đứng quầy, cạnh tấm bảng chuyển khoản */
+.donate { display: grid; grid-template-columns: minmax(0, 240px) minmax(0, 560px); justify-content: center; align-items: end; gap: clamp(16px, 3vw, 36px); max-width: 860px; margin: 0 auto; }
+.dn-npc { margin: 0; display: grid; justify-items: center; }
+.dn-bub { position: relative; background: #fffaf0; border: 3px solid #4a2414; border-radius: 14px; box-shadow: 0 4px 0 #4a2414; padding: 12px 16px; font-size: 16px; font-weight: 600; color: var(--ink); text-align: center; text-wrap: balance; }
+.dn-bub b { display: block; font-size: 13px; font-weight: 900; color: var(--moc-d); margin-bottom: 2px; }
+.dn-bub::after { content: ""; position: absolute; left: 50%; bottom: -13px; width: 20px; height: 20px; background: #fffaf0; border: solid #4a2414; border-width: 0 3px 3px 0; transform: translateX(-50%) rotate(45deg); }
+.dn-npc img { width: 200px; margin-top: 20px; }
+.dn-card { position: relative; padding: 6px 8px 8px; }
+.dn-pet { position: absolute; right: -6px; top: -78px; width: 64px; }
+.dn-ttl { display: flex; align-items: center; gap: 10px; font-size: 20px; color: var(--cream); margin-bottom: 14px; }
+.dn-ttl img { width: 28px; height: 28px; }
+.dn-body { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: center; }
+.bank { margin: 0; display: grid; gap: 10px; }
+.bank div { display: grid; gap: 2px; }
+.bank dt { font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--bronze); }
+.bank dd { margin: 0; padding: 7px 12px; background: var(--paper); border: 2px solid var(--bronze); border-radius: 6px; box-shadow: inset 0 -3px 0 #e8cfa0; font-weight: 800; color: var(--ink); overflow-wrap: anywhere; }
+.dn-qr { width: 132px; height: 132px; display: grid; place-items: center; text-align: center; border: 3px dashed var(--cream-dim); border-radius: 8px; font-size: 13px; font-weight: 700; line-height: 1.35; color: var(--cream-dim); }
+img.dn-qr { border: 0; background: #fff; padding: 6px; image-rendering: pixelated; }
+.kicker { display: inline-block; margin-bottom: 12px; font-size: 13px; font-weight: 900; letter-spacing: .14em; text-transform: uppercase; color: var(--hoa-d); }
+.pillars { list-style: none; margin: clamp(44px, 6vw, 64px) 0 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(12px, 2vw, 22px); }
+.pillars li { display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 12px; align-items: start; padding: 16px 14px; background: #fff; border: 3px solid #4a2414; border-radius: 10px; box-shadow: 0 4px 0 #4a2414; }
+.pillars img { width: 56px; height: 56px; object-fit: contain; }
+.pillars h3 { font-size: 17px; margin-bottom: 4px; }
+.pillars p { font-size: 14px; line-height: 1.5; color: var(--ink-dim); }
+.for { margin-top: 22px; text-align: center; color: var(--ink-dim); font-size: 15px; }
+.for b { color: var(--ink); }
+
+/* ---------- Bảng gỗ tiêu đề ---------- */
+section { padding-block: clamp(56px, 8vw, 104px); }
+.sign { width: min(560px, 100%); margin: 0 auto 18px; position: relative; container-type: inline-size; }
+.sign img { width: 100%; }
+.sign h2 {
+  position: absolute; left: 10%; right: 10%; top: 50%; bottom: 6%;
+  display: grid; place-items: center; text-align: center; text-transform: uppercase;
+  font-size: clamp(18px, 7.2cqw, 40px); color: #6b3410; letter-spacing: .02em; text-shadow: 0 2px 0 #ffe3a3;
+}
+.sec-lede { text-align: center; max-width: 62ch; margin: 0 auto clamp(28px, 5vw, 48px); color: var(--fg-dim); }
+
+/* ---------- Truyền thuyết ---------- */
+.reel { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(16px, 3vw, 32px); }
+.scene { margin: 0; }
+.scene .panel { padding: 0; }
+.scene .frame { aspect-ratio: 16 / 9; max-width: 100%; overflow: hidden; background: #000; }
+.scene .frame img { width: 100%; height: 100%; object-fit: cover; }
+.scene figcaption { padding: 16px 4px 2px; display: grid; gap: 6px; }
+.scene .no { font-size: 12px; font-weight: 800; letter-spacing: .14em; color: var(--ember); }
+.scene p { font-style: italic; font-weight: 500; }
+
+/* ---------- Già Quy, chọn trứng ---------- */
+.elder { display: grid; grid-template-columns: minmax(0, 260px) minmax(0, 1fr); gap: clamp(16px, 3vw, 36px); align-items: end; max-width: 940px; margin: 0 auto; }
+.elder > img { width: 100%; max-width: 260px; }
+.talk { position: relative; }
+.talk .name {
+  position: absolute; top: -48px; left: -6px; height: 34px; display: grid; place-items: center; padding: 0 8px;
+  border: solid transparent; border-width: 0 16px; border-image: url(img/ui-tab_chon.png) 0 34 fill / 0 16px stretch;
+  font-weight: 900; font-size: 15px; color: #fff;
+}
+.talk p { font-size: clamp(16px, 1.9vw, 19px); font-weight: 500; }
+.talk p + p { margin-top: 8px; }
+.talk .more { display: flex; justify-content: flex-end; align-items: center; gap: 8px; margin-top: 10px; font-size: 13px; color: var(--cream-dim); }
+.talk .more img { width: 26px; height: 26px; animation: tap 1.2s steps(2) infinite; }
+@keyframes tap { 50% { transform: translateY(2px); } }
+
+.picker { margin-top: clamp(48px, 7vw, 80px); display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: clamp(20px, 3vw, 36px); align-items: stretch; }
+.eggs { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; align-items: end; }
+.egg {
+  appearance: none; border: 0; background: none; color: var(--ink-dim); cursor: pointer; padding: 6px 0 0;
+  display: grid; justify-items: center; gap: 0; font: 800 15px/1 var(--f); position: relative;
+}
+.egg .e { height: 74px; width: auto; margin-bottom: -16px; position: relative; z-index: 1; transition: transform .15s; }
+.egg .b { width: 100%; max-width: 120px; }
+.egg span { margin-top: 8px; }
+.egg:hover .e { transform: translateY(-5px); }
+.egg[aria-pressed="true"] { color: var(--ink); }
+.egg[aria-pressed="true"] .e { animation: wobble .5s steps(4) 2; }
+.egg .b { opacity: .6; transition: opacity .15s; }
+.egg[aria-pressed="true"] .b, .egg:hover .b { opacity: 1; }
+@keyframes wobble { 25% { transform: rotate(-9deg); } 75% { transform: rotate(9deg); } }
+.card { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 14px 18px; align-items: center; }
+.card .stand { width: 150px; display: grid; justify-items: center; }
+.card .stand .pet { height: 104px; width: auto; margin-bottom: -26px; position: relative; z-index: 1; animation: bob 1.2s steps(2) infinite; }
+.card .stand .ped { width: 150px; }
+@keyframes bob { 50% { transform: translateY(-4px); } }
+.card h3 { font-size: 24px; }
+.card .he { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 700; color: var(--c); margin-top: 2px; }
+.card .he img { width: 40px; }
+.card .txt { grid-column: 1 / -1; color: var(--cream); }
+.card .quote { grid-column: 1 / -1; font-style: italic; color: var(--cream-dim); font-size: 15px; }
+.picker-l { display: grid; gap: 18px; align-content: center; }
+.picker-l h3 { font-size: 22px; }
+.picker-l p { color: var(--ink-dim); }
+
+/* ---------- Trong game ---------- */
+.viewer { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: clamp(18px, 3vw, 36px); align-items: start; }
+.viewer .panel { padding: 0; }
+.viewer .big { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; image-rendering: pixelated; background: #000; }
+.viewer .side { display: grid; gap: 16px; }
+.viewer h3 { font-size: 22px; }
+.viewer .desc { color: var(--ink-dim); min-height: 3.2em; }
+.thumbs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.thumb { appearance: none; padding: 0; border: 3px solid #4a2414; background: #000; cursor: pointer; aspect-ratio: 4 / 3; overflow: hidden; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; opacity: .6; transition: opacity .15s; }
+.thumb:hover img { opacity: .9; }
+.thumb[aria-pressed="true"] { border-color: var(--ember); }
+.thumb[aria-pressed="true"] img { opacity: 1; }
+.pager { display: flex; align-items: center; gap: 12px; font-size: 14px; color: var(--ink-dim); }
+.pager button { width: 34px; height: 33px; border: 0; padding: 0; background: none; cursor: pointer; }
+.pager button img { width: 100%; height: 100%; }
+.pager .count { font-variant-numeric: tabular-nums; font-weight: 700; color: var(--ink); }
+
+/* ---------- Lớn lên ---------- */
+.evo { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; align-items: end; }
+.stage { display: grid; justify-items: center; text-align: center; gap: 4px; }
+.stage .pic { height: 190px; display: grid; place-items: end center; width: 100%; }
+.stage .pic img { width: auto; max-width: 100%; position: relative; z-index: 1; margin-bottom: -22px; }
+.stage .ped { width: 82%; max-width: 150px; margin-bottom: 8px; }
+.stage h3 { font-size: 16px; }
+.stage .lv { font-weight: 900; color: var(--hoa-d); font-size: 14px; font-variant-numeric: tabular-nums; }
+.stage .need { font-size: 12.5px; color: var(--ink-dim); line-height: 1.4; }
+.s1 .pic img { height: 64px; } .s2 .pic img { height: 76px; } .s3 .pic img { height: 100px; }
+.s4 .pic img { height: 132px; } .s5 .pic img { height: 156px; } .s6 .pic img { height: 176px; }
+
+.stats { margin-top: clamp(36px, 6vw, 64px); display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(20px, 3vw, 40px); align-items: center; }
+.stat-list { display: grid; gap: 12px; }
+.stat { display: grid; grid-template-columns: 40px minmax(0, 1fr) 40px; gap: 4px 12px; align-items: center; }
+.stat > img { width: 40px; grid-row: span 2; }
+.stat b { font-size: 15px; font-weight: 700; }
+.stat .num { grid-row: span 2; text-align: right; font-weight: 800; font-variant-numeric: tabular-nums; }
+.bar { position: relative; height: 18px; background: url(img/ui-thanh_khung.png) center / 100% 100% no-repeat; }
+.bar i { position: absolute; left: 0; top: 2px; bottom: 2px; width: var(--v); overflow: hidden; }
+.bar i::before { content: ""; position: absolute; inset: 0 auto 0 0; width: calc(100% * 100 / var(--n)); background: var(--fill) left center / 100% 100% no-repeat; }
+.stats-txt { display: grid; gap: 12px; }
+.stats-txt h3 { font-size: 22px; }
+.stats-txt p { color: var(--ink-dim); }
+
+/* ---------- Ngũ Hành ---------- */
+.wuxing-sec { position: relative; isolation: isolate; overflow: hidden; }
+.wuxing-sec > img.bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -2; }
+.wuxing-sec::after { content: ""; position: absolute; inset: 0; z-index: -1; background: rgba(40, 14, 4, .25); }
+.wuxing { display: grid; grid-template-columns: minmax(0, 420px) minmax(0, 1fr); gap: clamp(24px, 4vw, 56px); align-items: center; }
+.wuxing .wx { width: 100%; max-width: 420px; }
+.wuxing svg { width: 100%; height: auto; display: block; }
+.wuxing-sec { --fg-dim: #fff; }
+.wuxing-sec .sec-lede { font-weight: 600; text-shadow: 0 1px 2px #2a0e04, 0 0 12px rgba(42,14,4,.9); }
+.rules { display: grid; gap: 18px; }
+.rule h3 { font-size: 18px; margin-bottom: 4px; }
+.rule p { color: var(--cream-dim); }
+.mult { color: var(--ember); font-weight: 900; }
+.legend { display: flex; flex-wrap: wrap; gap: 16px; font-size: 14px; color: var(--cream-dim); }
+.legend span { display: inline-flex; align-items: center; gap: 8px; }
+.legend i { width: 30px; border-top: 3px solid var(--cream); }
+.legend i.k { border-top-style: dashed; border-top-color: var(--smoke); }
+
+/* ---------- Năm vùng đất ---------- */
+.lands { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: clamp(10px, 1.6vw, 20px); }
+.land { display: grid; gap: 12px; align-content: start; }
+.tcard { position: relative; aspect-ratio: 300 / 455; max-width: 100%; }
+.tcard .art { position: absolute; left: 13%; right: 13%; top: 15%; bottom: 20%; overflow: hidden; background: #000; }
+.tcard .art img { width: 100%; height: 100%; object-fit: cover; }
+.tcard .frame { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.tcard .guard { position: absolute; left: 50%; bottom: 21%; transform: translateX(-50%); height: 30%; width: auto; max-width: 64%; object-fit: contain; filter: drop-shadow(0 0 6px var(--smoke)); }
+.tcard .label { position: absolute; left: 18%; right: 18%; bottom: 6.5%; height: 9%; display: grid; place-items: center; font-weight: 900; font-size: clamp(11px, 1.25vw, 15px); color: #5a2c0c; text-align: center; line-height: 1; }
+.land .he { display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 900; color: var(--cd); }
+.land .he img { width: 32px; }
+.land p { font-size: 14px; color: var(--ink-dim); line-height: 1.5; }
+.warn { margin-top: clamp(28px, 4vw, 40px); display: flex; align-items: center; gap: 14px; justify-content: center; text-align: center; color: var(--ink-dim); font-style: italic; }
+
+footer { background: var(--lacquer); border-top: 3px solid #4a2414; padding-block: 18px; font-size: 13px; color: var(--cream-dim); }
+footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 20px; align-items: center; }
+footer img { height: 28px; width: auto; }
+
+/* ---------- Nút máy (chip) ---------- */
+.k {
+  display: inline-grid; place-items: center; min-width: 28px; height: 26px; padding: 0 7px; vertical-align: middle;
+  background: #3a1a10; border: 2px solid var(--bronze); border-bottom-width: 4px; border-radius: 7px;
+  color: var(--cream); font: 900 12px/1 var(--f); white-space: nowrap;
+}
+.k.r { border-radius: 50%; padding: 0; width: 28px; }
+.k.a { background: #d8362a; border-color: #7a1810; color: #fff; }
+.k.b { background: #f2b51c; border-color: #8a5a06; color: #4a250e; }
+.k.x { background: #2f7fd6; border-color: #123f78; color: #fff; }
+.k.y { background: #3aa64a; border-color: #165a22; color: #fff; }
+
+/* ---------- Cách chơi ---------- */
+.loop { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(12px, 2vw, 22px); counter-reset: buoc; }
+.step { position: relative; background: #fff; border: 3px solid #4a2414; border-radius: 10px; padding: 34px 16px 18px; box-shadow: 0 4px 0 #4a2414; }
+.step::before {
+  counter-increment: buoc; content: counter(buoc); position: absolute; top: -18px; left: 14px; width: 40px; height: 40px;
+  display: grid; place-items: center; border-radius: 50%; background: var(--hoa-d); border: 3px solid #4a2414; color: #fff; font-weight: 900; font-size: 18px;
+}
+.step img.ic { position: absolute; top: 10px; right: 12px; width: 40px; height: 40px; object-fit: contain; }
+.step h3 { font-size: 18px; margin-bottom: 6px; padding-right: 40px; }
+.step p { font-size: 15px; color: var(--ink-dim); line-height: 1.55; }
+.step p + p { margin-top: 8px; }
+.menu5 { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 10px; }
+.menu5 span { font-size: 12px; font-weight: 800; padding: 2px 8px; background: #fbe6c2; border: 2px solid #e2bf86; border-radius: 6px; color: var(--ink); }
+.pad { margin-top: clamp(32px, 5vw, 56px); display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: clamp(20px, 3vw, 40px); align-items: center; }
+.pad-l h3 { font-size: 22px; margin-bottom: 8px; }
+.pad-l p { color: var(--ink-dim); }
+.pad-l p + p { margin-top: 10px; }
+.keys { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 10px 14px; align-items: center; font-size: 15px; }
+.keys dt { display: flex; gap: 4px; justify-content: flex-end; }
+.keys dd { margin: 0; color: var(--cream); line-height: 1.45; }
+
+/* ---------- Hoạt động ---------- */
+.acts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(14px, 2.4vw, 28px); }
+.act .panel { padding: 0; }
+.act .pic { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; image-rendering: pixelated; background: #000; }
+.act .body { padding: 14px 6px 6px; display: grid; gap: 6px; }
+.act h3 { font-size: 20px; display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.act h3 small { font-size: 12px; font-weight: 800; color: var(--ember); letter-spacing: .06em; text-transform: uppercase; }
+.act p { font-size: 15px; line-height: 1.5; color: var(--cream); }
+.act .how { font-size: 13px; color: var(--cream-dim); display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 4px; }
+.act .how .k { height: 22px; min-width: 24px; font-size: 11px; border-bottom-width: 3px; }
+.act .how .k.r { width: 24px; }
+.acts-note { margin-top: clamp(24px, 4vw, 36px); text-align: center; color: var(--ink-dim); }
+
+/* ---------- Đồ ăn ---------- */
+.food { display: grid; grid-template-columns: minmax(0, 300px) minmax(0, 1fr); gap: clamp(18px, 3vw, 36px); align-items: start; }
+.soc { display: grid; justify-items: center; gap: 0; position: sticky; top: 80px; }
+.soc .bub { position: relative; background: #fffaf0; border: 3px solid #5aa898; border-radius: 14px; padding: 12px 16px; font-size: 15px; font-weight: 500; color: var(--ink); }
+.soc .bub b { display: block; font-size: 13px; color: #2f7a6a; margin-bottom: 2px; }
+.soc .bub::after { content: ""; position: absolute; left: 50%; bottom: -13px; width: 20px; height: 20px; background: #fffaf0; border: solid #5aa898; border-width: 0 3px 3px 0; transform: translateX(-50%) rotate(45deg); }
+.soc img { width: 150px; margin-top: 18px; }
+.soc .law { margin-top: 14px; display: grid; gap: 8px; font-size: 14px; color: var(--ink-dim); }
+.soc .law p { padding-left: 12px; border-left: 3px solid #e2bf86; }
+.shelf { background: #fffaf0; border: 3px solid #5aa898; border-radius: 14px; padding: 0 clamp(10px, 2vw, 20px) 18px; box-shadow: 0 5px 0 #3d7f72; min-width: 0; }
+.shelf .stabs { display: flex; flex-wrap: wrap; gap: 6px; transform: translateY(-50%); margin-bottom: -6px; }
+.stab {
+  appearance: none; cursor: pointer; font: 800 14px/1 var(--f); padding: 9px 14px; border-radius: 10px;
+  background: #e4f3ee; border: 3px solid #5aa898; color: #2f6a5e;
+}
+.stab[aria-selected="true"] { background: #ffd9b8; border-color: #d8804a; color: #7a3a10; }
+.shelf .lede { font-size: 14px; color: var(--ink-dim); margin-bottom: 14px; }
+.items { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 12px 10px; }
+.item { display: grid; justify-items: center; text-align: center; gap: 4px; }
+.item .cell { width: 76px; height: 72px; background: url(img/ui-o-hang.png) center / 100% 100% no-repeat; image-rendering: pixelated; display: grid; place-items: center; }
+.item .ic { width: 56px; height: 56px; background-image: var(--sheet); background-size: calc(var(--n) * 100%) 100%; background-position: calc(var(--i) / (var(--n) - 1) * 100%) 0; image-rendering: auto; }
+.item b { font-size: 14px; line-height: 1.25; }
+.item .he { font-style: normal; font-size: 11.5px; font-weight: 800; color: var(--cd, var(--ink-dim)); }
+.item span { font-size: 12.5px; line-height: 1.35; color: var(--ink-dim); }
+
+/* ---------- Hẹp ---------- */
+@media (max-width: 900px) {
+  .loop { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 30px; }
+  .pillars { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .pad, .food { grid-template-columns: minmax(0, 1fr); }
+  .acts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .soc { position: static; grid-template-columns: auto minmax(0, 1fr); align-items: center; column-gap: 16px; }
+  .soc img { grid-row: 1 / span 2; grid-column: 1; margin: 0; width: 110px; }
+  .soc .bub::after { left: -10px; bottom: auto; top: 22px; border-width: 0 0 3px 3px; transform: rotate(45deg); }
+  .tabs nav { justify-content: flex-start; }
+  .intro .wrap, .picker, .viewer, .stats, .wuxing { grid-template-columns: minmax(0, 1fr); }
+  .wuxing { justify-items: center; }
+  .reel { grid-template-columns: minmax(0, 1fr); }
+  .evo { grid-template-columns: repeat(3, minmax(0, 1fr)); row-gap: 28px; }
+  .lands { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .land:last-child { grid-column: 1 / -1; justify-self: center; width: calc(50% - 6px); }
+  .tcard .label { font-size: clamp(11px, 3.4vw, 16px); }
+}
+@media (max-width: 640px) {
+  .tscreen .tbtn { left: 21%; width: 58%; height: 9.5%; font-size: 4.4cqw; gap: 2cqw; border: 2px solid #3b2d52; border-radius: 6px; }
+  .tscreen .tbtn img { height: 6.4cqw; }
+  .tscreen .tbtn.a { top: 74%; background: #fbd8a4; }
+  .tscreen .tbtn.b { top: 85.5%; background: #c9edb5; }
+  .screen .cap { white-space: normal; text-align: center; width: max-content; max-width: 90%; }
+  .panel { border-width: 20px; border-image-width: 20px; }
+  .elder { grid-template-columns: minmax(0, 1fr); justify-items: center; }
+  .elder > img { max-width: 170px; }
+  .talk { margin-top: 44px; }
+  .card { grid-template-columns: minmax(0, 1fr); justify-items: center; text-align: center; }
+  .card .he { justify-content: center; }
+  .egg .e { height: 52px; margin-bottom: -10px; }
+  .egg { font-size: 13px; }
+  .loop, .acts, .pillars { grid-template-columns: minmax(0, 1fr); }
+  .keys { font-size: 14px; }
+  .soc { grid-template-columns: minmax(0, 1fr); justify-items: center; }
+  .soc img { grid-row: auto; width: 110px; margin-top: 16px; }
+  .soc .bub::after { left: 50%; top: auto; bottom: -13px; border-width: 0 3px 3px 0; transform: translateX(-50%) rotate(45deg); }
+  .soc .bub { order: 0; } .soc img { order: 1; } .soc .law { order: 2; }
+  .items { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .shelf .stabs { transform: none; margin: 0 0 14px; padding-top: 14px; }
+  .stab { padding: 8px 11px; font-size: 13px; }
+  .stage .pic { height: 150px; }
+  .donate { grid-template-columns: minmax(0, 1fr); justify-items: center; }
+  .dn-npc img { width: 150px; }
+  .dn-card { width: 100%; margin-top: 30px; }
+  .dn-pet { top: -66px; width: 54px; right: -2px; }
+  .dn-body { grid-template-columns: minmax(0, 1fr); justify-items: center; }
+  .bank { width: 100%; }
+  .s4 .pic img { height: 112px; } .s5 .pic img { height: 128px; } .s6 .pic img { height: 140px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  html { scroll-behavior: auto; }
+}
+</style>
+</head>
+<body>
+
+<header class="tabs">
+  <div class="wrap">
+    <button class="lr" type="button" id="tab-l" aria-label="Phần trước"><img class="px" src="img/ui-nut_L.png" alt=""></button>
+    <nav aria-label="Các phần">
+      <a class="tab" href="#gioi-thieu"><span>Giới thiệu</span></a>
+      <a class="tab" href="#truyen-thuyet"><span>Truyền thuyết</span></a>
+      <a class="tab" href="#cach-choi"><span>Cách chơi</span></a>
+      <a class="tab" href="#hoat-dong"><span>Hoạt động</span></a>
+      <a class="tab" href="#do-an"><span>Đồ ăn</span></a>
+      <a class="tab" href="#lon-len"><span>Lớn lên</span></a>
+      <a class="tab" href="#vung-dat"><span>Vùng đất</span></a>
+      <a class="tab" href="#ung-ho"><span>Ủng hộ</span></a>
+    </nav>
+    <button class="lr" type="button" id="tab-r" aria-label="Phần sau"><img class="px" src="img/ui-nut_R.png" alt=""></button>
+  </div>
+</header>
+
+<section class="hero" id="dau">
+  <div class="tscreen">
+    <img src="img/title-nen.webp" alt="Màn hình tựa của Elemon: Hỏa Hổ ngồi trên đồi cỏ bên quả trứng, nhìn ra biển và các đảo">
+    <div class="logo-slot"><img src="img/logo.webp" alt="ELEMON"></div>
+    <a class="tbtn a" href="#truyen-thuyet"><img class="px" src="img/ui-nut_A.png" alt="">Truyền thuyết</a>
+    <a class="tbtn b" href="#chon-trung"><img class="px" src="img/ui-nut_B.png" alt="">Chọn trứng</a>
+  </div>
+</section>
+
+<section class="intro t-paper" id="gioi-thieu">
+  <div class="wrap">
+    <div>
+      <span class="kicker">Giới thiệu</span>
+      <h1>Ấp một quả trứng.<br><em>Giữ lại năm vùng đất.</em></h1>
+      <p class="sub">Elemon là game nuôi tinh linh pixel cho máy chơi game cầm tay. Bạn nhận một quả trứng ở Làng Ngũ Sắc, chăm bé từ lúc còn trong vỏ tới dạng Huyền thoại, rồi cùng nó đi giải thoát năm Thần thú đang bị Hư Ảnh nhập.</p>
+      <p class="sub">Game cầm lên chơi vài phút cũng được, chơi cả buổi cũng được: cho ăn, dọn chuồng, ra hồ câu cá, về bếp nấu món, tối tắt đèn cho bé ngủ.</p>
+      <div class="facts"><span><b>31</b>tinh linh</span><span><b>5</b>hệ</span><span><b>6</b>giai đoạn</span><span><b>17</b>phòng nuôi</span></div>
+    </div>
+    <div class="screen">
+      <div class="panel"><img class="shot" src="img/shot-hang-da.webp" alt="Hỏa Hổ trưởng thành đi lại trong phòng Hang đá, có ổ rơm, bếp lửa và thảm đỏ"></div>
+      <span class="cap">Chạy thật trên R36S · Hỏa Hổ trong Hang đá</span>
+    </div>
+  </div>
+  <div class="wrap">
+    <ul class="pillars">
+      <li><img class="px" src="img/egg-hoa.png" alt=""><div><h3>Nuôi từ trong trứng</h3><p>Cho ăn, tắm rửa, chơi cùng, ru ngủ. Bé lớn qua sáu giai đoạn và nhớ ai chăm mình.</p></div></li>
+      <li><img src="img/ui-he_thuy.png" alt=""><div><h3>Ăn gì thành nấy</h3><p>Món ăn nào cũng thuộc một hệ. Linh khí đổi theo, nhánh tiến hóa đổi theo.</p></div></li>
+      <li><img src="img/bac-soc.png" alt=""><div><h3>Cả một ngôi làng</h3><p>Câu cá, trồng rau, nấu ăn, đi học với cô Rắn, tập võ, mua bán ở quầy Bác Sóc.</p></div></li>
+      <li><img class="px" src="img/than-hoa.png" alt=""><div><h3>Năm vùng đất</h3><p>Lớn rồi thì lên đường. Đánh để giải thoát Thần thú bị khói tím nhập, không phải để giết.</p></div></li>
+    </ul>
+    <p class="for">Làm cho máy cầm tay chạy Linux: <b>R36S</b> trước, sau đó <b>Anbernic H700</b> và <b>PocketGo V1</b>. Không cần mạng.</p>
+  </div>
+</section>
+
+<main>
+  <section class="t-night" id="truyen-thuyet">
+    <div class="wrap">
+      <div class="sign"><img class="px" src="img/ui-khung_chao-doi_go.png" alt=""><h2>Truyền thuyết</h2></div>
+      <p class="sec-lede">Câu chuyện Già Quy vẫn kể cho người mới đến làng. Đây cũng là đoạn phim mở đầu khi bạn bấm Chơi mới.</p>
+      <div class="reel">
+        <figure class="scene"><div class="panel"><div class="frame"><img loading="lazy" decoding="async" src="img/phim-1-hu-anh.webp" alt="Bóng khói tím khổng lồ với đôi mắt sáng trùm lên núi rừng"></div>
+          <figcaption><span class="no">CẢNH 1 · HƯ ẢNH</span><p>Ngàn năm trước, từ một khe nứt của đất trời, Hư Ảnh tràn ra: một bóng khói không thuộc hệ nào, nuốt sạch Linh khí của muôn loài.</p></figcaption></div></figure>
+        <figure class="scene"><div class="panel"><div class="frame"><img loading="lazy" decoding="async" src="img/phim-2-than-thu.webp" alt="Năm Thần thú đứng trên vách đá đối mặt với Hư Ảnh"></div>
+          <figcaption><span class="no">CẢNH 2 · NĂM THẦN THÚ</span><p>Năm Thần thú hộ vùng đứng lên chống lại nó: Thủy Long, Kim Ưng, Thụ Nhân, Viêm Long và Thổ Long.</p></figcaption></div></figure>
+        <figure class="scene"><div class="panel"><div class="frame"><img loading="lazy" decoding="async" src="img/phim-3-phong-an.webp" alt="Năm luồng sáng năm màu hội tụ, phong ấn Hư Ảnh xuống Đài Ngũ Hành"></div>
+          <figcaption><span class="no">CẢNH 3 · PHONG ẤN</span><p>Họ hợp sức phong ấn Hư Ảnh dưới Đài Ngũ Hành, rồi trở về canh giữ năm vùng đất.</p></figcaption></div></figure>
+        <figure class="scene"><div class="panel"><div class="frame"><img loading="lazy" decoding="async" src="img/phim-5-phong-an-nut.webp" alt="Đêm, cột khói tím vọt lên từ Đài Ngũ Hành và tách làm năm luồng"></div>
+          <figcaption><span class="no">CẢNH 4 · ĐÊM ẤY</span><p>Ngàn năm trôi qua, phong ấn yếu dần. Rồi một đêm, Đài Ngũ Hành rung lên. Một vệt khói tím vọt lên, tách làm năm, bay về năm phía của quần đảo.</p></figcaption></div></figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="t-paper" id="chon-trung">
+    <div class="wrap">
+      <div class="elder">
+        <img src="img/gia-quy.png" alt="Già Quy, trưởng làng Ngũ Sắc, một cụ rùa chống gậy">
+        <div class="talk panel">
+          <span class="name">Già Quy</span>
+          <p>Một người lạ… Đã lâu lắm rồi mới có người tìm đến Làng Ngũ Sắc.</p>
+          <p>Ở đây, ai cũng có một tinh linh đồng hành. Làng còn giữ những quả trứng của đủ năm hệ.</p>
+          <p>Hãy chọn lấy một quả. Nó sẽ theo cháu suốt chặng đường phía trước.</p>
+          <div class="more">A: tiếp <img class="px" src="img/ui-nut_A.png" alt=""></div>
+        </div>
+      </div>
+
+      <div class="picker">
+        <div class="picker-l">
+          <div class="sign" style="margin:0"><img class="px" src="img/ui-khung_chao-doi_go.png" alt=""><h2>Chọn trứng</h2></div>
+          <div class="eggs" role="group" aria-label="Chọn một quả trứng">
+            <button class="egg" type="button" id="egg-hoa" data-he="hoa" style="--c:var(--hoa)" aria-pressed="true"><img class="e px" src="img/egg-hoa.png" alt=""><img class="b" src="img/ui-be-dung_hoa.png" alt=""><span>Hỏa</span></button>
+            <button class="egg" type="button" id="egg-kim" data-he="kim" style="--c:var(--kim)" aria-pressed="false"><img class="e px" src="img/egg-kim.png" alt=""><img class="b" src="img/ui-be-dung_kim.png" alt=""><span>Kim</span></button>
+            <button class="egg" type="button" id="egg-moc" data-he="moc" style="--c:var(--moc)" aria-pressed="false"><img class="e px" src="img/egg-moc.png" alt=""><img class="b" src="img/ui-be-dung_moc.png" alt=""><span>Mộc</span></button>
+            <button class="egg" type="button" id="egg-thuy" data-he="thuy" style="--c:var(--thuy)" aria-pressed="false"><img class="e px" src="img/egg-thuy.png" alt=""><img class="b" src="img/ui-be-dung_thuy.png" alt=""><span>Thủy</span></button>
+            <button class="egg" type="button" id="egg-tho" data-he="tho" style="--c:var(--tho)" aria-pressed="false"><img class="e px" src="img/egg-tho.png" alt=""><img class="b" src="img/ui-be-dung_tho.png" alt=""><span>Thổ</span></button>
+          </div>
+          <p>Mỗi hệ có sáu tinh linh, chia hai nhánh Thú hồn và Nguyên tố. Đây là năm con bạn có thể nở ra đầu tiên.</p>
+        </div>
+        <div class="panel" id="hatch" aria-live="polite" style="--c:var(--hoa)">
+          <div class="card">
+            <div class="stand"><img class="pet px" id="hatch-img" src="img/baby-hoa.png" alt="Hỏa Hổ lúc mới nở"><img class="ped" id="hatch-ped" src="img/ui-be-dung_hoa.png" alt=""></div>
+            <div>
+              <h3 id="hatch-name">Hỏa Hổ</h3>
+              <div class="he"><img id="hatch-he" src="img/ui-he_hoa.png" alt=""><span id="hatch-meta">Hệ Hỏa · Núi lửa</span></div>
+            </div>
+            <p class="txt" id="hatch-text">Sát thủ bùng nổ: nuôi Sức mạnh và Nhanh nhẹn. Ăn Ớt lửa cho đầy Năng lượng, nhưng đói nhanh hơn các hệ khác.</p>
+            <p class="quote">Già Quy: “<span id="hatch-quote">Trứng hệ Hỏa… Lựa chọn tốt. Ủ nó cho ấm và trò chuyện với nó mỗi ngày.</span>”</p>
+          </div>
+          <div class="hint"><span><b>◀ ▶</b> chọn trứng</span><span><b>A</b> ấp trứng</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="t-grass" id="cach-choi">
+    <div class="wrap">
+      <div class="sign"><img class="px" src="img/ui-khung_chao-doi_go.png" alt=""><h2>Cách chơi</h2></div>
+      <p class="sec-lede">Bé đói, buồn, bẩn hay mệt đều hiện lên đầu nó, chăm đúng thứ nó cần là được. Một ngày trong làng thường đi như thế này.</p>
+      <div class="loop">
+        <div class="step"><img class="ic px" src="img/egg-hoa.png" alt="">
+          <h3>Ấp trứng</h3>
+          <p>Chọn một quả trong năm hệ. Bấm <span class="k r a">A</span> gõ nhẹ lên vỏ vài lần, bé sẽ nở ra và dụi đầu vào tay bạn.</p></div>
+        <div class="step"><img class="ic" src="img/ui-icon_no.png" alt="">
+          <h3>Chăm trong phòng</h3>
+          <p>Thanh menu dưới màn hình có năm nút:</p>
+          <div class="menu5"><span>Ăn</span><span>Dọn</span><span>Vệ sinh</span><span>Ngủ/Đèn</span><span>Ra ngoài</span></div>
+          <p>Bấm <span class="k">R2</span> để chơi với bé, <span class="k r x">X</span> để vuốt ve. Đừng vuốt liền bốn lần, bé sẽ cáu.</p></div>
+        <div class="step"><img class="ic" src="img/ui-icon_vui.png" alt="">
+          <h3>Ra làng</h3>
+          <p>Chọn Ra ngoài để mở bản đồ Làng Ngũ Sắc: Trường học, Chợ, Võ đường và bảng Hoạt động với câu cá, nông trại, nấu ăn.</p>
+          <p>Việc gì cũng cho bé thêm kinh nghiệm, nhưng tốn chút No và Năng lượng.</p></div>
+        <div class="step"><img class="ic" src="img/ui-icon_suc-khoe.png" alt="">
+          <h3>Lớn lên, lên đường</h3>
+          <p>Đủ cấp và đủ Linh khí thì bé tiến hóa. Từ Thiếu niên, vùng đất cùng hệ mở cửa, và bé có thể đi giải thoát Thần thú.</p></div>
+      </div>
+
+      <div class="pad">
+        <div class="pad-l">
+          <h3>Nút trên máy</h3>
+          <p>Elemon làm cho máy cầm tay kiểu R36S: một D-pad, bốn nút mặt A B X Y, bốn nút vai, Select và Start. Không cần màn cảm ứng.</p>
+          <p>Mỗi màn đều ghi nút cần bấm ở cạnh dưới, nên chơi vài phút là quen.</p>
+        </div>
+        <div class="panel">
+          <dl class="keys">
+            <dt><span class="k">◀ ▶ ▲ ▼</span></dt><dd>Di chuyển: nút menu, món ăn, ô ruộng, địa điểm trên bản đồ</dd>
+            <dt><span class="k r a">A</span></dt><dd>Chọn, xác nhận, vào địa điểm, mua. Trong mini-game là nút chính</dd>
+            <dt><span class="k r b">B</span></dt><dd>Quay lại, đóng bảng</dd>
+            <dt><span class="k r x">X</span></dt><dd>Vuốt ve bé</dd>
+            <dt><span class="k r y">Y</span></dt><dd>Khoe chiêu: đấm, chưởng, tư thế thắng (khi bé đã lớn)</dd>
+            <dt><span class="k">R2</span></dt><dd>Chơi với bé, Vui tăng</dd>
+            <dt><span class="k">SELECT</span></dt><dd>Mở màn chỉ số. <span class="k">L1</span> <span class="k">R1</span> đổi trang</dd>
+            <dt><span class="k">START</span></dt><dd>Trang trí phòng</dd>
+          </dl>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="t-sky" id="trong-game">
+    <div class="wrap">
+      <div class="sign"><img class="px" src="img/ui-khung_chao-doi_go.png" alt=""><h2>Trong game</h2></div>
+      <p class="sec-lede">Phòng nuôi, bảng món, các trang chỉ số và bản đồ. Ảnh chụp từ bản chạy thử trên R36S, màn 640×480.</p>
+      <div class="viewer">
+        <div class="panel"><img class="big" id="shot-big" src="img/shot-phong.webp" alt=""></div>
+        <div class="side">
+          <div class="pager">
+            <button type="button" id="shot-l" aria-label="Ảnh trước"><img class="px" src="img/ui-nut_L.png" alt=""></button>
+            <span class="count" id="shot-count">1 / 8</span>
+            <button type="button" id="shot-r" aria-label="Ảnh sau"><img class="px" src="img/ui-nut_R.png" alt=""></button>
+          </div>
+          <h3 id="shot-title">Phòng nuôi</h3>
+          <p class="desc" id="shot-desc"></p>
+          <div class="thumbs" id="thumbs"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="t-paper" id="hoat-dong">
+    <div class="wrap">
+      <div class="sign"><img class="px" src="img/ui-khung_chao-doi_go.png" alt=""><h2>Hoạt động</h2></div>
+      <p class="sec-lede">Ngoài phòng nuôi, làng còn đủ việc để làm. Câu cá, trồng rau rồi đem nấu: thứ làm ra đều vào túi đồ để cho bé ăn hoặc bán lấy vàng.</p>
+      <div class="acts">
+        <article class="act"><div class="panel">
+          <img class="pic" loading="lazy" decoding="async" src="img/act-cau-ca.webp" alt="Hỏa Hổ con đứng trên cầu gỗ thả câu ra hồ thác, bên phải là thanh câu và thanh tiến độ">
+          <div class="body">
+            <h3>Câu cá <small>Hồ thác</small></h3>
+            <p>Thả câu rồi chờ phao chìm. Thấy dấu chấm than thì giật cần, sau đó giữ vùng xanh bám theo con cá cho tới khi đầy thanh. Cá có bốn bậc: Cá con, Cá vừa, Cá quý, Cá thần.</p>
+            <div class="how"><span class="k r a">A</span> thả, giật cần · giữ <span class="k r a">A</span> kéo · <span class="k r x">X</span> mua cần, mồi</div>
+          </div></div></article>
+        <article class="act"><div class="panel">
+          <img class="pic" loading="lazy" decoding="async" src="img/act-nong-trai.webp" alt="Ruộng 6 nhân 6 ô trên đồi cạnh nhà kho, nhiều ô đang có rau lớn">
+          <div class="body">
+            <h3>Nông trại <small>36 ô ruộng</small></h3>
+            <p>Nhổ cỏ, cuốc đất, gieo hạt, tưới nước, bắt sâu rồi thu hoạch. Quên tưới lâu là cây héo. Ban đầu có 9 ô, mỗi ô mới tốn 200 vàng. Mười lăm loại cây, mỗi hệ ba loại.</p>
+            <div class="how"><span class="k">◀ ▶ ▲ ▼</span> chọn ô · <span class="k r a">A</span> làm việc · <span class="k">L1</span><span class="k">R1</span> đổi hạt</div>
+          </div></div></article>
+        <article class="act"><div class="panel">
+          <img class="pic" loading="lazy" decoding="async" src="img/act-nau-an.webp" alt="Bốn bước nấu canh cá cà chua: cắt cà chua, khuấy nồi, chiên cá, bày món được ba sao">
+          <div class="body">
+            <h3>Nấu ăn <small>16 món</small></h3>
+            <p>Lấy rau và cá trong túi để nấu. Mỗi món hai tới bốn bước: cắt, khuấy, chiên. Nấu khéo được ba sao, món no lâu hơn và cho thêm chỉ số theo hệ.</p>
+            <div class="how">cắt: bấm <span class="k r a">A</span> liên tục · khuấy: xoay <span class="k">◀ ▲ ▶ ▼</span> · chiên: <span class="k r a">A</span> khi kim vào vùng xanh</div>
+          </div></div></article>
+        <article class="act"><div class="panel">
+          <img class="pic" loading="lazy" decoding="async" src="img/act-truong.webp" alt="Lớp học ngoài trời, cô Rắn đeo kính đứng cạnh ba thẻ môn Toán, Tiếng Anh, Học Hệ">
+          <div class="body">
+            <h3>Trường học <small>Cô Rắn</small></h3>
+            <p>Ba môn: Toán, Tiếng Anh và Học Hệ về Ngũ Hành. Mỗi câu đúng được thêm kinh nghiệm và 15 vàng. Cô Rắn cũng là người kể nhiều chuyện lạ trong làng nhất.</p>
+            <div class="how"><span class="k">◀ ▶</span> chọn đáp án · <span class="k r a">A</span> trả lời</div>
+          </div></div></article>
+        <article class="act"><div class="panel">
+          <img class="pic" loading="lazy" decoding="async" src="img/act-vo-duong.webp" alt="Võ đường gỗ có bao cát treo, thanh canh nhịp ở dưới">
+          <div class="body">
+            <h3>Võ đường <small>Tập luyện</small></h3>
+            <p>Mười lượt đánh bao cát: bấm đúng lúc kim chạy vào vùng xanh là đòn mạnh, nhiều kinh nghiệm nhất. Còn có Học né chiêu với sư phụ, Solo đối kháng mở sau.</p>
+            <div class="how"><span class="k r a">A</span> ra đòn · mỗi lượt tốn chút <b>No</b> và <b>Năng lượng</b></div>
+          </div></div></article>
+        <article class="act"><div class="panel">
+          <img class="pic" loading="lazy" decoding="async" src="img/act-cho.webp" alt="Quầy hàng của Bác Sóc với lưới hạt giống và giá tiền">
+          <div class="body">
+            <h3>Quầy Bác Sóc <small>Hạt · Đồ câu · Bán</small></h3>
+            <p>Mua hạt giống, cần câu, mồi; bán nông sản và cá lấy vàng. Cần câu tốt và mồi xịn thì dễ câu được cá hiếm.</p>
+            <div class="how"><span class="k">L1</span><span class="k">R1</span> đổi mục · <span class="k r a">A</span> mua, bán</div>
+          </div></div></article>
+      </div>
+      <p class="acts-note">Đi chơi xong nhớ về phòng cho bé ngủ. Hết Năng lượng thì bé chẳng làm được gì nữa.</p>
+    </div>
+  </section>
+
+  <section class="t-sky" id="do-an">
+    <div class="wrap">
+      <div class="sign"><img class="px" src="img/ui-khung_chao-doi_go.png" alt=""><h2>Đồ ăn</h2></div>
+      <p class="sec-lede">Mỗi món đều thuộc một hệ. Bé ăn gì sẽ thành con thú kiểu đó.</p>
+      <div class="food">
+        <div class="soc">
+          <div class="bub"><b>Bác Sóc</b>Bác mách cháu nhé: ăn đồ đúng hệ của bé thì lên Linh khí nhanh nhất.</div>
+          <img src="img/bac-soc.png" alt="Bác Sóc, chủ quầy hạt giống, đội mũ rơm và cầm túi hạt">
+          <div class="law">
+            <p><b>Cùng hệ</b> thì giữ và hồi Linh khí gốc của bé.</p>
+            <p><b>Khác hệ</b> thì Linh khí của món tăng, Linh khí gốc giảm. Nhánh tiến hóa cũng đổi theo.</p>
+            <p>Mỗi bé có một món thích, và ghét món của hệ khắc mình.</p>
+          </div>
+        </div>
+        <div class="shelf">
+          <div class="stabs" role="tablist" aria-label="Loại đồ ăn" id="stabs"></div>
+          <p class="lede" id="shelf-lede"></p>
+          <div class="items" id="items" role="tabpanel"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="t-grass" id="lon-len">
+    <div class="wrap">
+      <div class="sign"><img class="px" src="img/ui-khung_chao-doi_go.png" alt=""><h2>Lớn lên</h2></div>
+      <p class="sec-lede">Từ quả trứng tới dạng Huyền thoại. Đói thì cho ăn, mệt thì cho ngủ, bẩn thì tắm rửa và dọn chuồng. Tinh linh vui thì mau lớn, lại thương chủ.</p>
+      <div class="evo">
+        <div class="stage s1"><div class="pic"><img class="px" src="img/egg-hoa.png" alt="Trứng Hỏa Hổ"></div><img class="ped" src="img/ui-be-dung_trung-tinh.png" alt=""><h3>Trứng</h3><span class="lv">Ấp 30–60 phút</span><span class="need">Ủ ấm, trò chuyện mỗi ngày</span></div>
+        <div class="stage s2"><div class="pic"><img class="px" src="img/baby-hoa.png" alt="Hỏa Hổ giai đoạn Con"></div><img class="ped" src="img/ui-be-dung_trung-tinh.png" alt=""><h3>Con</h3><span class="lv">Lv 1–5</span><span class="need">Nở khi nó tin bạn</span></div>
+        <div class="stage s3"><div class="pic"><img class="px" src="img/evo-1.png" alt="Hỏa Hổ giai đoạn Nhi"></div><img class="ped" src="img/ui-be-dung_trung-tinh.png" alt=""><h3>Nhi</h3><span class="lv">Lv 6–20</span><span class="need">Đạt Lv 5</span></div>
+        <div class="stage s4"><div class="pic"><img class="px" src="img/evo-2.png" alt="Hỏa Hổ giai đoạn Thiếu niên"></div><img class="ped" src="img/ui-be-dung_trung-tinh.png" alt=""><h3>Thiếu niên</h3><span class="lv">Lv 21–45</span><span class="need">Lv 20 + một hệ Linh khí ≥ 30</span></div>
+        <div class="stage s5"><div class="pic"><img class="px" src="img/evo-3.png" alt="Hỏa Hổ Trưởng thành"></div><img class="ped" src="img/ui-be-dung_trung-tinh.png" alt=""><h3>Trưởng thành</h3><span class="lv">Lv 46–99</span><span class="need">Lv 45 + Linh khí chủ đạo ≥ 60</span></div>
+        <div class="stage s6"><div class="pic"><img class="px" src="img/evo-4.png" alt="Hỏa Hổ dạng Huyền thoại"></div><img class="ped" src="img/ui-be-dung_hoa.png" alt=""><h3>Huyền thoại</h3><span class="lv">Lv 100–150</span><span class="need">Lv 99, đủ 5 tim, nhà cấp 4, Hồn lửa xanh</span></div>
+      </div>
+
+      <div class="stats">
+        <div class="panel">
+          <div class="stat-list" aria-label="Năm chỉ số sinh tồn của Bông, Hỏa Hổ">
+            <div class="stat"><img src="img/ui-icon_no.png" alt=""><b>No</b><span class="num">72</span><div class="bar" style="--v:72%;--n:72;--fill:url(img/ui-thanh_fill_cam.png)"><i></i></div></div>
+            <div class="stat"><img src="img/ui-icon_vui.png" alt=""><b>Vui</b><span class="num">55</span><div class="bar" style="--v:55%;--n:55;--fill:url(img/ui-thanh_fill_hong.png)"><i></i></div></div>
+            <div class="stat"><img src="img/ui-icon_sach.png" alt=""><b>Sạch</b><span class="num">90</span><div class="bar" style="--v:90%;--n:90;--fill:url(img/ui-thanh_fill_xanh-duong.png)"><i></i></div></div>
+            <div class="stat"><img src="img/ui-icon_nang-luong.png" alt=""><b>Năng lượng</b><span class="num">15</span><div class="bar" style="--v:15%;--n:15;--fill:url(img/ui-thanh_fill_xanh-reu.png)"><i></i></div></div>
+            <div class="stat"><img src="img/ui-icon_suc-khoe.png" alt=""><b>Sức khỏe</b><span class="num">100</span><div class="bar" style="--v:100%;--n:100;--fill:url(img/ui-thanh_fill_do.png)"><i></i></div></div>
+          </div>
+          <div class="hint"><span><b>L/R</b> đổi trang</span><span><b>B</b> quay lại</span></div>
+        </div>
+        <div class="stats-txt">
+          <h3>Năm chỉ số sinh tồn</h3>
+          <p><b>No</b> hồi khi cho ăn. <b>Vui</b> hồi khi chơi mini-game và vuốt ve. <b>Sạch</b> tụt khi có phân trong chuồng. <b>Năng lượng</b> giảm khi thức, hồi khi tắt đèn cho ngủ. <b>Sức khỏe</b> tụt khi chỉ số khác về 0 quá lâu, phải dùng thuốc.</p>
+          <p>Đồ trong phòng cũng có tác dụng: có giường thì ngủ hồi nhanh gấp rưỡi, có bát thì ăn gọn hơn, có đèn hay lò lửa thì bé ít buồn, ít ốm.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="wuxing-sec" id="ngu-hanh">
+    <img class="bg" src="img/evo-nen.webp" alt="">
+    <div class="wrap">
+      <div class="sign"><img class="px" src="img/ui-khung_chao-doi_go.png" alt=""><h2>Ngũ Hành</h2></div>
+      <p class="sec-lede">Bài đầu tiên của cô Rắn ở Trường học. Năm hệ nuôi nhau thành một vòng, và khắc nhau thành một ngôi sao.</p>
+      <div class="wuxing">
+        <div class="panel wx"><svg viewBox="0 0 320 305" role="img" aria-labelledby="wx-title">
+          <title id="wx-title">Vòng tương sinh Mộc, Hỏa, Thổ, Kim, Thủy và ngôi sao tương khắc</title>
+          <defs>
+            <marker id="ar" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#f8e6c0"/></marker>
+            <marker id="ar2" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#b061ff"/></marker>
+          </defs>
+          <g fill="none" stroke="#b061ff" stroke-width="2" stroke-dasharray="5 5" marker-mid="url(#ar2)">
+            <polyline points="160,40 195.25,148.5 230.5,257"/>
+            <polyline points="230.5,257 138.25,190 46,123"/>
+            <polyline points="46,123 160,123 274,123"/>
+            <polyline points="274,123 181.75,190 89.5,257"/>
+            <polyline points="89.5,257 124.75,148.5 160,40"/>
+          </g>
+          <g fill="none" stroke="#f8e6c0" stroke-width="3" marker-mid="url(#ar)">
+            <polyline points="160,40 217,81.5 274,123"/>
+            <polyline points="274,123 252.25,190 230.5,257"/>
+            <polyline points="230.5,257 160,257 89.5,257"/>
+            <polyline points="89.5,257 67.75,190 46,123"/>
+            <polyline points="46,123 103,81.5 160,40"/>
+          </g>
+          <image href="img/ui-he_moc.png" x="122" y="14" width="76" height="52"/>
+          <image href="img/ui-he_hoa.png" x="236" y="97" width="76" height="52"/>
+          <image href="img/ui-he_tho.png" x="192.5" y="231" width="76" height="52"/>
+          <image href="img/ui-he_kim.png" x="51.5" y="231" width="76" height="52"/>
+          <image href="img/ui-he_thuy.png" x="8" y="97" width="76" height="52"/>
+          <g font-family="Be Vietnam Pro, sans-serif" font-weight="900" font-size="12" text-anchor="middle" fill="#f8e6c0" stroke="#1a0c06" stroke-width="3" paint-order="stroke">
+            <text x="160" y="80">MỘC</text><text x="274" y="163">HỎA</text><text x="230.5" y="298">THỔ</text><text x="89.5" y="298">KIM</text><text x="46" y="163">THỦY</text>
+          </g>
+        </svg></div>
+        <div class="rules panel">
+          <div class="legend"><span><i></i>Tương sinh</span><span><i class="k"></i>Tương khắc</span></div>
+          <div class="rule"><h3>Tương sinh, khi nuôi</h3><p>Mộc sinh Hỏa, Hỏa sinh Thổ, Thổ sinh Kim, Kim sinh Thủy, Thủy sinh Mộc. Mỗi hệ Linh khí đi từ 0 tới 100 và nuôi hai trong sáu thuộc tính.</p></div>
+          <div class="rule"><h3>Tương khắc, khi đấu</h3><p>Thủy dập Hỏa, Hỏa nung chảy Kim. Đánh vào hệ mình khắc thì <span class="mult">×1,5</span>, gặp hệ khắc mình còn <span class="mult">×0,75</span>.</p></div>
+          <div class="rule"><h3>Còn Hư Ảnh thì sao?</h3><p>Nó không thuộc hệ nào, nên cũng chẳng hệ nào khắc được nó. Cô Rắn nghĩ mãi vẫn chưa ra.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="t-paper" id="vung-dat">
+    <div class="wrap">
+      <div class="sign"><img class="px" src="img/ui-khung_chao-doi_go.png" alt=""><h2>Năm vùng đất</h2></div>
+      <p class="sec-lede">Năm mảnh Hư Ảnh đã nhập vào chính năm Thần thú. Cây héo, suối đục, núi lửa bốc khói tím. Những kẻ canh giữ giờ thành thứ phải canh chừng. Bóng Hư ở đó là tinh linh bị khói tím nhập: đánh để giải thoát chúng, không phải để giết.</p>
+      <div class="lands">
+        <article class="land" style="--c:var(--hoa);--cd:var(--hoa-d)">
+          <div class="tcard"><div class="art"><img loading="lazy" decoding="async" src="img/cong-hoa.webp" alt="Cổng Núi lửa giữa dòng dung nham"></div><img class="guard px" loading="lazy" src="img/than-hoa.png" alt="Viêm Long"><img class="frame" src="img/ui-the-0.png" alt=""><span class="label">Núi lửa</span></div>
+          <div class="he"><img src="img/ui-he_hoa.png" alt="">Viêm Long</div>
+          <p>Người buôn kể khói trên miệng núi đã chuyển màu tím.</p>
+        </article>
+        <article class="land" style="--c:var(--kim);--cd:var(--kim-d)">
+          <div class="tcard"><div class="art"><img loading="lazy" decoding="async" src="img/cong-kim.webp" alt="Cổng băng trên núi pha lê phủ tuyết"></div><img class="guard px" loading="lazy" src="img/than-kim.png" alt="Kim Ưng"><img class="frame" src="img/ui-the-0.png" alt=""><span class="label">Núi pha lê</span></div>
+          <div class="he"><img src="img/ui-he_kim.png" alt="">Kim Ưng</div>
+          <p>Sườn tuyết, mỏ pha lê, rồi tới cổng băng.</p>
+        </article>
+        <article class="land" style="--c:var(--moc);--cd:var(--moc-d)">
+          <div class="tcard"><div class="art"><img loading="lazy" decoding="async" src="img/cong-moc.webp" alt="Cổng rễ cây giữa rừng cổ thụ"></div><img class="guard px" loading="lazy" src="img/than-moc.png" alt="Thụ Nhân"><img class="frame" src="img/ui-the-0.png" alt=""><span class="label">Rừng cổ thụ</span></div>
+          <div class="he"><img src="img/ui-he_moc.png" alt="">Thụ Nhân</div>
+          <p>Hạt giống mang từ đây về, gieo mãi chẳng lên.</p>
+        </article>
+        <article class="land" style="--c:var(--tho);--cd:var(--tho-d)">
+          <div class="tcard"><div class="art"><img loading="lazy" decoding="async" src="img/cong-tho.webp" alt="Cổng đá giữa hẻm vực cát"></div><img class="guard px" loading="lazy" src="img/than-tho.png" alt="Thổ Long"><img class="frame" src="img/ui-the-0.png" alt=""><span class="label">Hẻm vực</span></div>
+          <div class="he"><img src="img/ui-he_tho.png" alt="">Thổ Long</div>
+          <p>Hẻm cát, hang hổ phách, rồi tới cổng đá.</p>
+        </article>
+        <article class="land" style="--c:var(--thuy);--cd:var(--thuy-d)">
+          <div class="tcard"><div class="art"><img loading="lazy" decoding="async" src="img/cong-thuy.webp" alt="Cổng xoáy nước giữa hồ và thác"></div><img class="guard px" loading="lazy" src="img/than-thuy.png" alt="Thủy Long"><img class="frame" src="img/ui-the-0.png" alt=""><span class="label">Hồ thác</span></div>
+          <div class="he"><img src="img/ui-he_thuy.png" alt="">Thủy Long</div>
+          <p>Mấy hôm nay, con suối sau trường học cứ đục ngầu.</p>
+        </article>
+      </div>
+      <p class="warn">Mỗi chuyến ra vùng đất đều tốn Năng lượng. Để bé ăn no, ngủ đủ rồi hẵng đi.</p>
+    </div>
+  </section>
+
+  <section class="outro" id="hen-gap">
+    <div class="wrap">
+      <div class="sign"><img class="px" src="img/ui-khung_chao-doi_go.png" alt=""><h2>Hẹn gặp ở làng</h2></div>
+      <div class="card-end">
+        <blockquote>“Năm luồng… bay về năm vùng đất. Ngàn năm rồi, cuối cùng nó cũng tới.”<cite>Già Quy, đêm phong ấn nứt</cite></blockquote>
+        <p>Một quả trứng, một ngôi làng, năm vùng đất đang chờ. Elemon vẫn đang được làm từng phần và chơi thử hằng ngày trên R36S. Phong ấn đã nứt, làng cần thêm một người.</p>
+        <div class="chips"><span class="now">R36S · làm trước</span><span>Anbernic H700</span><span>PocketGo V1</span><span>Không cần mạng</span><span>Đấu LAN 1-1 khi có Wi-Fi</span></div>
+        <div class="cta">
+          <a href="#ung-ho"><img class="px" src="img/ui-nut_A.png" alt="">Ủng hộ Elemon</a>
+          <a class="alt" href="#dau"><img class="px" src="img/ui-nut_B.png" alt="">Về đầu trang</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="t-paper" id="ung-ho">
+    <div class="wrap">
+      <div class="sign"><img class="px" src="img/ui-khung_chao-doi_go.png" alt=""><h2>Ủng hộ</h2></div>
+      <div class="donate">
+        <figure class="dn-npc">
+          <p class="dn-bub"><b>Bác Sóc</b>Thích Elemon thì ủng hộ một ly cà phê nhé. Cảm ơn bạn!</p>
+          <img class="px" src="img/bac-soc.png" alt="Bác Sóc đứng quầy">
+        </figure>
+        <div class="panel dn-card">
+          <img class="dn-pet px" src="img/baby-hoa.png" alt="">
+          <h3 class="dn-ttl"><img class="px" src="img/ui-nut_A.png" alt="">Chuyển khoản</h3>
+          <div class="dn-body">
+            <!-- Điền thông tin ngân hàng vào 3 ô "chưa có" dưới đây. -->
+            <dl class="bank">
+              <div><dt>Ngân hàng</dt><dd>chưa có</dd></div>
+              <div><dt>Số tài khoản</dt><dd>chưa có</dd></div>
+              <div><dt>Chủ tài khoản</dt><dd>chưa có</dd></div>
+            </dl>
+            <!-- Có mã QR thì thay cả khối <div class="dn-qr">…</div> bằng: <img class="dn-qr" src="img/qr-bank.png" alt="Mã QR chuyển khoản"> -->
+            <div class="dn-qr" aria-hidden="true">Mã QR<br>sắp có</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <img src="img/logo.webp" alt="ELEMON">
+    <span>Một game indie làm tại Việt Nam · 2026</span>
+    <span><b>Q/E</b> đổi phần</span>
+  </div>
+</footer>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+
+  // Chọn trứng
+  const DATA = {
+    hoa:  { ten: 'Hỏa Hổ',  he: 'Hỏa', vung: 'Núi lửa',
+            text: 'Sát thủ bùng nổ: nuôi Sức mạnh và Nhanh nhẹn. Ăn Ớt lửa cho đầy Năng lượng, nhưng đói nhanh hơn các hệ khác.' },
+    kim:  { ten: 'Kim Tê',  he: 'Kim', vung: 'Núi pha lê',
+            text: 'Chiến binh giáp sắt: nuôi Sức mạnh và Bền bỉ. Linh khí Kim cao thì phòng thủ dày và đói chậm hơn.' },
+    moc:  { ten: 'Mộc Lộc', he: 'Mộc', vung: 'Rừng cổ thụ',
+            text: 'Hồi phục, dai dẳng: nuôi Bền bỉ và Tinh thần. Ăn Lá non thì tự hồi Sức khỏe, ít ốm vặt.' },
+    thuy: { ten: 'Thủy Sa', he: 'Thủy', vung: 'Hồ thác',
+            text: 'Pháp sư: nuôi Thông minh và Trí tuệ. Ăn Cá suối thì vui lâu, chơi mini-game cũng dễ hơn.' },
+    tho:  { ten: 'Thổ Ngưu', he: 'Thổ', vung: 'Hẻm vực',
+            text: 'Thủ vững, phản đòn: nuôi Bền bỉ và Trí tuệ. Ăn Khoai đất no lâu, ngủ một giấc là đầy Năng lượng.' },
+  };
+  const eggs = [...document.querySelectorAll('.egg')];
+  const pick = btn => {
+    const k = btn.dataset.he, d = DATA[k];
+    eggs.forEach(b => b.setAttribute('aria-pressed', String(b === btn)));
+    $('hatch').style.setProperty('--c', `var(--${k})`);
+    $('hatch-img').src = `img/baby-${k}.png`;
+    $('hatch-img').alt = `${d.ten} lúc mới nở`;
+    $('hatch-ped').src = `img/ui-be-dung_${k}.png`;
+    $('hatch-he').src = `img/ui-he_${k}.png`;
+    $('hatch-name').textContent = d.ten;
+    $('hatch-meta').textContent = `Hệ ${d.he} · ${d.vung}`;
+    $('hatch-text').textContent = d.text;
+    $('hatch-quote').textContent = `Trứng hệ ${d.he}… Lựa chọn tốt. Ủ nó cho ấm và trò chuyện với nó mỗi ngày.`;
+  };
+  eggs.forEach((b, i) => {
+    b.addEventListener('click', () => pick(b));
+    b.addEventListener('keydown', e => {
+      const n = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+      if (!n) return;
+      e.preventDefault();
+      const next = eggs[(i + n + eggs.length) % eggs.length];
+      next.focus(); pick(next);
+    });
+  });
+
+  // Ảnh trong game
+  const SHOTS = [
+    ['shot-phong', 'Phòng nuôi', 'Thanh trên: No, Vui, Sạch, Năng lượng, Sức khỏe, tiền và level. Thanh dưới: Ăn, Dọn, Ngủ/Đèn, Ra ngoài. R2 để chơi, Start để trang trí.', 'Hỏa Hổ con trong phòng Hang đá, có thanh chỉ số phía trên và bốn nút phía dưới'],
+    ['shot-chon-mon', 'Chọn món', 'Bảng món ăn thế chỗ thanh menu. Mỗi món ghi hệ và tác dụng, ví dụ Ớt nướng: No +10, Năng lượng +15, món bé thích.', 'Bảng chọn món với sáu món ăn, đang chọn Ớt nướng'],
+    ['shot-sinh-ton', 'Sinh tồn', 'Bấm Select để xem chỉ số. L/R đổi giữa Sinh tồn, Linh khí, Thuộc tính và Hồ sơ.', 'Trang Sinh tồn với năm thanh chỉ số của Bông, Hỏa Hổ'],
+    ['shot-linh-khi', 'Linh khí', 'Ngũ giác Linh khí năm hệ. Vòng nét đứt là ngưỡng tiến hóa: 30 để lên Nhi, 60 để lên Thiếu niên.', 'Trang Linh khí với biểu đồ ngũ giác năm hệ'],
+    ['shot-ban-do', 'Bản đồ làng', 'Làng Ngũ Sắc ở giữa quần đảo: Nhà, Trường học, Chợ, Võ đường. Năm vùng đất xung quanh còn khóa cho tới khi bé đủ lớn.', 'Bản đồ quần đảo với làng ở giữa và các vùng bị khóa'],
+    ['shot-thuy-sa', 'Nhà sàn bên hồ', 'Phòng hệ Thủy của Thủy Sa giai đoạn Nhi. Mỗi hệ có phòng riêng, nhà cấp cao mua ở Chợ.', 'Thủy Sa trong nhà sàn bên hồ có võng và thùng gỗ'],
+    ['shot-moc-loc', 'Cây Thần', 'Mộc Lộc dạng Huyền thoại trong phòng hệ Mộc cấp cao.', 'Mộc Lộc Huyền thoại đứng trong phòng cây thần xanh lá'],
+    ['shot-moc-loc-dam', 'Ra đòn', 'Pet trưởng thành và Huyền thoại có đủ bộ động tác: đánh, chiêu, đỡ, trúng đòn, gục và thắng.', 'Mộc Lộc Huyền thoại tung chiêu lá xanh'],
+  ];
+  let cur = 0;
+  const thumbs = $('thumbs');
+  SHOTS.forEach(([f, t], i) => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'thumb'; b.id = `thumb-${i}`;
+    b.setAttribute('aria-label', t);
+    b.innerHTML = `<img loading="lazy" decoding="async" src="img/${f}.webp" alt="">`;
+    b.addEventListener('click', () => show(i));
+    thumbs.appendChild(b);
+  });
+  function show(i) {
+    cur = (i + SHOTS.length) % SHOTS.length;
+    const [f, t, d, alt] = SHOTS[cur];
+    $('shot-big').src = `img/${f}.webp`; $('shot-big').alt = alt;
+    $('shot-title').textContent = t; $('shot-desc').textContent = d;
+    $('shot-count').textContent = `${cur + 1} / ${SHOTS.length}`;
+    [...thumbs.children].forEach((b, k) => b.setAttribute('aria-pressed', String(k === cur)));
+  }
+  $('shot-l').addEventListener('click', () => show(cur - 1));
+  $('shot-r').addEventListener('click', () => show(cur + 1));
+  show(0);
+
+  // Quầy đồ ăn: mỗi mục một ảnh ghép, ô thứ i là món thứ i
+  const HE = { hoa: 'Hỏa', kim: 'Kim', moc: 'Mộc', thuy: 'Thủy', tho: 'Thổ' };
+  const ORDER = ['hoa', 'kim', 'moc', 'thuy', 'tho'];
+  const CROPS = [['hoa', 'Ớt'], ['hoa', 'Cà chua'], ['hoa', 'Dâu tây'], ['kim', 'Củ cải'], ['kim', 'Súp lơ'], ['kim', 'Tỏi'],
+    ['moc', 'Bắp cải'], ['moc', 'Đậu Hà Lan'], ['moc', 'Ngô'], ['thuy', 'Sen'], ['thuy', 'Dưa hấu'], ['thuy', 'Lúa'],
+    ['tho', 'Bí ngô'], ['tho', 'Cà rốt'], ['tho', 'Khoai lang']];
+  const FISH = ['Cá con', 'Cá vừa', 'Cá quý', 'Cá thần'];
+  const BUFF = { hoa: 'Sức mạnh', kim: 'Phòng thủ', moc: 'Hồi máu', thuy: 'Nhanh nhẹn', tho: 'Bền bỉ' };
+  const DISHES = [['thuy', 'Canh cá cà chua', 'Cà chua, Cá'], ['hoa', 'Cá chiên ớt', 'Ớt, Cá'], ['hoa', 'Bánh dâu', 'Dâu tây, Lúa'],
+    ['hoa', 'Cơm trứng cà chua', 'Lúa, Cà chua'], ['kim', 'Hầm củ cải tỏi', 'Củ cải, Tỏi'], ['kim', 'Súp lơ nướng', 'Súp lơ'],
+    ['moc', 'Bắp cải cuộn', 'Bắp cải'], ['moc', 'Ngô nướng', 'Ngô'], ['moc', 'Cơm chiên đậu', 'Lúa, Đậu Hà Lan'],
+    ['thuy', 'Canh ngó sen', 'Sen, Ngô'], ['thuy', 'Nước dưa hấu', 'Dưa hấu'], ['thuy', 'Cơm nắm cá', 'Lúa, Cá'],
+    ['tho', 'Súp bí ngô', 'Bí ngô'], ['tho', 'Khoai lang nướng', 'Khoai lang'], ['tho', 'Bánh cà rốt', 'Cà rốt, Lúa'],
+    ['thuy', 'Lẩu hải sản', 'Cá, Cá, Củ cải']];
+  const SHELF = [
+    { tab: 'Chợ', sheet: 'cho', lede: 'Mua ở Chợ trong làng, có thể mang thẳng về cho bé ăn.', items: [
+      ['hoa', 'Ớt nướng', 'No +10 · Năng lượng +15'], ['hoa', 'Xiên thịt nướng', 'No +20'],
+      ['hoa', 'Táo lửa', 'No +15 · Vui +10 · Linh khí +3'], ['hoa', 'Khoai nướng than', 'No +30 · Sức mạnh +1'],
+      ['thuy', 'Cá tươi', 'No +15 · Vui +10'], ['moc', 'Giỏ quả rừng', 'No +20 · Sức khỏe +10'],
+      ['kim', 'Lê vàng', 'No +20 · Bền bỉ +1'], ['tho', 'Cơm nắm vàng', 'No +30 · Linh khí +5']] },
+    { tab: 'Nông sản', sheet: 'nong', lede: 'Tự trồng ở nông trại. Ăn sống được, nhưng ngon nhất là đem nấu.',
+      items: CROPS.map(([h, n]) => [h, n, 'No +20 · Linh khí +5']) },
+    { tab: 'Cá', sheet: 'ca', lede: 'Hai mươi loài, mỗi hệ bốn bậc. Bậc càng cao càng no, Linh khí càng nhiều.',
+      items: ORDER.flatMap(h => FISH.map((n, t) => [h, `${n} ${HE[h]}`, `No +${15 + t * 5} · Linh khí +${2 + t * 2}`])) },
+    { tab: 'Món nấu', sheet: 'mon', lede: 'Nấu ở bếp từ rau và cá. Ba sao cho No +50 và thêm chỉ số theo hệ của món.',
+      items: DISHES.map(([h, n, need]) => [h, n, `${need} → ${BUFF[h]} +6`]) },
+    { tab: 'Thuốc, đồ chơi', sheet: 'dac', lede: 'Không no bụng, nhưng thiếu thì khó nuôi.', items: [
+      [null, 'Thuốc chữa ốm', 'Hết ốm ngay'], [null, 'Viên thảo dược', 'Phòng ốm 1 ngày'], [null, 'Kẹo vitamin', 'Vui +15'],
+      [null, 'Nước tăng lực', 'Năng lượng +30'], [null, 'Xà phòng tắm', 'Sạch +40'], [null, 'Bóng đồ chơi', 'Vui +20 mỗi lần chơi'],
+      [null, 'Đá tiến hóa', 'Cần Lv 20 để dùng'], [null, 'Ngọc Hồn', 'Chỉ rơi từ boss']] },
+  ];
+  const stabs = $('stabs'), items = $('items');
+  const shelf = k => {
+    const s = SHELF[k];
+    [...stabs.children].forEach((b, i) => { b.setAttribute('aria-selected', String(i === k)); b.tabIndex = i === k ? 0 : -1; });
+    $('shelf-lede').textContent = s.lede;
+    items.style.setProperty('--sheet', `url(img/an-${s.sheet}.webp)`);
+    items.style.setProperty('--n', s.items.length);
+    items.innerHTML = s.items.map(([h, n, e], i) => `<div class="item"${h ? ` style="--cd:var(--${h}-d)"` : ''}>` +
+      `<div class="cell"><div class="ic" style="--i:${i}"></div></div><b>${n}</b>` +
+      (h ? `<em class="he">Hệ ${HE[h]}</em>` : '') + `<span>${e}</span></div>`).join('');
+  };
+  SHELF.forEach((s, i) => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'stab'; b.role = 'tab'; b.textContent = s.tab;
+    b.addEventListener('click', () => shelf(i));
+    b.addEventListener('keydown', e => {
+      const n = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+      if (!n) return;
+      e.preventDefault();
+      const k = (i + n + SHELF.length) % SHELF.length;
+      shelf(k); stabs.children[k].focus();
+    });
+    stabs.appendChild(b);
+  });
+  shelf(0);
+
+  // Tab L/R theo phần đang xem
+  const tabs = [...document.querySelectorAll('.tab')];
+  const secs = tabs.map(t => document.querySelector(t.getAttribute('href')));
+  const nav = document.querySelector('.tabs nav');
+  let active = -2;
+  const mark = () => {
+    const y = window.innerHeight * 0.35;
+    let k = -1;
+    secs.forEach((s, i) => { if (s.getBoundingClientRect().top <= y) k = i; });
+    if (k === active) return;
+    active = k;
+    tabs.forEach((t, i) => t.setAttribute('aria-current', String(i === k)));
+    if (k >= 0) {
+      const t = tabs[k];
+      nav.scrollTo({ left: t.offsetLeft - (nav.clientWidth - t.offsetWidth) / 2, behavior: 'smooth' });
+    }
+  };
+  const go = n => {
+    const k = Math.max(0, Math.min(secs.length - 1, active + n));
+    secs[k].scrollIntoView();
+  };
+  $('tab-l').addEventListener('click', () => go(-1));
+  $('tab-r').addEventListener('click', () => go(1));
+  document.addEventListener('keydown', e => {
+    if (e.target.closest('input, textarea')) return;
+    if (e.key === 'q' || e.key === 'Q') go(-1);
+    if (e.key === 'e' || e.key === 'E') go(1);
+  });
+  // chỉ tính lại khi có phần đi qua đường mốc ở 35% chiều cao màn hình, không tính mỗi lần cuộn
+  const io = new IntersectionObserver(mark, { rootMargin: '0px 0px -65% 0px' });
+  secs.forEach(s => io.observe(s));
+})();
+</script>
+</body>
+</html>

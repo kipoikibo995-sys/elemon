@@ -25,6 +25,10 @@ void jsrt_audio_commit(void);
 void jsrt_audio(int16_t *out, int n);
 /* the page's __quit() (the game saves there), before jsrt_shutdown */
 void jsrt_quit(void);
+/* the page asked to end the program (__cv.exit()) */
+int jsrt_wants_exit(void);
 void jsrt_shutdown(void);
+/* where the memory is, for the log: one line ("mem: pictures ... sounds ... process ...") into buf */
+void jsrt_mem(char *buf, int size);
 
 #endif

@@ -2,7 +2,8 @@
    frame as out/NNNNN.ppm and the sound as out/am-thanh.wav, and the time each frame took.
    Usage: holua-game-test <game dir> <out dir> [every Nth frame to write, default 1] [script file]
    A script file is words: a number waits that many frames, a button name (A B X Y L1 R1 L2 R2 SELECT START UP DOWN
-   LEFT RIGHT) taps it; # starts a comment to the end of the line. Without one, the built-in walk round the room. */
+   LEFT RIGHT) taps it, names:N (UP:40, UP,RIGHT:20) hold those buttons N frames; # starts a comment to the end of
+   the line. Without one, the built-in walk round the room. Each frame's time goes to out/times.txt (ms a line). */
 #include "jsrt.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -44,6 +45,14 @@ static Step *read_script(const char *path, unsigned *count) {
         if (w[0] == '#') { while ((c = fgetc(f)) != EOF && c != '\n') {} continue; }
         if (n + 2 > cap) { cap = cap ? cap * 2 : 64; out = (Step *)realloc(out, cap * sizeof *out); }
         if (w[0] >= '0' && w[0] <= '9') { out[n].frames = atoi(w); out[n++].pad = 0; continue; }
+        if (strchr(w, ':')) {                    /* a hold: names:frames */
+            char *name = strtok(w, ":"), *fr = strtok(0, ":"), *one;
+            unsigned bits = 0;
+            for (one = strtok(name, ","); one; one = strtok(0, ","))
+                for (i = 0; i < sizeof NAMES / sizeof *NAMES; ++i) if (!strcmp(one, NAMES[i].name)) bits |= NAMES[i].bit;
+            out[n].frames = fr ? atoi(fr) : 1; out[n++].pad = bits;
+            continue;
+        }
         for (i = 0; i < sizeof NAMES / sizeof *NAMES; ++i)
             if (!strcmp(w, NAMES[i].name)) { out[n].frames = 3; out[n++].pad = NAMES[i].bit; out[n].frames = 12; out[n++].pad = 0; }
     }
@@ -62,7 +71,7 @@ int main(int argc, char **argv) {
     const Step *script = SCRIPT;
     double t = 0, worst = 0, sum = 0;
     int16_t *pcm;
-    FILE *wav;
+    FILE *wav, *times;
     if (argc < 3) { fprintf(stderr, "usage: %s game out [every]\n", argv[0]); return 2; }
     if (every < 1) every = 1;
     if (argc > 4 && !(script = read_script(argv[4], &steps))) { fprintf(stderr, "no script %s\n", argv[4]); return 2; }
@@ -74,14 +83,18 @@ int main(int argc, char **argv) {
     put32(wav, JS_AUDIO_RATE); put32(wav, JS_AUDIO_RATE * 2);
     fwrite("\x02\0\x10\0data\0\0\0\0", 1, 12, wav);
     pcm = (int16_t *)malloc(sizeof(int16_t) * (size_t)per);
+    snprintf(path, sizeof path, "%s/times.txt", argv[2]);
+    times = fopen(path, "w");
     for (s = 0; s < steps; ++s) {
         int k;
         for (k = 0; k < script[s].frames; ++k, ++n) {
             clock_t c0 = clock();
             const uint32_t *screen = jsrt_frame(t, script[s].pad);
+            { static int told; if (jsrt_wants_exit() && !told) { told = 1; printf("exit asked at frame %d\n", n); } }   /* the game's own quit */
             double ms = (clock() - c0) * 1000.0 / CLOCKS_PER_SEC;
             FILE *f;
             sum += ms; if (ms > worst && n > 5) worst = ms;
+            if (times) fprintf(times, "%.3f\n", ms);
             t += 1000.0 / 30;
             jsrt_audio_commit();
             jsrt_audio(pcm, per);
@@ -99,12 +112,14 @@ int main(int argc, char **argv) {
             fclose(f);
         }
     }
+    if (times) fclose(times);
     fseek(wav, 4, SEEK_SET); put32(wav, 36 + total * 2);
     fseek(wav, 40, SEEK_SET); put32(wav, total * 2);
     fclose(wav);
     free(pcm);
     printf("%d frames, %.2f ms a frame on average, %.2f ms at worst\n", n, sum / n, worst);
     jsrt_quit();
+    { char m[256]; jsrt_mem(m, sizeof m); printf("%s\n", m); }
     jsrt_shutdown();
     return 0;
 }

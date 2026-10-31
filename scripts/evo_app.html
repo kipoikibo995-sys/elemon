@@ -87,8 +87,9 @@ function load(name, path, tries = 5) {
 }
 const NEEDS = [['icon_no', 'cam', 'no'], ['icon_vui', 'hong', 'vui'], ['icon_sach', 'xanh-duong', 'sach'],
                ['icon_nang-luong', 'xanh-reu', 'nl']];
-// 4 care actions (play is on R2, decorating on Start; shop and training are in the village behind "Ra ngoài")
-const MENU = [['nut_cho-an', 'Ăn'], ['nut_don-dep', 'Dọn'], ['nut_ve-sinh', 'Vệ sinh'], ['nut_ngu', 'Ngủ / Đèn'],
+// care actions (play is on R2, decorating on Start; shop and training are in the village behind "Ra ngoài");
+// sweeping is in Vệ sinh (the user, 28/10/2026), its place is the Túi đồ, to look at everything owned
+const MENU = [['nut_cho-an', 'Ăn'], ['nut_kho-do', 'Kho đồ'], ['nut_ve-sinh', 'Vệ sinh'], ['nut_ngu', 'Ngủ / Đèn'],
               ['nut_hoat-dong', 'Hoạt động'], ['nut_ra-ngoai', 'Ra ngoài']];
 // which bag things each menu shows: Vệ sinh = bath and medicine, Ăn = everything else
 const CARE = ['bath', 'medicine'];
@@ -105,7 +106,7 @@ const files = ['room', 'nen', 'bar', 'coin_box', 'badge', 'o_chon', 'panel', 'pi
   'shop_bg', 'chu-quan', 'bong_trong', 'tab_sel', 'shelf_o_hang', 'shelf_o_hang-chon', 'shelf_o_hang-khoa', 'nhan-gia',
   'shop_desc', 'nut_mua', 'nut_ban', 'nen-menu_hoang-hon', 'nen-menu_troi-dem', ...DATA.shop.tabs.map(t => t.icon), ...DATA.shop.rows.flat().map(r => r.key),
   ...DATA.shop.rows[0].flatMap(r => ['food_' + r.file, 'mouth_' + r.file]), ...[2, 3].flatMap(t => DATA.shop.rows[t].map(r => 'food_' + r.file)),
-  'bot_nho', 'bot_vua', 'bot_to', 'hd_bang-ten', 'hd_mui-ten_phai', 'hd_mui-ten_trai', 'hd_nen_cau-ca', 'hd_nen_nong-trai', 'hd_nut_A', 'hd_nut_B', 'hd_the', 'hd_the_chon', 'hd_the_khoa', 'cc_ca_keo_dai6', 'th_nen_lop', 'th_khung-giay', 'th_mui-ten-cuon', 'th_nut_chon', 'th_nut_dung', 'th_nut_sai', 'th_nut_thuong', 'th_thanh-cuon', 'th_the_anh', 'th_the_chon', 'th_the_he', 'th_the_toan', 'th_co_1-cuoi', 'th_co_2-chop-mat', 'th_co_3-giang', 'th_co_4-khen', 'th_co_5-suy-nghi', 'th_co_6-ngac-nhien', 'th_co_7-sai', 'th_co_8-len-cap', 'td_tui', 'td_tab_tat-ca', 'td_tab_nong-san', 'td_tab_ca', 'td_tab_hat', 'td_tab_do-cau', 'td_tab_mon-an', 'td_tab_ngoc', 'td_tab_chon', 'td_so-luong', 'td_o-khoa', 'td_moi', 'td_dung', 'td_yeu-thich', 'td_vut', 'td_sap-xep', 'na_nen_cat', 'na_nen_khuay', 'na_nen_chien', 'na_nen_ban-an', 'na_cat_dai6', 'na_khuay_dai6', 'na_chien_dai6', 'na_xong_dai6', 'na_khung-popup', 'na_nut-bam', 'na_nut-bam_nhan', 'na_mui-ten-xuong', 'na_xoay', 'na_vong_khung', 'na_vong_day', 'na_thanh_khung', 'na_thanh_nhiet', 'na_kim-chi', 'na_sao', 'na_sao_rong', 'na_buff_suc-manh', 'na_hoan-hao', 'na_truot', 'na_lap-lanh', 'na_mon_canh-ca-ca-chua', 'na_mon_ca-chien-ot', 'na_mon_banh-dau', 'na_mon_com-trung-ca-chua', 'na_mon_ham-cu-cai-toi', 'na_mon_sup-lo-nuong', 'na_mon_bap-cai-cuon', 'na_mon_ngo-nuong', 'na_mon_com-chien-dau', 'na_mon_canh-ngo-sen', 'na_mon_nuoc-dua-hau', 'na_mon_com-nam-ca', 'na_mon_sup-bi-ngo', 'na_mon_khoai-lang-nuong', 'na_mon_banh-ca-rot', 'na_mon_lau-hai-san', 'cc_can_quang_dai4', 'cc_can_cho_dai4', 'cc_can_keo_dai4', 'sn_can_1-tre', 'sn_can_2-go', 'sn_can_3-xanh', 'sn_can_4-bac', 'sn_can_5-vang', 'sn_moi_giun', 'sn_moi_vun-banh', 'sn_moi_tom', 'sn_moi_moi-gia', 'sn_moi_phep', 'sn_xo-ca', 'sn_vot', 'sn_hop-do-nghe', 'sn_thung-da', 'sn_thung-ca-da', 'cc_gon-nuoc_dai6', 'cc_phao_can_dai6', 'cc_phao_noi_dai6', 'sn_nen', 'sn_o-hang', 'sn_o-hang_chon', 'sn_tab_ban', 'sn_tab_mua', 'sn_the-gia', 'sn_xu', 'sn_hat_hoa-ot', 'sn_hat_hoa-ca-chua', 'sn_hat_hoa-dau-tay', 'sn_hat_kim-cu-cai', 'sn_hat_kim-sup-lo', 'sn_hat_kim-toi', 'sn_hat_moc-bap-cai', 'sn_hat_moc-dau-ha-lan', 'sn_hat_moc-ngo', 'sn_hat_thuy-sen', 'sn_hat_thuy-dua-hau', 'sn_hat_thuy-lua', 'sn_hat_tho-bi-ngo', 'sn_hat_tho-ca-rot', 'sn_hat_tho-khoai-lang', 'sn_chu_1-cuoi', 'sn_chu_2-chop-mat', 'sn_chu_3-chao', 'sn_chu_4-cuoi-lon', 'sn_chu_5-suy-nghi', 'sn_chu_6-dua-hat', 'sn_chu_7-nhan-xu', 'sn_chu_8-cam-on', 'cc_ca_icon', 'cc_can-cau', 'cc_cham-than', 'cc_fill_tien-do', 'cc_gon-nuoc', 'cc_nen', 'cc_nuoc-ban', 'cc_phao', 'cc_phao_chim', 'cc_ruong_dong', 'cc_ruong_mo', 'cc_thanh-cau', 'cc_thanh-tien-do', 'cc_vung-bat_vang', 'cc_vung-bat_xanh', 'cc_CA_hoa_1', 'cc_CA_hoa_2', 'cc_CA_hoa_3', 'cc_CA_hoa_4', 'cc_CA_kim_1', 'cc_CA_kim_2', 'cc_CA_kim_3', 'cc_CA_kim_4', 'cc_CA_moc_1', 'cc_CA_moc_2', 'cc_CA_moc_3', 'cc_CA_moc_4', 'cc_CA_thuy_1', 'cc_CA_thuy_2', 'cc_CA_thuy_3', 'cc_CA_thuy_4', 'cc_CA_tho_1', 'cc_CA_tho_2', 'cc_CA_tho_3', 'cc_CA_tho_4', 'fm_nen', 'fm_con-tro_o', 'fm_con-tro_o_vang', 'fm_dat_cay-heo', 'fm_dat_co-dai', 'fm_dat_cuoc', 'fm_dat_gieo-hat', 'fm_dat_kho', 'fm_dat_khoa', 'fm_dat_sau', 'fm_dat_tron', 'fm_dat_tuoi', 'fm_fx_nuoc', 'fm_cay_hoa-ot_1-mam', 'fm_cay_hoa-ot_2-non', 'fm_cay_hoa-ot_3-lon', 'fm_cay_hoa-ot_4-chin', 'fm_cay_hoa-ot_5-nong-san', 'fm_cay_hoa-ca-chua_1-mam', 'fm_cay_hoa-ca-chua_2-non', 'fm_cay_hoa-ca-chua_3-lon', 'fm_cay_hoa-ca-chua_4-chin', 'fm_cay_hoa-ca-chua_5-nong-san', 'fm_cay_hoa-dau-tay_1-mam', 'fm_cay_hoa-dau-tay_2-non', 'fm_cay_hoa-dau-tay_3-lon', 'fm_cay_hoa-dau-tay_4-chin', 'fm_cay_hoa-dau-tay_5-nong-san', 'fm_cay_kim-cu-cai_1-mam', 'fm_cay_kim-cu-cai_2-non', 'fm_cay_kim-cu-cai_3-lon', 'fm_cay_kim-cu-cai_4-chin', 'fm_cay_kim-cu-cai_5-nong-san', 'fm_cay_kim-sup-lo_1-mam', 'fm_cay_kim-sup-lo_2-non', 'fm_cay_kim-sup-lo_3-lon', 'fm_cay_kim-sup-lo_4-chin', 'fm_cay_kim-sup-lo_5-nong-san', 'fm_cay_kim-toi_1-mam', 'fm_cay_kim-toi_2-non', 'fm_cay_kim-toi_3-lon', 'fm_cay_kim-toi_4-chin', 'fm_cay_kim-toi_5-nong-san', 'fm_cay_moc-bap-cai_1-mam', 'fm_cay_moc-bap-cai_2-non', 'fm_cay_moc-bap-cai_3-lon', 'fm_cay_moc-bap-cai_4-chin', 'fm_cay_moc-bap-cai_5-nong-san', 'fm_cay_moc-dau-ha-lan_1-mam', 'fm_cay_moc-dau-ha-lan_2-non', 'fm_cay_moc-dau-ha-lan_3-lon', 'fm_cay_moc-dau-ha-lan_4-chin', 'fm_cay_moc-dau-ha-lan_5-nong-san', 'fm_cay_moc-ngo_1-mam', 'fm_cay_moc-ngo_2-non', 'fm_cay_moc-ngo_3-lon', 'fm_cay_moc-ngo_4-chin', 'fm_cay_moc-ngo_5-nong-san', 'fm_cay_thuy-sen_1-mam', 'fm_cay_thuy-sen_2-non', 'fm_cay_thuy-sen_3-lon', 'fm_cay_thuy-sen_4-chin', 'fm_cay_thuy-sen_5-nong-san', 'fm_cay_thuy-dua-hau_1-mam', 'fm_cay_thuy-dua-hau_2-non', 'fm_cay_thuy-dua-hau_3-lon', 'fm_cay_thuy-dua-hau_4-chin', 'fm_cay_thuy-dua-hau_5-nong-san', 'fm_cay_thuy-lua_1-mam', 'fm_cay_thuy-lua_2-non', 'fm_cay_thuy-lua_3-lon', 'fm_cay_thuy-lua_4-chin', 'fm_cay_thuy-lua_5-nong-san', 'fm_cay_tho-bi-ngo_1-mam', 'fm_cay_tho-bi-ngo_2-non', 'fm_cay_tho-bi-ngo_3-lon', 'fm_cay_tho-bi-ngo_4-chin', 'fm_cay_tho-bi-ngo_5-nong-san', 'fm_cay_tho-ca-rot_1-mam', 'fm_cay_tho-ca-rot_2-non', 'fm_cay_tho-ca-rot_3-lon', 'fm_cay_tho-ca-rot_4-chin', 'fm_cay_tho-ca-rot_5-nong-san', 'fm_cay_tho-khoai-lang_1-mam', 'fm_cay_tho-khoai-lang_2-non', 'fm_cay_tho-khoai-lang_3-lon', 'fm_cay_tho-khoai-lang_4-chin', 'fm_cay_tho-khoai-lang_5-nong-san', 'bc_cham-than', 'bc_choang', 'bc_gian', 'bc_hoi', 'bc_mo-hoi-nho', 'bc_mo-hoi', 'bc_not-nhac-doi', 'bc_not-nhac', 'bc_tim-nho', 'bc_tim', 'bc_xi-khoi', 'bc_zzz', 'tam_L1_dau-goi', 'tam_L1_khan', 'tam_L1_vit', 'tam_L1_xa-phong', 'tam_L2_dau-goi', 'tam_L2_khan', 'tam_L2_vit', 'tam_L2_xa-phong', 'tam_L3_dau-goi', 'tam_L3_khan', 'tam_L3_vit', 'tam_L3_xa-phong', 'tam_L4_dau-goi', 'tam_L4_khan', 'tam_L4_vit', 'tam_L4_xa-phong', 'tt_doi', 'tt_ban', 'tt_buon', 'tt_om', 'tt_buon-ngu', 'tt_chan', 'tt_khat', 'tt_vui', 'san_phan-nho', 'san_phan-to', 'san_vet-ban', 'san_vun-do-an', 'san_vung-nuoc', 'san_long', 'san_bui', 'san_sach', 'cs_bat_day', 'cs_bat_nua', 'cs_bat_rong', 'cs_bat_nuoc', 'cs_chau_nuoc', 'cs_chau_bot', 'cs_khan', 'cs_xa-phong', 'cs_do-choi_bong', 'cs_do-choi_chuong', 'cs_do-choi_khuc-go', 'cs_do-choi_long-vu', 'cs_choi_0', 'cs_choi_1', 'cs_choi_2', 'cs_sach-bong', 'cs_bao_chu-y', 'cs_bao_chu-y-2', 'cs_bao_chu-y-3', 'cs_bao_nguy', 'cs_tim_vo', 'cs_dau-x', 'cs_bong_bay', 'cs_sao_no', 'cs_dong-ho-cat', 'title_bg', 'bang_go', 'title_b', 'title_pet', ...(DATA.title_baked ? [] : ['logo_elemon']), 'logo', 'nut-menu_thuong', 'nut-menu_chon', 'nut-menu_khoa', 'con-tro', 'phan_nho', 'phan_vua', 'phan_to', 'bong_om',
+  'bot_nho', 'bot_vua', 'bot_to', 'hd_nen_cau-ca', 'hd_nen_nong-trai', 'hd_vd_the_thuong', 'hd_vd_the_chon', 'hd_vd_bang-tieu-de', 'hd_vd_bang-chu', 'hd_vd_khoa', 'hd_vd_o', 'cc_ca_keo_dai6', 'th_nen_lop', 'th_khung-giay', 'th_mui-ten-cuon', 'th_nut_chon', 'th_nut_dung', 'th_nut_sai', 'th_nut_thuong', 'th_thanh-cuon', 'th_the_anh', 'th_the_chon', 'th_the_he', 'th_the_toan', 'th_co_1-cuoi', 'th_co_2-chop-mat', 'th_co_3-giang', 'th_co_4-khen', 'th_co_5-suy-nghi', 'th_co_6-ngac-nhien', 'th_co_7-sai', 'th_co_8-len-cap', 'td_tui', 'td_tab_tat-ca', 'td_tab_nong-san', 'td_tab_ca', 'td_tab_hat', 'td_tab_do-cau', 'td_tab_mon-an', 'td_tab_ngoc', 'td_tab_chon', 'td_so-luong', 'td_khung', 'td_khung-chon', 'td_o-khoa', 'td_moi', 'td_dung', 'td_yeu-thich', 'td_vut', 'td_sap-xep', 'na_nen_cat', 'na_nen_khuay', 'na_nen_chien', 'na_nen_ban-an', 'na_cat_dai6', 'na_khuay_dai6', 'na_chien_dai6', 'na_xong_dai6', 'na_khung-popup', 'na_nut-bam', 'na_nut-bam_nhan', 'na_mui-ten-xuong', 'na_xoay', 'na_vong_khung', 'na_vong_day', 'na_thanh_khung', 'na_thanh_nhiet', 'na_kim-chi', 'na_sao', 'na_sao_rong', 'na_buff_suc-manh', 'na_hoan-hao', 'na_truot', 'na_lap-lanh', 'na_mon_canh-ca-ca-chua', 'na_mon_ca-chien-ot', 'na_mon_banh-dau', 'na_mon_com-trung-ca-chua', 'na_mon_ham-cu-cai-toi', 'na_mon_sup-lo-nuong', 'na_mon_bap-cai-cuon', 'na_mon_ngo-nuong', 'na_mon_com-chien-dau', 'na_mon_canh-ngo-sen', 'na_mon_nuoc-dua-hau', 'na_mon_com-nam-ca', 'na_mon_sup-bi-ngo', 'na_mon_khoai-lang-nuong', 'na_mon_banh-ca-rot', 'na_mon_lau-hai-san', 'cc_can_quang_dai4', 'cc_can_cho_dai4', 'cc_can_keo_dai4', 'sn_can_1-tre', 'sn_can_2-go', 'sn_can_3-xanh', 'sn_can_4-bac', 'sn_can_5-vang', 'sn_moi_giun', 'sn_moi_vun-banh', 'sn_moi_tom', 'sn_moi_moi-gia', 'sn_moi_phep', 'sn_xo-ca', 'sn_vot', 'sn_hop-do-nghe', 'sn_thung-da', 'sn_thung-ca-da', 'cc_gon-nuoc_dai6', 'cc_phao_can_dai6', 'cc_phao_noi_dai6', 'sn_nen', 'sn_o-hang', 'sn_o-hang_chon', 'sn_tab_ban', 'sn_tab_mua', 'sn_the-gia', 'sn_xu', 'sn_hat_hoa-ot', 'sn_hat_hoa-ca-chua', 'sn_hat_hoa-dau-tay', 'sn_hat_kim-cu-cai', 'sn_hat_kim-sup-lo', 'sn_hat_kim-toi', 'sn_hat_moc-bap-cai', 'sn_hat_moc-dau-ha-lan', 'sn_hat_moc-ngo', 'sn_hat_thuy-sen', 'sn_hat_thuy-dua-hau', 'sn_hat_thuy-lua', 'sn_hat_tho-bi-ngo', 'sn_hat_tho-ca-rot', 'sn_hat_tho-khoai-lang', 'sn_chu_1-cuoi', 'sn_chu_2-chop-mat', 'sn_chu_3-chao', 'sn_chu_4-cuoi-lon', 'sn_chu_5-suy-nghi', 'sn_chu_6-dua-hat', 'sn_chu_7-nhan-xu', 'sn_chu_8-cam-on', 'cc_ca_icon', 'cc_can-cau', 'cc_cham-than', 'cc_fill_tien-do', 'cc_gon-nuoc', 'cc_nen', 'cc_nuoc-ban', 'cc_phao', 'cc_phao_chim', 'cc_ruong_dong', 'cc_ruong_mo', 'cc_thanh-cau', 'cc_thanh-tien-do', 'cc_vung-bat_vang', 'cc_vung-bat_xanh', 'cc_CA_hoa_1', 'cc_CA_hoa_2', 'cc_CA_hoa_3', 'cc_CA_hoa_4', 'cc_CA_kim_1', 'cc_CA_kim_2', 'cc_CA_kim_3', 'cc_CA_kim_4', 'cc_CA_moc_1', 'cc_CA_moc_2', 'cc_CA_moc_3', 'cc_CA_moc_4', 'cc_CA_thuy_1', 'cc_CA_thuy_2', 'cc_CA_thuy_3', 'cc_CA_thuy_4', 'cc_CA_tho_1', 'cc_CA_tho_2', 'cc_CA_tho_3', 'cc_CA_tho_4', 'fm_nen', 'fm_con-tro_o', 'fm_con-tro_o_vang', 'fm_dat_cay-heo', 'fm_dat_co-dai', 'fm_dat_cuoc', 'fm_dat_gieo-hat', 'fm_dat_kho', 'fm_dat_khoa', 'fm_dat_sau', 'fm_dat_tron', 'fm_dat_tuoi', 'fm_fx_nuoc', 'fm_cay_hoa-ot_1-mam', 'fm_cay_hoa-ot_2-non', 'fm_cay_hoa-ot_3-lon', 'fm_cay_hoa-ot_4-chin', 'fm_cay_hoa-ot_5-nong-san', 'fm_cay_hoa-ca-chua_1-mam', 'fm_cay_hoa-ca-chua_2-non', 'fm_cay_hoa-ca-chua_3-lon', 'fm_cay_hoa-ca-chua_4-chin', 'fm_cay_hoa-ca-chua_5-nong-san', 'fm_cay_hoa-dau-tay_1-mam', 'fm_cay_hoa-dau-tay_2-non', 'fm_cay_hoa-dau-tay_3-lon', 'fm_cay_hoa-dau-tay_4-chin', 'fm_cay_hoa-dau-tay_5-nong-san', 'fm_cay_kim-cu-cai_1-mam', 'fm_cay_kim-cu-cai_2-non', 'fm_cay_kim-cu-cai_3-lon', 'fm_cay_kim-cu-cai_4-chin', 'fm_cay_kim-cu-cai_5-nong-san', 'fm_cay_kim-sup-lo_1-mam', 'fm_cay_kim-sup-lo_2-non', 'fm_cay_kim-sup-lo_3-lon', 'fm_cay_kim-sup-lo_4-chin', 'fm_cay_kim-sup-lo_5-nong-san', 'fm_cay_kim-toi_1-mam', 'fm_cay_kim-toi_2-non', 'fm_cay_kim-toi_3-lon', 'fm_cay_kim-toi_4-chin', 'fm_cay_kim-toi_5-nong-san', 'fm_cay_moc-bap-cai_1-mam', 'fm_cay_moc-bap-cai_2-non', 'fm_cay_moc-bap-cai_3-lon', 'fm_cay_moc-bap-cai_4-chin', 'fm_cay_moc-bap-cai_5-nong-san', 'fm_cay_moc-dau-ha-lan_1-mam', 'fm_cay_moc-dau-ha-lan_2-non', 'fm_cay_moc-dau-ha-lan_3-lon', 'fm_cay_moc-dau-ha-lan_4-chin', 'fm_cay_moc-dau-ha-lan_5-nong-san', 'fm_cay_moc-ngo_1-mam', 'fm_cay_moc-ngo_2-non', 'fm_cay_moc-ngo_3-lon', 'fm_cay_moc-ngo_4-chin', 'fm_cay_moc-ngo_5-nong-san', 'fm_cay_thuy-sen_1-mam', 'fm_cay_thuy-sen_2-non', 'fm_cay_thuy-sen_3-lon', 'fm_cay_thuy-sen_4-chin', 'fm_cay_thuy-sen_5-nong-san', 'fm_cay_thuy-dua-hau_1-mam', 'fm_cay_thuy-dua-hau_2-non', 'fm_cay_thuy-dua-hau_3-lon', 'fm_cay_thuy-dua-hau_4-chin', 'fm_cay_thuy-dua-hau_5-nong-san', 'fm_cay_thuy-lua_1-mam', 'fm_cay_thuy-lua_2-non', 'fm_cay_thuy-lua_3-lon', 'fm_cay_thuy-lua_4-chin', 'fm_cay_thuy-lua_5-nong-san', 'fm_cay_tho-bi-ngo_1-mam', 'fm_cay_tho-bi-ngo_2-non', 'fm_cay_tho-bi-ngo_3-lon', 'fm_cay_tho-bi-ngo_4-chin', 'fm_cay_tho-bi-ngo_5-nong-san', 'fm_cay_tho-ca-rot_1-mam', 'fm_cay_tho-ca-rot_2-non', 'fm_cay_tho-ca-rot_3-lon', 'fm_cay_tho-ca-rot_4-chin', 'fm_cay_tho-ca-rot_5-nong-san', 'fm_cay_tho-khoai-lang_1-mam', 'fm_cay_tho-khoai-lang_2-non', 'fm_cay_tho-khoai-lang_3-lon', 'fm_cay_tho-khoai-lang_4-chin', 'fm_cay_tho-khoai-lang_5-nong-san', 'bc_cham-than', 'bc_choang', 'bc_gian', 'bc_hoi', 'bc_mo-hoi-nho', 'bc_mo-hoi', 'bc_not-nhac-doi', 'bc_not-nhac', 'bc_tim-nho', 'bc_tim', 'bc_xi-khoi', 'bc_zzz', 'tam_L1_dau-goi', 'tam_L1_khan', 'tam_L1_vit', 'tam_L1_xa-phong', 'tam_L2_dau-goi', 'tam_L2_khan', 'tam_L2_vit', 'tam_L2_xa-phong', 'tam_L3_dau-goi', 'tam_L3_khan', 'tam_L3_vit', 'tam_L3_xa-phong', 'tam_L4_dau-goi', 'tam_L4_khan', 'tam_L4_vit', 'tam_L4_xa-phong', 'tt_doi', 'tt_ban', 'tt_buon', 'tt_om', 'tt_buon-ngu', 'tt_chan', 'tt_khat', 'tt_vui', 'san_phan-nho', 'san_phan-to', 'san_vet-ban', 'san_vun-do-an', 'san_vung-nuoc', 'san_long', 'san_bui', 'san_sach', 'cs_bat_day', 'cs_bat_nua', 'cs_bat_rong', 'cs_bat_nuoc', 'cs_chau_nuoc', 'cs_chau_bot', 'cs_khan', 'cs_xa-phong', 'cs_do-choi_bong', 'cs_do-choi_chuong', 'cs_do-choi_khuc-go', 'cs_do-choi_long-vu', 'cs_choi_0', 'cs_choi_1', 'cs_choi_2', 'cs_sach-bong', 'cs_bao_chu-y', 'cs_bao_chu-y-2', 'cs_bao_chu-y-3', 'cs_bao_nguy', 'cs_tim_vo', 'cs_dau-x', 'cs_bong_bay', 'cs_sao_no', 'cs_dong-ho-cat', 'title_bg', 'bang_go', 'title_b', 'title_pet', ...(DATA.title_baked ? [] : ['logo_elemon']), 'logo', 'nut-menu_thuong', 'nut-menu_chon', 'nut-menu_khoa', 'con-tro', 'phan_nho', 'phan_vua', 'phan_to', 'bong_om',
   ...[0, 1, 2, 3].flatMap(i => [`trung_${i}`, `no-trung_${i}`]),
   ...['hoa', 'kim', 'moc', 'thuy', 'tho'].flatMap(he => [1, 2, 3, 4, 5, 6, 7, 8].map(i => `no_${he}_${i}`)), 'ruoi_0', 'ruoi_1', 'ruoi_2',
   ...DATA.stats_stages.flatMap(st => [0, 1, 2, 3].map(p => `stats_${st}_${p}`))];
@@ -322,7 +323,7 @@ function conds() {
 function hint() {
   if (S.night > 0.5) return 'Đang ngủ… A: đánh thức';
   if (S.sick) return `${DATA.pet.name} bị ốm: Vệ sinh → Thuốc chữa ốm`;
-  if (S.poops.length) return 'Có phân kìa: bấm Dọn';
+  if (S.poops.length) return 'Có phân kìa: Vệ sinh → Dọn';
   if (S.need.no < 30) return `${DATA.pet.name} đói: bấm Ăn`;
   if (S.need.nl < 20) return `${DATA.pet.name} buồn ngủ: bấm Ngủ`;
   if (S.need.sach < 30) return 'Bẩn rồi: Vệ sinh → Tắm';
@@ -353,11 +354,20 @@ function tickNeeds(dt, now) {
     S.sick = true; S.act = null; emote('bc_choang'); toast(`${DATA.pet.name} bị ốm rồi! Cho uống thuốc nhé`);
   }
 }
+// Vệ sinh opens with sweeping first (SWEEP in S.view: not a bag thing, never runs out), then the bath and medicine
+const SWEEP = -1;
 function openBag(kind) {
   S.bagKind = kind;
   S.view = S.items.map((b, i) => i).filter(i => CARE.includes(S.items[i].use) === (kind === 'care'));
-  if (!S.view.length) return toast(kind === 'care' ? 'Hết xà phòng và thuốc rồi, ra Chợ mua nhé' : 'Hết đồ ăn rồi, ra Chợ mua nhé');
+  if (kind === 'care') S.view.unshift(SWEEP);
+  if (!S.view.length) return toast('Hết đồ ăn rồi, ra Chợ mua nhé');
   S.pick = 0; S.pickerGoal = 1;
+}
+function sweep(now) {
+  S.sparkle = now; S.sweepT = now;
+  S.mess = [];
+  if (S.poops.length) { emote('bc_tim-nho'); S.poops = []; S.need.sach = Math.min(100, S.need.sach + 45); gainExp(15); toast('Dọn sạch phân rồi!'); }
+  else { S.need.sach = Math.min(100, S.need.sach + 25); gainExp(5); toast('Phòng sạch bong!'); }
 }
 // Vệ sinh -> Tắm: off to the bathroom, the bath move (or bubbles over the pet), then home again
 function drawBath(now) {
@@ -461,12 +471,22 @@ function drawPicker() {
     const b = S.items[i], sx = 34 + j * 70, sy = y + 36;
     ctx.drawImage(IMG[first + j === S.pick ? 'o_hang-chon' : 'o_hang'], sx, sy);
     slotBack(sx, sy, 56);
-    const f = IMG['food_' + b.file];
+    if (i === SWEEP) {                          // the room's own sweeping broom, fitted into the slot
+      const f = IMG.cs_choi_1, k = Math.min(44 / f.width, 44 / f.height), w = f.width * k, h = f.height * k;
+      ctx.drawImage(f, sx + 28 - w / 2, sy + 28 - h / 2, w, h); return;
+    }
+    const f = foodImg(b.file);
     ctx.drawImage(f, sx + 28 - f.width / 2, sy + 28 - f.height / 2);
     text('x' + S.bag[i], sx + 52, sy + 48, 12, S.bag[i] ? '#f0e4ce' : '#e66e5a', 'right', true, 3);
   });
   if (first > 0) text('◀', 22, y + 64, 12, '#ffd67a', 'center');
   if (first + 6 < S.view.length) text('▶', 450, y + 64, 12, '#ffd67a', 'center');
+  if (S.view[S.pick] === SWEEP) {
+    text('Dọn phòng', 462, y + 44, 16);
+    text(S.poops.length ? 'Hốt phân, quét sàn' : 'Quét sạch sàn', 462, y + 64, 12, '#f0e4ce', 'left', false);
+    text('Sạch +' + (S.poops.length ? 45 : 25), 462, y + 80, 12, '#f0e4ce', 'left', false);
+    return;
+  }
   const b = S.items[S.view[S.pick]];
   text(b.name, 462, y + 44, 16);
   if (b.use) { text(b.info + (b.use === 'ball' ? ' (dùng mãi)' : ''), 462, y + 64, 12, '#f0e4ce', 'left', false); return; }
@@ -542,7 +562,7 @@ function drawRoom(now) {
     ctx.fillStyle = 'rgba(0,0,0,0.25)'; ctx.beginPath(); ctx.ellipse(fx, FEET_Y + 2, 30, 5, 0, 0, 7); ctx.fill();
     prop(done < 0.4 ? 'bat_day' : done < 0.8 ? 'bat_nua' : 'bat_rong', fx, FEET_Y + 4, 64);
     if (done < 0.25) {                                         // the food tips in at the start
-      const f = IMG['food_' + act.food], k = 0.8 * (1 - done * 2);
+      const f = foodImg(act.food), k = 0.8 * (1 - done * 2);
       ctx.drawImage(f, fx - f.width * k / 2, FEET_Y - 34 - f.height * k + done * 60, f.width * k, f.height * k);
     }
   }
@@ -637,7 +657,20 @@ function idleOf(stage) { return stage === 'baby' || stage === 'child' || stage =
 
 // ---------- page 3 (Thuộc tính): gem sockets; a socketed gem raises its element's two attributes ----------
 const GEM = DATA.gems, HE = Object.keys(GEM.attrs);
+// the sockets open with the pet's level (the user, 28/10/2026), one at each step of growing up: Nhi (Lv6), half way
+// through Nhi (Lv15), Thiếu niên (Lv21), Trưởng thành (Lv46), Huyền thoại (Lv100). A gem in a socket not open yet (a
+// new pet's starting gems, an older save) goes back to the bag
+const SOCKET_LV = [6, 15, 21, 46, 100];
+const sockOpen = i => (S.level || 1) >= SOCKET_LV[i];
+function gemFree() {
+  S.gems.forEach((g, i) => {
+    if (!g || sockOpen(i)) return;
+    S.gemBag = S.gemBag || {};
+    const k = `${g[0]}_${g[1]}`; S.gemBag[k] = (S.gemBag[k] || 0) + 1; S.gems[i] = null;
+  });
+}
 function gemBonus() {
+  gemFree();
   const b = [0, 0, 0, 0, 0, 0];
   for (const g of S.gems) if (g) for (const a of GEM.attrs[g[0]]) b[a] += GEM.grades[g[1] - 1][1];
   return b;
@@ -645,14 +678,18 @@ function gemBonus() {
 function drawAttrLive(now) {
   const bonus = gemBonus();
   GEM.rows.forEach((r, i) => {
-    const v = r.base + bonus[i], f = IMG[r.fill], w = r.cap + Math.round((f.width - 2 * r.cap) * Math.min(100, v) / 100);
+    const v = (S.attr ? Math.round(S.attr[i]) : r.base) + bonus[i], f = IMG[r.fill], w = r.cap + Math.round((f.width - 2 * r.cap) * Math.min(100, v) / 100);
     ctx.drawImage(f, 0, 0, w, f.height, r.x, r.y, w, f.height);
     text(String(v), 612, r.yc + 1 - (bonus[i] ? 7 : 0), 17, '#eee2ce', 'right');
     if (bonus[i]) text('+' + bonus[i], 612, r.yc + 15, 12, '#8ce16e', 'right', false);
   });
   GEM.sockets.forEach(([cx, cy], i) => {
-    const g = S.gems[i];
-    if (g) { const im = IMG[`gem_${g[0]}_${g[1]}`]; ctx.drawImage(im, cx - im.width / 2, cy - im.height / 2); }
+    const g = S.gems[i], lock = IMG.hd_vd_khoa;
+    if (!sockOpen(i)) {                                     // not open yet: a small lock, the level it opens at
+      if (lock) { const h = 18, w = lock.width * h / lock.height; ctx.globalAlpha = 0.75; ctx.drawImage(lock, cx - w / 2, cy - h / 2 - 2, w, h); ctx.globalAlpha = 1; }
+      text('Lv' + SOCKET_LV[i], cx, cy + 25, 10, '#d8c8a8', 'center', true, 2);
+    }
+    else if (g) { const im = IMG[`gem_${g[0]}_${g[1]}`]; ctx.drawImage(im, cx - im.width / 2, cy - im.height / 2); }
     else text('+', cx, cy, 17, '#b0967a', 'center');
     if (S.gemMode && i === S.sock) {
       ctx.strokeStyle = `rgba(255,214,90,${0.65 + 0.35 * Math.sin(now / 150)})`; ctx.lineWidth = 3;
@@ -696,7 +733,7 @@ function gemInput(btn) {
     if (btn === 'A') {
       const he = HE[S.gp.r], g = S.gp.c + 1, key = `${he}_${g}`, old = S.gems[S.sock];
       if (!S.gemBag[key]) return toast('Chưa có viên này');
-      if (old) S.gemBag[`${old[0]}_${old[1]}`]++;
+      if (old) S.gemBag[`${old[0]}_${old[1]}`] = (S.gemBag[`${old[0]}_${old[1]}`] || 0) + 1;
       S.gemBag[key]--; S.gems[S.sock] = [he, g]; S.gemFx = performance.now(); S.gemMode = 'sock';
       toast(`Đã khảm Ngọc ${GEM.names[he]} · ${GEM.grades[g - 1][0]}`);
     }
@@ -705,10 +742,11 @@ function gemInput(btn) {
   if (btn === 'LEFT' || btn === 'UP') S.sock = (S.sock + 4) % 5;
   if (btn === 'RIGHT' || btn === 'DOWN') S.sock = (S.sock + 1) % 5;
   if (btn === 'B') S.gemMode = null;
+  if ((btn === 'A' || btn === 'X') && !sockOpen(S.sock)) return toast(`Ô ngọc này mở ở Lv ${SOCKET_LV[S.sock]}`);
   if (btn === 'X') {
     const old = S.gems[S.sock];
     if (!old) return toast('Ô này đang trống');
-    S.gemBag[`${old[0]}_${old[1]}`]++; S.gems[S.sock] = null; toast('Đã gỡ ngọc, cất vào túi');
+    S.gemBag[`${old[0]}_${old[1]}`] = (S.gemBag[`${old[0]}_${old[1]}`] || 0) + 1; S.gems[S.sock] = null; toast('Đã gỡ ngọc, cất vào túi');
   }
   if (btn === 'A') {
     const g = S.gems[S.sock];
@@ -890,51 +928,59 @@ const ACTS = [{ key: 'fish', name: 'Câu cá', line: 'Ra hồ câu cá', bg: 'hd
               { key: 'farm', name: 'Nông trại', line: 'Trồng rau, thu hoạch', bg: 'hd_nen_nong-trai', pic: 'fm_nen', crop: [90, 120, 460, 360] },
               { key: 'cook', name: 'Nấu ăn', line: 'Nấu món, nhận buff', bg: 'na_nen_ban-an', pic: 'na_nen_khuay', crop: [130, 150, 380, 330] },
               { key: 'school', name: 'Trường học', line: 'Học bài với cô Rắn', bg: 'th_nen_lop', pic: 'th_nen_lop', crop: [380, 150, 260, 230] }];
-const CARD_X = [115, 320, 525], CARD_BOTTOM = 395;
+// in the game's own frames (the user, 28/10/2026: the mock-up's cream cards did not match the game), the set Võ đường's
+// menu uses: the wooden card with its gold rim (picked: the glowing one), the title board, a name board under each card
+// (centres x 130 / 320 / 510, card middle CARD_Y, its board LABEL_Y); the game's picture fills the card's wood
+const CARD_X = [130, 320, 510], CARD_Y = 210, LABEL_Y = 352;
+const ACT_WIN = { hd_vd_the_thuong: [24, 23, 135, 179], hd_vd_the_chon: [34, 34, 143, 190] };   // the wood inside the rim
 function drawAct(now) {
-  // background: the last game card chosen, cross-faded
+  // background: the last game card chosen, cross-faded, under Võ đường's dark wash
   const want = ACTS[S.actSel].bg || S.actBg || ACTS[0].bg;
   if (want !== S.actBg) { S.actBgPrev = S.actBg; S.actBg = want; S.actBgT = now; }
   const fade = Math.min(1, (now - (S.actBgT || 0)) / 200);
   if (S.actBgPrev && fade < 1) ctx.drawImage(IMG[S.actBgPrev], 0, 0);
   ctx.globalAlpha = S.actBgPrev ? fade : 1; ctx.drawImage(IMG[want], 0, 0); ctx.globalAlpha = 1;
-  // the name board
-  ctx.drawImage(IMG['hd_bang-ten'], 170, 8);
-  text('HOẠT ĐỘNG', 320, 41, 22, '#3f6a3a', 'center', true);
-  text(`${DATA.pet.name} · Lv ${S.level}`, 628, 22, 13, '#5a4a3a', 'right', true);
+  ctx.fillStyle = 'rgba(14,9,6,0.42)'; ctx.fillRect(0, 0, 640, 480);   // darkened: the light wash glared on the device
+  const centre = (im, x, y) => ctx.drawImage(im, Math.round(x - im.width / 2), Math.round(y - im.height / 2));
+  // the title board
+  centre(IMG['hd_vd_bang-tieu-de'], 320, 48);
+  title('HOẠT ĐỘNG', 320, 46, 26, '#ffe6a8', 4);
+  text(`${DATA.pet.name} · Lv ${S.level}`, 628, 22, 13, '#fff2d8', 'right', true, 3);
   const first = Math.max(0, Math.min(S.actSel - 1, ACTS.length - 3));
   ACTS.forEach((a, i) => {
     if (i < first || i > first + 2) return;
-    const cx = CARD_X[i - first], on = i === S.actSel, card = IMG[!a.key ? 'hd_the_khoa' : on ? 'hd_the_chon' : 'hd_the'];
-    const bob = on ? Math.round(2 * Math.sin(now / 260)) : 0;
-    const x = cx - card.width / 2, y = CARD_BOTTOM - card.height + bob;
-    if (a.pic) {                                              // the game's picture in the card's window
-      const [wx0, wy0, wx1, wy1] = on ? [39, 56, 168, 196] : [23, 30, 147, 165], [cx, cy, cw, ch] = a.crop;
-      const ww = wx1 - wx0, wh = wy1 - wy0, k = Math.max(ww / cw, wh / ch);
+    const cx = CARD_X[i - first], on = i === S.actSel, bob = on ? Math.round(2 * Math.sin(now / 260)) : 0;
+    const key = on ? 'hd_vd_the_chon' : 'hd_vd_the_thuong', card = IMG[key];
+    const x = Math.round(cx - card.width / 2), y = Math.round(CARD_Y + bob - card.height / 2);
+    ctx.drawImage(card, x, y);
+    if (a.pic) {                                              // the game's picture on the card's wood
+      const [wx0, wy0, wx1, wy1] = ACT_WIN[key], [px, py, pw, ph] = a.crop;
+      const ww = wx1 - wx0, wh = wy1 - wy0, k = Math.max(ww / pw, wh / ph);
       ctx.save(); ctx.beginPath(); ctx.rect(x + wx0, y + wy0, ww, wh); ctx.clip();
-      ctx.drawImage(IMG[a.pic], cx, cy, cw, ch, x + wx0 + (ww - cw * k) / 2, y + wy0 + (wh - ch * k) / 2, cw * k, ch * k);
+      if (!a.key) ctx.filter = 'grayscale(1) brightness(0.6)';
+      ctx.drawImage(IMG[a.pic], px, py, pw, ph, x + wx0 + (ww - pw * k) / 2, y + wy0 + (wh - ph * k) / 2, pw * k, ph * k);
       ctx.restore();
     }
-    ctx.drawImage(card, x, y);
-    const ty = y + card.height * 0.86;
-    text(a.name, cx, ty - 8, on ? 19 : 16, a.key ? (on ? '#c4553a' : '#4a3020') : '#a8a098', 'center', true);
-    text(a.line, cx, ty + 12, 11, a.key ? '#7a5a40' : '#a8a098', 'center', true);
+    centre(IMG['hd_vd_bang-chu'], cx, LABEL_Y);
+    const lock = IMG.hd_vd_khoa, tx = a.key ? cx : cx + 9;
+    if (!a.key) ctx.drawImage(lock, cx - 62, LABEL_Y - 14, lock.width * 0.34, lock.height * 0.34);   // not open yet
+    text(a.name, tx, LABEL_Y, 15, a.key ? '#ffe6a8' : '#d8c8a8', 'center', true, 3);
   });
-  // the bag and the shop, reachable straight from here
+  if (first > 0) text('◀', 22, CARD_Y, 20, '#ffe6a8', 'center', true, 3);
+  if (first + 3 < ACTS.length) text('▶', 618, CARD_Y, 20, '#ffe6a8', 'center', true, 3);
+  text(ACTS[S.actSel].line, 320, 404, 14, '#fff2d8', 'center', true, 3);
+  // the bag and the shop, reachable straight from here: in the game's small wooden frame, the button that opens each
   [['td_tui', 'Túi đồ', 'X', '#3a7ad8'], [null, 'Cửa hàng', 'Y', '#3aa84a']].forEach(([ic, nm, key, kc], j) => {
-    const cx = 42 + j * 70, cy = 44;
-    ctx.fillStyle = '#fffaf0'; ctx.strokeStyle = '#7fb0d0'; ctx.lineWidth = 3;
-    ctx.beginPath(); ctx.arc(cx, cy, 25, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-    if (ic) fit(IMG[ic], cx, cy, 34, 32);
-    else { ctx.save(); ctx.beginPath(); ctx.arc(cx, cy, 23, 0, Math.PI * 2); ctx.clip();       // the stall keeper's face
-           ctx.drawImage(IMG['sn_chu_1-cuoi'], 13, 0, 100, 96, cx - 25, cy - 22, 50, 48); ctx.restore(); }
-    ctx.fillStyle = kc; ctx.beginPath(); ctx.arc(cx + 19, cy + 18, 9, 0, Math.PI * 2); ctx.fill();
-    text(key, cx + 19, cy + 18, 11, '#fff', 'center', true);
+    const cx = 40 + j * 64, cy = 40;
+    centre(IMG.hd_vd_o, cx, cy);
+    if (ic) fit(IMG[ic], cx, cy, 30, 28);
+    else { ctx.save(); ctx.beginPath(); ctx.rect(cx - 17, cy - 17, 34, 34); ctx.clip();      // the stall keeper's face
+           ctx.drawImage(IMG['sn_chu_1-cuoi'], 13, 0, 100, 96, cx - 18, cy - 17, 36, 35); ctx.restore(); }
+    ctx.fillStyle = kc; ctx.beginPath(); ctx.arc(cx + 21, cy + 20, 9, 0, Math.PI * 2); ctx.fill();
+    text(key, cx + 21, cy + 20, 11, '#fff', 'center', true);
     text(nm, cx, cy + 38, 12, '#fff2d8', 'center', true, 3);
   });
-  ctx.drawImage(IMG['hd_mui-ten_trai'], 382, 430); ctx.drawImage(IMG['hd_mui-ten_phai'], 414, 430);
-  ctx.drawImage(IMG.hd_nut_A, 470, 432); text('A', 483, 446, 13, '#fff', 'center', true); text('Vào', 504, 446, 14, '#3a2a1a', 'left', true);
-  ctx.drawImage(IMG.hd_nut_B, 550, 432); text('B', 563, 446, 13, '#fff', 'center', true); text('Về', 584, 446, 14, '#3a2a1a', 'left', true);
+  text('◀ ▶ chọn · A: vào · B: về', 320, 462, 13, '#f0e4ce', 'center', false, 3);
 }
 function actInput(btn) {
   if (btn === 'LEFT' || btn === 'UP') S.actSel = (S.actSel + ACTS.length - 1) % ACTS.length;
@@ -998,11 +1044,16 @@ function strip(name, k, x, y, n = 6) {
   ctx.drawImage(im, f * w, 0, w, im.height, Math.round(x - w / 2), Math.round(y - im.height), w, im.height);
   return true;
 }
-function bag(file, name, he, effect) {        // a caught fish / a crop goes into the bag as food
-  IMG['food_' + file] = IMG['food_' + file] || IMG[file.startsWith('CA_') ? 'cc_' + file : file.startsWith('mon_') ? 'na_' + file : 'fm_' + file];
-  let i = S.items.findIndex(b => b.file === file);
-  if (i < 0) { S.items.push({ file, name, he, effect }); S.bag.push(0); i = S.items.length - 1; }
-  (S.newItems || (S.newItems = {}))['it:' + file] = true;
+// a bag thing's picture: the shop's own (food_<file>), or for what the game makes (a caught fish, a crop, a dish) its
+// source picture; looked up here, not only when the thing was caught (after loading a save those had none: empty slots)
+function foodImg(file) {
+  return IMG['food_' + file] || (IMG['food_' + file] = IMG[file.startsWith('CA_') ? 'cc_' + file : file.startsWith('mon_') ? 'na_' + file : 'fm_' + file]);
+}
+function bag(file, name, he, effect, stars = 0) {   // a caught fish / a crop / a dish (its stars) goes into the bag as food
+  foodImg(file);
+  let i = S.items.findIndex(b => b.file === file && (b.stars || 0) === stars);
+  if (i < 0) { S.items.push(stars ? { file, name, he, effect, stars } : { file, name, he, effect }); S.bag.push(0); i = S.items.length - 1; }
+  (S.newItems || (S.newItems = {}))['it:' + file + (stars ? '_' + stars : '')] = true;
   S.bag[i]++;
 }
 function fishInput(btn, now) {
@@ -1070,7 +1121,8 @@ function drawFish(now, dt) {
     if (now > f.fnext) { f.ft = 10 + Math.random() * (H - 40); f.fnext = now + (900 - f.tier * 150) * (0.5 + Math.random()); }
     f.fy += (f.ft - f.fy) * Math.min(1, 0.02 * f.tier * k + 0.01 * k);
     const on = f.fy + 11 > f.zone && f.fy + 11 < f.zone + zh;
-    f.prog = Math.max(0, Math.min(100, f.prog + (on ? 0.42 - f.tier * 0.04 : own.vot ? -0.22 : -0.32) * k));
+    const de = typeof __lkDe === 'function' ? __lkDe() : 1;      // Thủy Linh khí: the bar fills faster (game: chi-so.js)
+    f.prog = Math.max(0, Math.min(100, f.prog + (on ? (0.42 - f.tier * 0.04) * de : own.vot ? -0.22 : -0.32) * k));
     ctx.drawImage(IMG['cc_thanh-tien-do'], bx - 44, by);
     const fill = IMG['cc_fill_tien-do'], fh = Math.round(fill.height * f.prog / 100);
     ctx.drawImage(fill, 0, fill.height - fh, fill.width, fh, bx - 44 + 10, by + 14 + fill.height - fh, fill.width, fh);
@@ -1095,7 +1147,6 @@ function drawFish(now, dt) {
     ctx.drawImage(im, 320 - im.width * k * t / 2, 230 - im.height * k * t / 2, im.width * k * t, im.height * k * t);
     title(f.tier >= 3 ? 'CÁ HIẾM!' : 'BẮT ĐƯỢC!', 320, 120, 32, '#ffe6a8', 4);
     text(f.name, 320, 300, 20, '#fff2d8', 'center', true, 4);
-    text(`Đã cho vào túi · bán ở quầy được ${f.coins} xu`, 320, 328, 14, '#ffe0b0', 'center', true, 3);
   }
   drawTop('Câu cá');
   const hint = { ready: 'A: thả câu · X: quầy đồ câu · B: quay lại', wait: 'Chờ phao chìm…', bite: 'CÁ CẮN! Bấm A ngay!',
@@ -1185,9 +1236,21 @@ function farmInput(btn, now) {
     Object.assign(p, { s: 'dat', stage: 0, he: null });
   } else toast('Cây đang lớn, chờ chút nhé');
 }
+// the farm's backdrop a little darker (the user, 28/10/2026: the soil squares did not stand out from the sunny field),
+// darkened once and then copied
+let farmBack = null;
+function farmBackdrop() {
+  if (farmBack) return farmBack;
+  const c = document.createElement('canvas'); c.width = 640; c.height = 480;
+  const g = c.getContext('2d');
+  g.drawImage(IMG.fm_nen, 0, 0);
+  g.fillStyle = 'rgba(14,9,6,0.32)'; g.fillRect(0, 0, 640, 480);
+  if (typeof __cv === 'object' && __cv.seal) __cv.seal(c.__id);
+  return (farmBack = c);
+}
 function drawFarm(now, dt) {
   farmTick(now, dt);
-  ctx.drawImage(IMG.fm_nen, 0, 0);
+  ctx.drawImage(farmBackdrop(), 0, 0);
   const ps = farmPlots();
   FIELD.forEach((f, i) => { const t = IMG[plotTile(ps[i], now)]; if (t) ctx.drawImage(t, f.x - t.width / 2, f.y - t.height / 2); });
   const sel = FIELD[S.farmSel], cur = IMG[ps[S.farmSel].s === 'khoa' ? 'fm_con-tro_o' : 'fm_con-tro_o_vang'];
@@ -1239,6 +1302,10 @@ const STEP = { cat: { n: 'Cắt', bg: 'na_nen_cat', how: 'Bấm A liên tục đ
                khuay: { n: 'Khuấy', bg: 'na_nen_khuay', how: 'Xoay D-pad ↑ → ↓ ← để khuấy' },
                chien: { n: 'Chiên', bg: 'na_nen_chien', how: 'Bấm A khi kim ở vùng xanh' } };
 const BUFF = { hoa: 'Sức mạnh', kim: 'Phòng thủ', moc: 'Hồi máu', thuy: 'Nhanh nhẹn', tho: 'Bền bỉ' };
+// a dish's effect by its element and stars: Mộc, Sức khỏe at once; the others, the next trip / Solo match
+// (game/src/chi-so.js __monNau); the numbers each star adds
+const BUFF_N = { hoa: 4, kim: 5, moc: 15, thuy: 4, tho: 4 };
+const buffLine = (he, stars) => he === 'moc' ? `Sức khỏe +${BUFF_N.moc * stars}` : `${BUFF[he]} +${BUFF_N[he] * stars} trận sau`;
 const ingName = k => k === 'CA' ? 'Cá' : CROP_NAME[k];
 function ingSlot(k, skip = []) {               // the bag slot an ingredient comes from (fish: the smallest one)
   const ok = i => S.bag[i] - skip.filter(x => x === i).length > 0;
@@ -1273,9 +1340,10 @@ function cookScore(c) {
 function cookNext(now) {
   const c = S.cook; c.scores.push(cookScore(c));
   if (++c.si < c.d.steps.length) return cookStep(now);
-  const avg = c.scores.reduce((a, b) => a + b, 0) / c.scores.length, stars = avg >= 0.85 ? 3 : avg >= 0.55 ? 2 : 1;
+  const de = typeof __lkDe === 'function' ? __lkDe() : 1;        // Thủy Linh khí: stars come easier (game: chi-so.js)
+  const avg = Math.min(1, c.scores.reduce((a, b) => a + b, 0) / c.scores.length * de), stars = avg >= 0.85 ? 3 : avg >= 0.55 ? 2 : 1;
   const d = c.d, file = 'mon_' + d.k;
-  bag(file, d.n, HE_NAME[d.he], `No +${20 + stars * 10} · ${BUFF[d.he]} +${stars * 2} (${stars} sao)`);
+  bag(file, d.n, HE_NAME[d.he], `No +${20 + stars * 10} · ${buffLine(d.he, stars)} · ${stars} sao`, stars);
   gainExp(15 + stars * 10); S.need.vui = Math.min(100, S.need.vui + 6);
   Object.assign(c, { st: 'done', t: now, stars });
 }
@@ -1435,7 +1503,7 @@ function drawCookDone(now) {
     }
     if (since > 1600) {
       ctx.drawImage(IMG['na_buff_suc-manh'], 400, 94, 60, 41);
-      text(`${BUFF[c.d.he]} +${c.stars * 2}`, 470, 115, 15, '#c4553a', 'left', true);
+      text(buffLine(c.d.he, c.stars), 470, 115, 15, '#c4553a', 'left', true);
     }
   }
   if (since > 1600) {
@@ -1639,7 +1707,7 @@ function tuiAll() {                            // every slot of the bag, in the 
     const kind = tuiKind(b), crop = kind === 'nong-san' && SEEDS.find(x => b.file === `cay_${x.he}-${x.k}_5-nong-san`);
     const desc = kind === 'nong-san' ? `Dùng nấu món tăng ${BUFF[crop ? crop.he : 'tho']}` : kind === 'ca' ? `Bán ${fishPrice(+b.file.slice(-1))} xu · dùng nấu món`
                : b.use ? b.info : b.effect;
-    out.push({ key: 'it:' + b.file, kind, img: IMG['food_' + b.file], name: b.name, he: b.he, n: S.bag[i], desc, item: i });
+    out.push({ key: 'it:' + b.file + (b.stars ? '_' + b.stars : ''), kind, img: foodImg(b.file), name: b.name, he: b.he, n: S.bag[i], desc, item: i });
   });
   SEEDS.forEach((sd, j) => { const n = seedsOf(sd); if (n) out.push({ key: 'hat:' + seedKey(sd), kind: 'hat', img: IMG[`sn_hat_${sd.he}-${sd.k}`],
     name: 'Hạt ' + sd.n.toLowerCase(), he: HE_NAME[sd.he], n, desc: `Gieo ${sd.days} ngày là thu · bán ${sd.sell} xu`, seed: j }); });
@@ -1698,6 +1766,20 @@ function tuiDo(r, which) {
   if (r.tackle) return fadeTo(() => { S.mode = 'fish'; S.fish = { st: 'ready', t: performance.now() }; });
   if (r.gem) return toast('Gắn ngọc ở mục Thuộc tính (thông tin pet)');
 }
+// the bag's slots: the plain wooden frame with a thin gold rim, td_khung (the user, 28/10/2026: the shelf's carved
+// corners, 24 at once, were too heavy and busy); o open, chon picked, khoa locked (dimmed, a small lock), made once
+const TUI_SLOT = {};
+function tuiSlot(kind) {
+  if (TUI_SLOT[kind]) return TUI_SLOT[kind];
+  const im = IMG[kind === 'chon' ? 'td_khung-chon' : 'td_khung'], lock = IMG['td_o-khoa'];
+  if (!im || (kind === 'khoa' && !lock)) return IMG[kind === 'chon' ? 'shelf_o_hang-chon' : kind === 'khoa' ? 'shelf_o_hang-khoa' : 'shelf_o_hang'];
+  const c = document.createElement('canvas'); c.width = c.height = 58;
+  const g = c.getContext('2d');
+  if (kind === 'khoa') g.globalAlpha = 0.45;
+  g.drawImage(im, 0, 0, 58, 58);
+  if (kind === 'khoa') { g.globalAlpha = 0.6; g.drawImage(lock, 19, 19, 20, 20 * lock.height / lock.width); }
+  return (TUI_SLOT[kind] = c);
+}
 function drawTui(now) {
   const tb = S.tb, rows = tuiRows(), all = tuiAll().length;
   // the scene behind, dimmed, and the big cream panel
@@ -1721,12 +1803,10 @@ function drawTui(now) {
   const top = Math.max(0, Math.floor(tb.i / 6) - 3) * 6, open = Math.max(20, Math.ceil(rows.length / 6) * 6);
   for (let j = 0; j < 24; j++) {
     const i = top + j, x = 40 + (j % 6) * 64, y = 128 + Math.floor(j / 6) * 64, r = rows[i];
-    if (i >= open) { ctx.drawImage(IMG['shelf_o_hang-khoa'], x, y, 58, 58); continue; }
-    ctx.drawImage(IMG[r && i === tb.i ? 'shelf_o_hang-chon' : 'shelf_o_hang'], x, y, 58, 58);
+    if (i >= open) { ctx.drawImage(tuiSlot('khoa'), x, y); continue; }
+    ctx.drawImage(tuiSlot(r && i === tb.i ? 'chon' : 'o'), x, y);
     if (!r) continue;
-    if (r.img) fit(r.img, x + 29, y + 27, 42, 40);
-    const sl = IMG['td_so-luong']; ctx.drawImage(sl, x + 58 - sl.width, y + 58 - sl.height);
-    text(String(r.n), x + 50, y + 50, 11, '#2a4a6a', 'center', true);
+    if (r.img) fit(r.img, x + 29, y + 29, 40, 40);
     if ((S.newItems || {})[r.key]) ctx.drawImage(IMG.td_moi, x + 44, y - 6);
     if ((S.fav || {})[r.key]) fit(IMG['td_yeu-thich'], x + 10, y + 10, 16, 16);
   }
@@ -1739,7 +1819,8 @@ function drawTui(now) {
     if (S.newItems) delete S.newItems[r.key];
     if (r.img) fit(r.img, 522, 186, 100, 80);
     text(r.name, 522, 246, 17, '#ffd67a', 'center', true);
-    text((r.he ? `Hệ ${r.he} · ` : '') + `x${r.n}`, 522, 266, 12, '#b8a080', 'center', true);
+    if (r.he) text(`Hệ ${r.he}`, 522, 266, 12, '#b8a080', 'center', true);
+    text(`x${r.n}`, 596, 142, 15, '#ffe6a8', 'right', true, 3);       // how many: the details' top right corner
     ctx.font = '12px Tahoma, sans-serif'; const words = String(r.desc || '').split(' '), lines = [''];
     for (const w of words) { const t = (lines[lines.length - 1] + ' ' + w).trim(); if (ctx.measureText(t).width > 148) lines.push(w); else lines[lines.length - 1] = t; }
     lines.slice(0, 3).forEach((l, j) => text(l, 522, 292 + j * 16, 12, '#f0e4ce', 'center', false));
@@ -1826,7 +1907,7 @@ function drawSeedShop(now) {
   rows.slice(top, top + 9).forEach((r, j) => {
     const i = top + j, x = 372 + (j % 3) * 82, y = 64 + Math.floor(j / 3) * 96, on = i === ss.i;
     ctx.drawImage(IMG[on ? 'sn_o-hang_chon' : 'sn_o-hang'], x, y);
-    const icon = ss.tab === 2 ? IMG['food_' + r.b.file] : ss.tab ? IMG['sn_' + r.k] : IMG[`sn_hat_${r.he}-${r.k}`];
+    const icon = ss.tab === 2 ? foodImg(r.b.file) : ss.tab ? IMG['sn_' + r.k] : IMG[`sn_hat_${r.he}-${r.k}`];
     if (icon) fit(icon, x + 29, y + 27, 40, 40);
     ctx.drawImage(IMG['sn_the-gia'], x - 8, y + 56);
     ctx.drawImage(IMG.sn_xu, x - 2, y + 61);
@@ -2262,6 +2343,7 @@ function press(btn) {
     if (btn === 'B') S.pickerGoal = 0;
     if (btn === 'A') {
       const k = S.view[S.pick];
+      if (k === SWEEP) { S.pickerGoal = 0; sweep(now); return; }
       if (!S.bag[k]) { toast('Hết món này rồi'); return; }
       const it = S.items[k], food = it.file;
       if (it.use) { useItem(k); return; }
@@ -2274,8 +2356,10 @@ function press(btn) {
       if (!S.bag[S.pick]) {                                   // the last one: it leaves the bag
         S.items.splice(S.pick, 1); S.bag.splice(S.pick, 1); S.pick = Math.min(S.pick, Math.max(0, S.items.length - 1));
       }
-      S.need.no = Math.min(100, S.need.no + 25); S.tim = Math.min(5, S.tim + 0.1); gainExp(25);
+      S.need.no = Math.min(100, S.need.no + (it.stars ? 20 + it.stars * 10 : 25)); S.tim = Math.min(5, S.tim + 0.1); gainExp(25);
+      if (it.stars && typeof __monNau === 'function') __monNau(HE_KEY[it.he], it.stars);   // a dish's buff (game: chi-so.js)
       const he = HE_KEY[it.he]; if (he) S.lk[he] = Math.min(100, S.lk[he] + 6);       // food feeds its element's Linh khí
+      if (he && typeof __anMon === 'function') __anMon(he);                        // and its two attributes (game: chi-so.js)
       S.nextPoop = Math.min(S.nextPoop, now + 15000);
       act('eat', { food, loops: 3 });
       if (S.mess.length < 4) S.mess.push({ x: S.px + (S.left ? -1 : 1) * 64, y: FEET_Y + 14, img: 'san_vun-do-an' });
@@ -2326,12 +2410,7 @@ function press(btn) {
   }
   switch (S.cursor) {
     case 0: openBag('food'); break;
-    case 1:
-      S.sparkle = now; S.sweepT = now;
-      S.mess = [];
-      if (S.poops.length) { emote('bc_tim-nho'); S.poops = []; S.need.sach = Math.min(100, S.need.sach + 45); gainExp(15); toast('Dọn sạch phân rồi!'); }
-      else { S.need.sach = Math.min(100, S.need.sach + 25); gainExp(5); toast('Phòng sạch bong!'); }
-      break;
+    case 1: fadeTo(() => openTui('room')); break;
     case 2: openBag('care'); break;
     case 3: S.nightGoal = 1; S.bubble = null; S.sleepT = now; act('sleep', { hold: true }); break;
     case 4: fadeTo(() => { S.mode = 'act'; S.actSel = 0; }); break;

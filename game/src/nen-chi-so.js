@@ -83,7 +83,7 @@
   function values() {
     const n = S.need, he = EL();
     if (S.stats === 0 && L.bars) {
-      const v = [n.no, n.vui, n.sach, n.nl, S.sick ? 25 : 100];  // Sức khỏe: the game only knows ill or well
+      const v = [n.no, n.vui, n.sach, n.nl, typeof n.sk === 'number' ? n.sk : S.sick ? 25 : 100];  // Sức khỏe (game/src/chi-so.js)
       L.bars.forEach((b, i) => fill('hs_fill_' + b.fill, b.x, b.y, L.barH, v[i]));
       L.nums.forEach((sp, i) => put(Math.round(v[i]), sp, v[i] < 20 ? '#ff8a6a' : null));
     }

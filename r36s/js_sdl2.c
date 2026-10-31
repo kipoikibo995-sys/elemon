@@ -2,7 +2,9 @@
 #include "jsrt.h"
 #include <SDL.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 /* the page's buttons, their pad bit, and the SDL button (or trigger axis) that presses them */
 static struct { const char *name; unsigned bit; int button, axis; } map[] = {
@@ -17,9 +19,43 @@ static struct { const char *name; unsigned bit; int button, axis; } map[] = {
 #define N_MAP (sizeof map / sizeof *map)
 static SDL_GameController *pads[4];
 
+/* the handheld's own volume: TrimUI's keymon writes the volume buttons' level (0..20, "vol") and "mute" into
+   system.json but sets no mixer the game's sound goes through, so the game scales its sound by it (30 dB from 1 to 20,
+   0 silent); without the file (R36S) the sound is as it was */
+#define VOL_FILE "/mnt/UDISK/system.json"
+static volatile int vol_gain = 65536;                     /* 16.16 */
+static int json_int(const char *s, const char *key, int dflt) {
+    const char *p = strstr(s, key);
+    if (!p) return dflt;
+    p += strlen(key);
+    while (*p == '"' || *p == ':' || *p == ' ' || *p == '\t') ++p;
+    return *p >= '0' && *p <= '9' ? atoi(p) : dflt;
+}
+static void read_volume(void) {
+    static int last = -2;
+    char buf[4096];
+    size_t n;
+    int v;
+    FILE *f = fopen(VOL_FILE, "r");
+    if (!f) return;
+    n = fread(buf, 1, sizeof buf - 1, f);
+    fclose(f);
+    buf[n] = 0;
+    v = json_int(buf, "\"mute\"", 0) ? 0 : json_int(buf, "\"vol\"", 20);
+    if (v < 0) v = 0;
+    if (v > 20) v = 20;
+    if (v == last) return;
+    last = v;
+    vol_gain = v ? (int)(65536 * SDL_pow(10.0, 1.5 * (v - 20) / 20.0)) : 0;
+    printf("volume %d/20: x%.3f\n", v, vol_gain / 65536.0);
+}
+
 static void audio_callback(void *user, Uint8 *stream, int len) {
+    int16_t *s = (int16_t *)stream;
+    int i, n = len / 2, g = vol_gain;
     (void)user;
-    jsrt_audio((int16_t *)stream, len / 2);
+    jsrt_audio(s, n);
+    if (g != 65536) for (i = 0; i < n; ++i) s[i] = (int16_t)((s[i] * g) >> 16);
 }
 
 /* buttons.txt: "A=b" lines (SDL names; lefttrigger / righttrigger for the trigger axes) */
@@ -97,19 +133,48 @@ static unsigned read_pad(void) {
     return bits;
 }
 
+/* log.txt through a pipe: printf only fills the pipe, a thread of its own writes it to the card. On the SD card a
+   write now and then waits (its housekeeping, up to seconds), and a log line written in the frame stopped the game */
+static int log_out = -1;
+static SDL_Thread *log_thread;
+static int log_pump(void *arg) {
+    int in = (int)(intptr_t)arg;
+    char buf[4096];
+    ssize_t n;
+    while ((n = read(in, buf, sizeof buf)) > 0) {
+        ssize_t off = 0;
+        while (off < n) { ssize_t w = write(log_out, buf + off, (size_t)(n - off)); if (w <= 0) break; off += w; }
+    }
+    return 0;
+}
+static void log_through_pipe(void) {
+    int fds[2];
+    if (pipe(fds) != 0) return;
+    log_out = dup(STDOUT_FILENO);
+    if (log_out < 0) { close(fds[0]); close(fds[1]); return; }
+    fflush(stdout);
+    dup2(fds[1], STDOUT_FILENO);
+    dup2(fds[1], STDERR_FILENO);
+    close(fds[1]);
+    if (!(log_thread = SDL_CreateThread(log_pump, "log", (void *)(intptr_t)fds[0]))) {   /* no thread: back to the file itself */
+        dup2(log_out, STDOUT_FILENO); dup2(log_out, STDERR_FILENO);
+    }
+}
+
 int main(int argc, char **argv) {
     SDL_Window *window;
     SDL_Renderer *renderer;
     SDL_Texture *texture;
     SDL_AudioSpec want;
     int audio = 0, running = 1, i, n = 0;
-    Uint32 start, quit_since = 0;
+    Uint32 start, quit_since = 0, vol_t = 0;
     (void)argc; (void)argv;
     setvbuf(stdout, 0, _IOLBF, 0);                         /* log.txt is written line by line */
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER) != 0) {
         printf("SDL_Init: %s\n", SDL_GetError());
         return 1;
     }
+    log_through_pipe();
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
     window = SDL_CreateWindow("Elemon", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, JS_SCREEN_W, JS_SCREEN_H,
                               SDL_WINDOW_SHOWN | SDL_WINDOW_FULLSCREEN_DESKTOP);
@@ -140,6 +205,7 @@ int main(int argc, char **argv) {
     want.samples = 1024;
     want.callback = audio_callback;
     if (!jsrt_init(".")) { printf("the page did not start (see above)\n"); SDL_Quit(); return 1; }
+    read_volume();
     if (SDL_OpenAudio(&want, NULL) == 0) { audio = 1; SDL_PauseAudio(0); }   /* SDL converts to the device */
     else printf("no sound: %s\n", SDL_GetError());
 
@@ -147,7 +213,7 @@ int main(int argc, char **argv) {
     {
     /* every 5 s a line in log.txt: frames a second and where the time went (the game's frame, putting it on the
        screen), so the real speed on the handheld can be read off the card */
-    Uint32 stat_t = SDL_GetTicks(), stat_n = 0, stat_worst = 0;
+    Uint32 stat_t = SDL_GetTicks(), stat_n = 0, stat_worst = 0, stat_lines = 0;
     Uint64 stat_js = 0, stat_show = 0, freq = SDL_GetPerformanceFrequency();
     while (running) {
         Uint32 t0 = SDL_GetTicks(), spent;
@@ -167,6 +233,8 @@ int main(int argc, char **argv) {
             else if (t0 - quit_since > 500) running = 0;
         } else quit_since = 0;
         if (SDL_GetKeyboardState(0)[SDL_SCANCODE_ESCAPE] && SDL_GetKeyboardState(0)[SDL_SCANCODE_LCTRL]) running = 0;
+        if (jsrt_wants_exit()) running = 0;
+        if (t0 - vol_t >= 300) { vol_t = t0; read_volume(); }   /* the volume buttons, within a third of a second */                 /* the game's own "Thoát game" */
 
         p0 = SDL_GetPerformanceCounter();
         screen = jsrt_frame((double)(t0 - start), pad);
@@ -178,12 +246,16 @@ int main(int argc, char **argv) {
         SDL_RenderPresent(renderer);
         p2 = SDL_GetPerformanceCounter();
         stat_js += p1 - p0; stat_show += p2 - p1; ++stat_n;
+        if ((p1 - p0) * 1000 / freq > 300 || (p2 - p1) * 1000 / freq > 300)   /* a stall: when, and in which part */
+            printf("slow: frame at t=%.1fs, game %u ms, screen %u ms\n", (SDL_GetTicks() - start) / 1000.0,
+                   (unsigned)((p1 - p0) * 1000 / freq), (unsigned)((p2 - p1) * 1000 / freq));
         if ((Uint32)((p2 - p0) * 1000 / freq) > stat_worst) stat_worst = (Uint32)((p2 - p0) * 1000 / freq);
         if (SDL_GetTicks() - stat_t >= 5000) {
             double s = (SDL_GetTicks() - stat_t) / 1000.0;
             printf("t=%us  %.1f fps  game %.1f ms  screen %.1f ms  worst %u ms\n", (unsigned)((SDL_GetTicks() - start) / 1000),
                    stat_n / s, stat_js * 1000.0 / freq / stat_n, stat_show * 1000.0 / freq / stat_n, (unsigned)stat_worst);
             stat_t = SDL_GetTicks(); stat_n = 0; stat_js = stat_show = 0; stat_worst = 0;
+            if (++stat_lines % 6 == 1) { char m[256]; jsrt_mem(m, sizeof m); printf("%s\n", m); }   /* every 30 s */
         }
         spent = SDL_GetTicks() - t0;
         if (spent < 16) SDL_Delay(16 - spent);              /* up to 60 frames a second, as a browser */
@@ -196,6 +268,11 @@ int main(int argc, char **argv) {
     SDL_DestroyTexture(texture);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
+    if (log_thread) {                            /* the last lines reach log.txt: the pipe closed, its thread done */
+        fflush(stdout); fflush(stderr);
+        dup2(log_out, STDOUT_FILENO); dup2(log_out, STDERR_FILENO);
+        SDL_WaitThread(log_thread, 0);
+    }
     SDL_Quit();
     return 0;
 }

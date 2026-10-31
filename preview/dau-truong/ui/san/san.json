@@ -10,18 +10,18 @@
   {
    "id": "hoa_nui-lua",
    "file": "ui/san/hoa_nui-lua.png",
-   "y": 319,
+   "y": 290,
    "rx": 296,
-   "ry": 116
+   "ry": 137
   }
  ],
  "thuy": [
   {
    "id": "thuy_den-bao",
    "file": "ui/san/thuy_den-bao.png",
-   "y": 318,
+   "y": 292,
    "rx": 291,
-   "ry": 117
+   "ry": 136
   },
   {
    "id": "thuy_hang-pha-le",
@@ -49,9 +49,9 @@
   {
    "id": "moc_rung-xanh",
    "file": "ui/san/moc_rung-xanh.png",
-   "y": 324,
+   "y": 289,
    "rx": 285,
-   "ry": 111
+   "ry": 136
   },
   {
    "id": "moc_thac-rung",
@@ -72,16 +72,16 @@
   {
    "id": "tho_hem-da-do",
    "file": "ui/san/tho_hem-da-do.png",
-   "y": 325,
+   "y": 294,
    "rx": 287,
-   "ry": 110
+   "ry": 132
   },
   {
    "id": "tho_vong-da-chieu",
    "file": "ui/san/tho_vong-da-chieu.png",
-   "y": 296,
+   "y": 277,
    "rx": 267,
-   "ry": 139
+   "ry": 153
   }
  ],
  "kim": [
@@ -95,25 +95,34 @@
   {
    "id": "kim_nui-tuyet",
    "file": "ui/san/kim_nui-tuyet.png",
-   "y": 299,
+   "y": 270,
    "rx": 266,
-   "ry": 109
+   "ry": 126
   }
  ],
  "chung": [
   {
    "id": "chung_dao-may",
    "file": "ui/san/chung_dao-may.png",
-   "y": 298,
+   "y": 284,
    "rx": 265,
-   "ry": 137
+   "ry": 148
   },
   {
    "id": "chung_rung-rune",
    "file": "ui/san/chung_rung-rune.png",
-   "y": 288,
+   "y": 274,
    "rx": 296,
-   "ry": 147
+   "ry": 158
+  }
+ ],
+ "hu": [
+  {
+   "id": "hu_dai-ngu-hanh",
+   "file": "ui/san/hu_dai-ngu-hanh.png",
+   "y": 270,
+   "rx": 284,
+   "ry": 108
   }
  ]
 }

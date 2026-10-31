@@ -45,8 +45,9 @@
     let tune = null, stepAt = 0, step = 0, bite = -1, evo = '', asked = false;
     globalThis.frame = function (now) {
       const r = frame0.apply(this, arguments);
-      // music: the room theme by day, the night theme with the lights out, none while evolving
-      const want = S.mode === 'evo' ? '' : S.night > 0.5 ? 'dem' : 'ngay';
+      // music: the room theme by day, the night theme with the lights out (and under the opening film), none while
+      // evolving
+      const want = S.mode === 'evo' ? '' : S.night > 0.5 || S.mode === 'phim' ? 'dem' : 'ngay';
       if (want !== tune) { music(want); tune = want; }
       // footsteps: the pet strolling in the room, or walking over the map
       let walking = S.mode === 'room' && S.stats === null && !!S.walk;

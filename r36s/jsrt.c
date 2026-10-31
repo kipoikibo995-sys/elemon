@@ -13,13 +13,16 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <time.h>
+#include <pthread.h>
 
-#define MAX_SURF 32768                       /* slots only; a match's pictures are freed after it (free) */
+#define MAX_SURF 32768                       /* pictures at once; a freed slot is handed out again (surf_add) */
+#define SLOT_BITS 15                         /* an id is slot | generation << SLOT_BITS (MAX_SURF = 1 << SLOT_BITS) */
 #define MAX_FONTS 64
 #define MAX_GLYPHS 512
 #define SCALE_MAX 4096                       /* the widest / tallest draw the fast paths take */
 #define MAX_SOUNDS 1024   /* the game's and every Solo pet's (31 x 9) and element sounds, each read from the card once */
-#define CHANNELS 8
+#define CHANNELS 9                           /* 0 the music, 1-7 sounds, VOICE the story's voice */
+#define VOICE (CHANNELS - 1)
 
 typedef struct { int w, h, opaque; uint32_t *px; } Surf;   /* opaque: a picture with no see-through pixel */
 typedef struct { int size, bold, ascent, descent, loaded; Surf atlas; uint16_t map[0x3000];
@@ -29,7 +32,9 @@ typedef struct { const int16_t *d; int len, pos, vol, loop; } Channel;
 
 static char root[512];
 static Surf *surf[MAX_SURF];
-static int n_surf;
+static int n_surf;                           /* slots ever used; the free ones among them are in free_slot */
+static int free_slot[MAX_SURF], n_free;
+static uint16_t slot_gen[MAX_SURF];          /* bumped when a slot is freed: an old id of it then finds nothing */
 static Font *fonts[MAX_FONTS];
 static int n_fonts;
 static Sound sounds[MAX_SOUNDS];
@@ -628,33 +633,67 @@ static int sound_of(const char *name) {
     return -1;
 }
 
-static int load_sound(const char *rel, const char *name) {
+/* real milliseconds (also in the test harness): long reads and writes are named in the log */
+static double clock_ms(void) {
+    struct timespec ts;
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+    return ts.tv_sec * 1e3 + ts.tv_nsec / 1e6;
+}
+/* a .wav's samples (22050 Hz mono 16-bit, make_sfx_8bit.py), malloc'd, and how many; 0 if it cannot be read */
+static int16_t *read_wav(const char *rel, int *samples) {
     long len, p = 12;
-    uint8_t *b;
-    int k = sound_of(name);
-    if (k >= 0) return k;                    /* already in memory: the card is read only the first time */
-    b = read_file(rel, &len);
-    if (!b || n_sounds >= MAX_SOUNDS || len < 44 || memcmp(b, "RIFF", 4)) { free(b); return -1; }
+    double t0 = clock_ms();
+    uint8_t *b = read_file(rel, &len);
+    if (clock_ms() - t0 > 200) printf("slow: sound %s took %.0f ms\n", rel, clock_ms() - t0);
+    if (!b || len < 44 || memcmp(b, "RIFF", 4)) { free(b); return 0; }
     while (p + 8 <= len) {
         long size = b[p + 4] | b[p + 5] << 8 | b[p + 6] << 16 | (long)b[p + 7] << 24;
         if (!memcmp(b + p, "data", 4)) {
-            Sound *s = &sounds[n_sounds];
+            int16_t *d;
             if (size > len - p - 8) size = len - p - 8;
-            snprintf(s->name, sizeof s->name, "%s", name);
-            s->len = (int)(size / 2);
-            s->data = (int16_t *)malloc((size_t)size);
-            memcpy(s->data, b + p + 8, (size_t)size);      /* 22050 Hz mono 16-bit (make_sfx_8bit.py) */
+            d = (int16_t *)malloc((size_t)size + 2);
+            if (d) { memcpy(d, b + p + 8, (size_t)size); *samples = (int)(size / 2); }
             free(b);
-            return n_sounds++;
+            return d;
         }
         p += 8 + size + (size & 1);
     }
     free(b);
-    return -1;
+    return 0;
 }
+
+static int load_sound(const char *rel, const char *name) {
+    int k = sound_of(name), n = 0;
+    int16_t *d;
+    if (k >= 0) return k;                    /* already in memory: the card is read only the first time */
+    if (n_sounds >= MAX_SOUNDS || !(d = read_wav(rel, &n))) return -1;
+    snprintf(sounds[n_sounds].name, sizeof sounds[n_sounds].name, "%s", name);
+    sounds[n_sounds].data = d;
+    sounds[n_sounds].len = n;
+    return n_sounds++;
+}
+
+/* the story's voice (game/src/giong.js): one line at a time on its own channel, read from the card each time it is
+   said and given back once it has been said or another line has started (each line is heard about once, so
+   keeping them, as the sounds are kept, would only fill memory). voice_new waits for jsrt_audio_commit */
+static int16_t *voice_data, *voice_new;
+static int voice_new_len, voice_next;       /* voice_next: 0 nothing, 1 say voice_new, 2 stop */
 
 void jsrt_audio_commit(void) {
     int i, k;
+    /* the voice: started or stopped, and a line no channel plays any more freed (the audio thread is locked) */
+    if (voice_next) {
+        chan[VOICE].d = 0;
+        free(voice_data);
+        voice_data = 0;
+        if (voice_next == 1 && voice_new) {
+            voice_data = voice_new;
+            chan[VOICE].d = voice_data; chan[VOICE].len = voice_new_len;
+            chan[VOICE].pos = 0; chan[VOICE].vol = 256; chan[VOICE].loop = 0;
+        } else free(voice_new);
+        voice_new = 0;
+        voice_next = 0;
+    } else if (voice_data && !chan[VOICE].d) { free(voice_data); voice_data = 0; }
     if (music_next == -2) chan[0].d = 0;
     else if (music_next >= 0) {
         chan[0].d = sounds[music_next].data; chan[0].len = sounds[music_next].len;
@@ -663,7 +702,7 @@ void jsrt_audio_commit(void) {
     music_next = -1;
     for (i = 0; i < n_pending; ++i) {
         int best = 1;
-        for (k = 1; k < CHANNELS; ++k)              /* a free channel, or the one nearest its end */
+        for (k = 1; k < VOICE; ++k)                 /* a free channel, or the one nearest its end */
             if (!chan[k].d) { best = k; break; } else if (chan[k].len - chan[k].pos < chan[best].len - chan[best].pos) best = k;
         chan[best].d = sounds[pending[i].sound].data; chan[best].len = sounds[pending[i].sound].len;
         chan[best].pos = 0; chan[best].vol = pending[i].vol; chan[best].loop = 0;
@@ -699,9 +738,24 @@ static uint32_t u32_arg(JSContext *ctx, int argc, JSValueConst *argv, int i) {
     if (i < argc) JS_ToUint32(ctx, &v, argv[i]);
     return v;
 }
+/* the slot of an id still in use, else -1 (a freed picture's id, or nonsense) */
+static int slot_of(int id) {
+    int k = id & (MAX_SURF - 1);
+    if (id < 0 || k >= n_surf || !surf[k] || (unsigned)id >> SLOT_BITS != slot_gen[k]) return -1;
+    return k;
+}
 static Surf *surf_arg(JSContext *ctx, int argc, JSValueConst *argv, int i) {
-    int id = (int)double_arg(ctx, argc, argv, i);
-    return id >= 0 && id < n_surf ? surf[id] : 0;
+    int k = slot_of((int)double_arg(ctx, argc, argv, i));
+    return k >= 0 ? surf[k] : 0;
+}
+/* a new picture in a free slot (one given back by free() first): its id, or -1 when all are taken */
+static int surf_add(Surf *s) {
+    int k;
+    if (n_free) k = free_slot[--n_free];
+    else if (n_surf < MAX_SURF) k = n_surf++;
+    else return -1;
+    surf[k] = s;
+    return k | slot_gen[k] << SLOT_BITS;
 }
 static Mat mat_args(JSContext *ctx, int argc, JSValueConst *argv, int i) {
     Mat m;
@@ -731,16 +785,22 @@ static JSValue b_log(JSContext *ctx, JSValueConst t, int argc, JSValueConst *arg
     return JS_UNDEFINED;
 }
 static JSValue b_new_canvas(JSContext *ctx, JSValueConst t, int argc, JSValueConst *argv) {
+    Surf *s = surf_new(ARG_I(0), ARG_I(1));
+    int id = surf_add(s);
     (void)t;
-    if (n_surf >= MAX_SURF) return JS_ThrowInternalError(ctx, "too many canvases");
-    surf[n_surf] = surf_new(ARG_I(0), ARG_I(1));
-    return JS_NewInt32(ctx, n_surf++);
+    if (id < 0) { free(s->px); free(s); return JS_ThrowInternalError(ctx, "too many canvases"); }
+    return JS_NewInt32(ctx, id);
 }
-/* free(id): give a canvas's or picture's pixels back (Solo đối kháng frees a match's frames when it ends) */
+/* free(id): give a canvas's or picture's pixels and its slot back (Solo đối kháng frees a match's frames when it
+   ends); the screen (0) is never freed, and an id freed already is left alone */
 static JSValue b_free(JSContext *ctx, JSValueConst t, int argc, JSValueConst *argv) {
-    int id = ARG_I(0);
+    int k = slot_of(ARG_I(0));
     (void)t;
-    if (id > 0 && id < n_surf && surf[id]) { free(surf[id]->px); surf[id]->px = (uint32_t *)calloc(1, 4); surf[id]->w = surf[id]->h = 0; }
+    if (k > 0) {
+        free(surf[k]->px); free(surf[k]); surf[k] = 0;
+        slot_gen[k] = (uint16_t)((slot_gen[k] + 1) & 0xFFFF);
+        free_slot[n_free++] = k;
+    }
     return JS_UNDEFINED;
 }
 static JSValue b_resize(JSContext *ctx, JSValueConst t, int argc, JSValueConst *argv) {
@@ -768,15 +828,17 @@ static JSValue b_seal(JSContext *ctx, JSValueConst t, int argc, JSValueConst *ar
 }
 static JSValue b_load_image(JSContext *ctx, JSValueConst t, int argc, JSValueConst *argv) {
     const char *path = argc ? JS_ToCString(ctx, argv[0]) : 0;
+    double t0 = clock_ms();
     Surf *s = path ? load_hli(path) : 0;
     JSValue r;
+    int id;
+    if (path && clock_ms() - t0 > 200) printf("slow: picture %s took %.0f ms\n", path, clock_ms() - t0);
     (void)t;
     if (!s) { if (path) { printf("missing picture %s\n", path); JS_FreeCString(ctx, path); } return JS_NULL; }
     JS_FreeCString(ctx, path);
-    if (n_surf >= MAX_SURF) return JS_NULL;
-    surf[n_surf] = s;
+    if ((id = surf_add(s)) < 0) { printf("too many pictures\n"); free(s->px); free(s); return JS_NULL; }
     r = JS_NewArray(ctx);
-    JS_SetPropertyUint32(ctx, r, 0, JS_NewInt32(ctx, n_surf++));
+    JS_SetPropertyUint32(ctx, r, 0, JS_NewInt32(ctx, id));
     JS_SetPropertyUint32(ctx, r, 1, JS_NewInt32(ctx, s->w));
     JS_SetPropertyUint32(ctx, r, 2, JS_NewInt32(ctx, s->h));
     return r;
@@ -905,24 +967,93 @@ static JSValue b_read_text(JSContext *ctx, JSValueConst t, int argc, JSValueCons
     JS_FreeCString(ctx, path);
     return r;
 }
+/* writing files on a thread of its own: an SD card stops now and then (its own housekeeping; up to seconds on the
+   handhelds), and a save written in the frame stopped the game with it. The newest text for a file wins; quitting
+   waits for the writes left (writer_flush in jsrt_shutdown) */
+static pthread_mutex_t wr_lock = PTHREAD_MUTEX_INITIALIZER;
+static pthread_cond_t wr_wake = PTHREAD_COND_INITIALIZER, wr_idle = PTHREAD_COND_INITIALIZER;
+static char wr_path[1024], *wr_text;
+static size_t wr_len;
+static int wr_started, wr_busy;
+
+static int write_file_now(const char *full, const char *text, size_t len) {
+    char tmp[1100];
+    FILE *f;
+    int ok = 0;
+    double t0 = clock_ms();
+    snprintf(tmp, sizeof tmp, "%s.tmp", full);
+    f = fopen(tmp, "wb");
+    if (f) {
+        ok = fwrite(text, 1, len, f) == len;
+        ok = fclose(f) == 0 && ok;
+        ok = ok && rename(tmp, full) == 0;
+    }
+    if (!ok) printf("could not write %s\n", full);
+    if (clock_ms() - t0 > 200) printf("slow: writing %s took %.0f ms (on the writer thread)\n", full, clock_ms() - t0);
+    return ok;
+}
+static void *writer(void *arg) {
+    (void)arg;
+    pthread_mutex_lock(&wr_lock);
+    for (;;) {
+        while (!wr_text) pthread_cond_wait(&wr_wake, &wr_lock);
+        {
+            char path[1024];
+            char *text = wr_text;
+            size_t len = wr_len;
+            snprintf(path, sizeof path, "%s", wr_path);
+            wr_text = 0; wr_busy = 1;
+            pthread_mutex_unlock(&wr_lock);
+            write_file_now(path, text, len);
+            free(text);
+            pthread_mutex_lock(&wr_lock);
+            wr_busy = 0;
+            if (!wr_text) pthread_cond_broadcast(&wr_idle);
+        }
+    }
+    return 0;
+}
+static int write_later(const char *full, const char *text, size_t len) {
+    char *copy = (char *)malloc(len + 1);
+    if (!copy) return write_file_now(full, text, len);
+    memcpy(copy, text, len);
+    pthread_mutex_lock(&wr_lock);
+    if (!wr_started) {
+        pthread_t th;
+        wr_started = pthread_create(&th, 0, writer, 0) == 0 ? 1 : -1;
+        if (wr_started == 1) pthread_detach(th);
+    }
+    if (wr_started != 1) { pthread_mutex_unlock(&wr_lock); free(copy); return write_file_now(full, text, len); }
+    if (wr_text && strcmp(wr_path, full)) {          /* another file still waiting: written first, here */
+        char *old = wr_text; size_t ol = wr_len; char op[1024];
+        snprintf(op, sizeof op, "%s", wr_path); wr_text = 0;
+        pthread_mutex_unlock(&wr_lock);
+        write_file_now(op, old, ol); free(old);
+        pthread_mutex_lock(&wr_lock);
+    }
+    free(wr_text);                                   /* a newer text for the same file replaces the waiting one */
+    snprintf(wr_path, sizeof wr_path, "%s", full);
+    wr_text = copy; wr_len = len;
+    pthread_cond_signal(&wr_wake);
+    pthread_mutex_unlock(&wr_lock);
+    return 1;
+}
+static void writer_flush(void) {
+    pthread_mutex_lock(&wr_lock);
+    while (wr_started == 1 && (wr_text || wr_busy)) pthread_cond_wait(&wr_idle, &wr_lock);
+    pthread_mutex_unlock(&wr_lock);
+}
+
 static JSValue b_write_text(JSContext *ctx, JSValueConst t, int argc, JSValueConst *argv) {
     const char *path = argc > 1 ? JS_ToCString(ctx, argv[0]) : 0;
     size_t len = 0;
     const char *text = path ? JS_ToCStringLen(ctx, &len, argv[1]) : 0;
-    char full[1024], tmp[1100];
-    FILE *f;
+    char full[1024];
     int ok = 0;
     (void)t;
     if (path && text) {
         snprintf(full, sizeof full, "%s%s%s", path[0] == '/' ? "" : root, path[0] == '/' ? "" : "/", path);
-        snprintf(tmp, sizeof tmp, "%s.tmp", full);
-        f = fopen(tmp, "wb");
-        if (f) {
-            ok = fwrite(text, 1, len, f) == len;
-            ok = fclose(f) == 0 && ok;
-            ok = ok && rename(tmp, full) == 0;
-        }
-        if (!ok) printf("could not write %s\n", full);
+        ok = test_mode ? write_file_now(full, text, len) : write_later(full, text, len);
     }
     if (text) JS_FreeCString(ctx, text);
     if (path) JS_FreeCString(ctx, path);
@@ -948,6 +1079,21 @@ static JSValue b_sfx(JSContext *ctx, JSValueConst t, int argc, JSValueConst *arg
         if (k >= 0 && n_pending < 16) { pending[n_pending].sound = k; pending[n_pending].vol = argc > 1 ? ARG_I(1) : 230; n_pending++; }
         JS_FreeCString(ctx, name);
     }
+    return JS_UNDEFINED;
+}
+/* holua.voice(name under sfx/, or '' to stop): the line before stops either way */
+static JSValue b_voice(JSContext *ctx, JSValueConst t, int argc, JSValueConst *argv) {
+    const char *name = argc ? JS_ToCString(ctx, argv[0]) : 0;
+    (void)t;
+    free(voice_new);                         /* one asked for this frame already: never started */
+    voice_new = 0;
+    voice_next = 2;
+    if (name && *name) {
+        char rel[96];
+        snprintf(rel, sizeof rel, "sfx/%s.wav", name);
+        if ((voice_new = read_wav(rel, &voice_new_len)) != 0) voice_next = 1;
+    }
+    if (name) JS_FreeCString(ctx, name);
     return JS_UNDEFINED;
 }
 static JSValue b_music(JSContext *ctx, JSValueConst t, int argc, JSValueConst *argv) {
@@ -998,13 +1144,23 @@ static int run_file(const char *rel) {
     return 1;
 }
 
+/* the game's own "Thoát game" (game/src/man-chao.js): the program ends after this frame, through jsrt_quit like
+   SELECT + START */
+static int exit_asked;
+static JSValue b_exit(JSContext *ctx, JSValueConst t, int argc, JSValueConst *argv) {
+    (void)ctx; (void)t; (void)argc; (void)argv;
+    exit_asked = 1;
+    return JS_UNDEFINED;
+}
+int jsrt_wants_exit(void) { return exit_asked; }
+
 int jsrt_init(const char *dir) {
     static const struct { const char *name; JSCFunction *f; int n; } fns[] = {
         { "now", b_now, 0 }, { "clock", b_clock, 0 }, { "pad", b_pad, 0 }, { "log", b_log, 1 }, { "newCanvas", b_new_canvas, 2 },
         { "resize", b_resize, 3 }, { "loadImage", b_load_image, 1 }, { "fillRect", b_fill_rect, 14 },
         { "drawImage", b_draw_image, 22 }, { "ellipse", b_ellipse, 15 }, { "text", b_text, 17 },
-        { "measure", b_measure, 3 }, { "sfx", b_sfx, 2 }, { "music", b_music, 1 }, { "poly", b_poly, 13 }, { "pixels", b_pixels, 5 }, { "put", b_put, 6 }, { "free", b_free, 1 }, { "seal", b_seal, 1 },
-        { "readText", b_read_text, 1 }, { "writeText", b_write_text, 2 } };
+        { "measure", b_measure, 3 }, { "sfx", b_sfx, 2 }, { "music", b_music, 1 }, { "voice", b_voice, 1 }, { "poly", b_poly, 13 }, { "pixels", b_pixels, 5 }, { "put", b_put, 6 }, { "free", b_free, 1 }, { "seal", b_seal, 1 },
+        { "readText", b_read_text, 1 }, { "writeText", b_write_text, 2 }, { "exit", b_exit, 0 } };
     /* the scripts to run, in order: js/load.txt (one path a line, scripts/r36s_game.py), else the test page's set */
     static const char *scripts[] = { "js/shim.js", "js/data.js", "js/page.js", "js/am-thanh.js" };
     char *list, *line, *save = 0, save_dir[1200];
@@ -1065,6 +1221,24 @@ void jsrt_quit(void) {
     JS_FreeValue(jc, global);
 }
 
+void jsrt_mem(char *buf, int size) {
+    double pics = 0, big = 0, snd = 0, fnt = 0;
+    int np = 0, nb = 0, ns = 0, i;
+    long rss = 0;
+    FILE *f;
+    for (i = 1; i < n_surf; ++i) if (surf[i] && surf[i]->w) {       /* 0 is the screen */
+        double b = (double)surf[i]->w * surf[i]->h * 4;
+        pics += b; ++np;
+        if (b >= 512 * 1024) { big += b; ++nb; }                  /* the big ones: backdrops, atlases */
+    }
+    for (i = 0; i < n_sounds; ++i) { snd += sounds[i].len * 2.0; ++ns; }
+    for (i = 0; i < n_fonts; ++i) fnt += (double)fonts[i]->atlas.w * fonts[i]->atlas.h * 4 + sizeof(Font);
+    if ((f = fopen("/proc/self/statm", "r"))) { long pages; if (fscanf(f, "%*ld %ld", &pages) == 1) rss = pages * 4096; fclose(f); }
+    snprintf(buf, (size_t)size, "mem: pictures %.0f MB (%d, of them %d over 0.5 MB: %.0f MB), sounds %.0f MB (%d), "
+             "fonts %.0f MB, process %ld MB", pics / 1048576, np, nb, big / 1048576, snd / 1048576, ns,
+             fnt / 1048576, rss / 1048576);
+}
+
 const uint32_t *jsrt_frame(double now, unsigned pad) {
     JSValue global = JS_GetGlobalObject(jc), f = JS_GetPropertyStr(jc, global, "__frame"), arg, r;
     now_ms = now;
@@ -1081,13 +1255,17 @@ const uint32_t *jsrt_frame(double now, unsigned pad) {
 
 void jsrt_shutdown(void) {
     int i;
+    writer_flush();                              /* the save written on quitting reaches the card first */
     if (jc) JS_FreeContext(jc);
     if (rt) JS_FreeRuntime(rt);
     jc = 0; rt = 0;
-    for (i = 0; i < n_surf; ++i) { free(surf[i]->px); free(surf[i]); }
-    n_surf = 0;
+    for (i = 0; i < n_surf; ++i) if (surf[i]) { free(surf[i]->px); free(surf[i]); surf[i] = 0; }
+    n_surf = n_free = 0;
     for (i = 0; i < n_fonts; ++i) { free(fonts[i]->atlas.px); free(fonts[i]); }
     n_fonts = 0;
     for (i = 0; i < n_sounds; ++i) free(sounds[i].data);
     n_sounds = 0;
+    free(voice_data); free(voice_new);
+    voice_data = voice_new = 0;
+    voice_next = 0;
 }

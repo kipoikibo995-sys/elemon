@@ -3,3 +3,13 @@ Nhạc trận đánh, bản quyền CC0 (public domain, không cần ghi tên), 
   https://opengameart.org/content/determined-pursuit-epic-orchestra-loop  -> dùng làm nhac/chien-dau.ogg (đấu trường)
 - QaziJamJam.wav  "QaziJamJam (orchestral battle theme)" - Emma_MA
   https://opengameart.org/content/qazijamjam-orchestral-battle-theme  -> để dành cho trận boss / trận lớn
+
+Nhạc nền phòng (scripts/make_nhac_cc0.py -> nhac/ngay.wav, nhac/dem.wav), CC0, tải từ OpenGameArt ngày 27/10/2026:
+- a-new-town.mp3  "A New Town (RPG Theme)" - cynicmusic (The Cynic Project), độc tấu hạc cầm
+  https://opengameart.org/content/a-new-town-rpg-theme  -> nhac/ngay.wav (mặc định)
+- medieval-exploration.mp3  "Medieval: Exploration"
+  https://opengameart.org/content/medieval-exploration  -> bản thay cho ban ngày
+- forest-whisper/  "Forest Whisper Theme" - Cleyton Kauffman, lặp liền mạch sẵn
+  https://opengameart.org/content/forest-whisper-theme  -> nhac/dem.wav (mặc định)
+- rising-moon.mp3  "Fantasy: Rising Moon"
+  https://opengameart.org/content/fantasy-rising-moon  -> bản thay cho ban đêm

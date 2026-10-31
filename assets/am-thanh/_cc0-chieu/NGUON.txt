@@ -1,0 +1,72 @@
+Tiếng gốc cho bộ tiếng chiêu (scripts/make_chieu_cc0.py), lấy qua Openverse (phần lớn từ Freesound), chỉ CC0 (không cần ghi tên, dùng thương mại được). Tải ngày 27/10/2026.
+raw/: file gốc; wav/: 22050 Hz mono.
+
+- fire-whoosh: "fire-whoosh.wav" của hnhnh, CC0, https://freesound.org/people/hnhnh/sounds/244926
+- fire-whoosh-calm: "ESE - WHOOSH - CALM - Fire Flame.wav" của EpicSoundEffects, CC0, https://freesound.org/people/EpicSoundEffects/sounds/475879
+- fireball-3: "JM_FX_Fireball 03.wav" của Julien Matthey, CC0, https://freesound.org/people/Julien%20Matthey/sounds/346916
+- fireball-2: "JM_FX_Fireball 02.wav" của Julien Matthey, CC0, https://freesound.org/people/Julien%20Matthey/sounds/346917
+- fire-burst-flash: "Fire Burst Flash" của Za-Games, CC0, https://freesound.org/people/Za-Games/sounds/539972
+- flame-ignite: "flame burst ignite bbq barbecue.flac" của kyles, CC0, https://freesound.org/people/kyles/sounds/637533
+- fire-spray: "fire_spray-2.wav" của 13FPanska_Kolar_Jan, CC0, https://freesound.org/people/13FPanska_Kolar_Jan/sounds/378638
+- fire-crackling: "Fire Crackling" của AntumDeluge, CC0, https://freesound.org/people/AntumDeluge/sounds/188038
+- explosion-debris: "Explosion with Debris.wav" của FxKid2, CC0, https://freesound.org/people/FxKid2/sounds/367622
+- explosion-2: "explosion.2.wav" của alienbomb, CC0, https://freesound.org/people/alienbomb/sounds/39069
+- musket-explosion: "Musket Explosion" của Willlewis, CC0, https://freesound.org/people/Willlewis/sounds/244345
+- cannon-boom7: "cannon_boom7.wav" của ReadeOnly, CC0, https://freesound.org/people/ReadeOnly/sounds/186951
+- dragon-roar: "Dragon Roar" của frasbr, CC0, https://freesound.org/people/frasbr/sounds/145729
+- dragon-roar-1: "Dragon roar 1.wav" của AMWD_Mortsel-Edegem-Kontich, CC0, https://freesound.org/people/AMWD_Mortsel-Edegem-Kontich/sounds/651817
+- magic-chargeup: "Magic Chargeup.wav" của cribbler, CC0, https://freesound.org/people/cribbler/sounds/381860
+- magical-focus: "Magical focus energy" của Iridiuss, CC0, https://freesound.org/people/Iridiuss/sounds/519415
+- magic-shield: "Magic Shield.wav" của spookymodem, CC0, https://freesound.org/people/spookymodem/sounds/249818
+- magic-shield-block: "magicShield_block.wav" của rafaelzimrp, CC0, https://freesound.org/people/rafaelzimrp/sounds/570853
+- swoosh-windy: "Swoosh 15 Windy" của qubodup, CC0, https://freesound.org/people/qubodup/sounds/60002
+- swoosh-air: "Swosh swoosh whoosh air sound, free, high quality" của qubodup, CC0, https://freesound.org/people/qubodup/sounds/60026
+- water-splash: "water splash" của audiosmedia, CC0, https://freesound.org/people/audiosmedia/sounds/243519
+- water-splash-short: "water splash 2.wav" của VacekH, CC0, https://freesound.org/people/VacekH/sounds/189499
+- water-splashing: "water splashing" của ssierra1202, CC0, https://freesound.org/people/ssierra1202/sounds/391943
+- big-splash: "Big Splash.wav" của Bird_man, CC0, https://freesound.org/people/Bird_man/sounds/316744
+- rock-splash: "rock splash.wav" của 13GPanska_Kubinova_Karolina, CC0, https://freesound.org/people/13GPanska_Kubinova_Karolina/sounds/378262
+- bubble: "Bubble" của deleted_user_3854053, CC0, https://freesound.org/people/deleted_user_3854053/sounds/269583
+- bubbles-03: "bubbles-03.aif" của kijjaz, CC0, https://freesound.org/people/kijjaz/sounds/16738
+- water-drop-splash: "Water drop / Splash" của bxyorna, CC0, https://freesound.org/people/bxyorna/sounds/410335
+- leaves-rustling: "Leaves Rustling FX.wav" của Santi171, CC0, https://freesound.org/people/Santi171/sounds/655968
+- branch-crack: "Crack_of_branch_2.wav" của deleted_user_2104797, CC0, https://freesound.org/people/deleted_user_2104797/sounds/144945
+- twig-snap: "Twig Snap" của alegemaate, CC0, https://freesound.org/people/alegemaate/sounds/364699
+- wood-crack-4: "Wood Crack 4" của utsuru, CC0, https://freesound.org/people/utsuru/sounds/183451
+- bush-hit: "bushhit.wav" của j1987, CC0, https://freesound.org/people/j1987/sounds/106113
+- bush-rustle: "The Rustle of a Bush" của Montacue, CC0, https://freesound.org/people/Montacue/sounds/178615
+- tree-shake: "tree shake.wav" của zepurple, CC0, https://freesound.org/people/zepurple/sounds/540278
+- wind-gust: "Wind gust" của wintuh, CC0, https://freesound.org/people/wintuh/sounds/471854
+- wood-hit: "Wood Hit" của alegemaate, CC0, https://freesound.org/people/alegemaate/sounds/364691
+- rock-crumble: "PiedraDesmoronandose.wav" của Trancox, CC0, https://freesound.org/people/Trancox/sounds/391919
+- rock-hit-dirt: "Single Rock hit dirt 2.wav" của worthahep88, CC0, https://freesound.org/people/worthahep88/sounds/319229
+- rock-impact: "S020_Rock_Impact_Mono.wav" của Pól, CC0, https://freesound.org/people/P%C3%B3l/sounds/385938
+- quake-break: "quake and break.wav" của cheetahzbrain, CC0, https://freesound.org/people/cheetahzbrain/sounds/431859
+- stone-impact-decay: "Stein Aufschlag mit langem Decay 01.wav" của mbezzola, CC0, https://freesound.org/people/mbezzola/sounds/105278
+- boulder-push: "Boulder Push" của IDLauncher, CC0, https://freesound.org/people/IDLauncher/sounds/513236
+- brick-on-soil: "Brick on soil.wav" của deleted_user_2104797, CC0, https://freesound.org/people/deleted_user_2104797/sounds/325268
+- gravel-step: "dirt/gravel footstep 1" của Yoyodaman234, CC0, https://freesound.org/people/Yoyodaman234/sounds/166511
+- sword-clang: "Badass Sword Clang!.wav" của ethanchase7744, CC0, https://freesound.org/people/ethanchase7744/sounds/439508
+- sword-clash: "Sword Clash.wav" của Bird_man, CC0, https://freesound.org/people/Bird_man/sounds/275159
+- sword-swing-fast: "Fast Sword Swing Sound" của qubodup, CC0, https://freesound.org/people/qubodup/sounds/60004
+- sword-swings: "Sword Swings" của SamsterBirdies, CC0, https://freesound.org/people/SamsterBirdies/sounds/353708
+- sword-unsheath: "unsheath_sword.wav" của Qat, CC0, https://freesound.org/people/Qat/sounds/107589
+- metal-impact: "Metal Impact" của Rickplayer, CC0, https://freesound.org/people/Rickplayer/sounds/530486
+- metal-impact-heavy: "Heavy Metal Impact 2" của magnuswaker, CC0, https://freesound.org/people/magnuswaker/sounds/614063
+- metal-impact-hard: "Hard metal impact" của ronnyver, CC0, https://freesound.org/people/ronnyver/sounds/488589
+- metal-clang: "Metal Clang sound" của kermite607, CC0, https://freesound.org/people/kermite607/sounds/362625
+- bell-once: "Bell ringing once.wav" của Fenodyrie, CC0, https://freesound.org/people/Fenodyrie/sounds/583949
+- carrot-nom: "carrotnom.wav" của j1987, CC0, https://freesound.org/people/j1987/sounds/106392
+- apple-bite: "Bite (Apple)" của wadaltmon, CC0, https://freesound.org/people/wadaltmon/sounds/275015
+- crunch: "Crunch.wav" của MATRIXXX_, CC0, https://freesound.org/people/MATRIXXX_/sounds/348112
+- coin-pickup: "Coin Pickup Sound V 0.2" của Davidsraba, CC0, https://freesound.org/people/Davidsraba/sounds/347174
+- gleam-chime: "GLEAM-GLOW-SFX-CHIME.wav" của newagesoup, CC0, https://freesound.org/people/newagesoup/sounds/351408
+- glimmer: "Glimmer.wav" của opticaillusions, CC0, https://freesound.org/people/opticaillusions/sounds/521873
+- fanfare-short: "Game Success Fanfare Short" của el_boss, CC0, https://freesound.org/people/el_boss/sounds/677858
+- level-up: "Level up sound.wav" của vibritherabjit123, CC0, https://freesound.org/people/vibritherabjit123/sounds/644409
+- bird-chirp: "Bird chirping" của supercell10, CC0, https://freesound.org/people/supercell10/sounds/266832
+- tiny-splash: "Tiny Splash" của dslrguide, CC0, https://freesound.org/people/dslrguide/sounds/321490
+- water-bubble: "water bubble effect" của rubberduck9999, CC0, https://freesound.org/people/rubberduck9999/sounds/676310
+- body-fall: "Body falling on the ground 1" của ihitokage, CC0, https://freesound.org/people/ihitokage/sounds/395331
+- chime-notify: "Chime Notification" của Jofae, CC0, https://freesound.org/people/Jofae/sounds/380482
+- owl: "Hoot_1.wav" của deleted_user_2104797, CC0, https://freesound.org/people/deleted_user_2104797/sounds/164651

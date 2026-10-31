@@ -1,0 +1,119 @@
+{
+ "hoa": [
+  {
+   "id": "hoa_dung-nham",
+   "file": "ui/san/hoa_dung-nham.png",
+   "y": 268,
+   "rx": 296,
+   "ry": 168
+  },
+  {
+   "id": "hoa_nui-lua",
+   "file": "ui/san/hoa_nui-lua.png",
+   "y": 319,
+   "rx": 296,
+   "ry": 116
+  }
+ ],
+ "thuy": [
+  {
+   "id": "thuy_den-bao",
+   "file": "ui/san/thuy_den-bao.png",
+   "y": 318,
+   "rx": 291,
+   "ry": 117
+  },
+  {
+   "id": "thuy_hang-pha-le",
+   "file": "ui/san/thuy_hang-pha-le.png",
+   "y": 268,
+   "rx": 296,
+   "ry": 168
+  }
+ ],
+ "moc": [
+  {
+   "id": "moc_rung-dem",
+   "file": "ui/san/moc_rung-dem.png",
+   "y": 268,
+   "rx": 296,
+   "ry": 168
+  },
+  {
+   "id": "moc_rung-truc",
+   "file": "ui/san/moc_rung-truc.png",
+   "y": 308,
+   "rx": 296,
+   "ry": 126
+  },
+  {
+   "id": "moc_rung-xanh",
+   "file": "ui/san/moc_rung-xanh.png",
+   "y": 324,
+   "rx": 285,
+   "ry": 111
+  },
+  {
+   "id": "moc_thac-rung",
+   "file": "ui/san/moc_thac-rung.png",
+   "y": 292,
+   "rx": 288,
+   "ry": 144
+  }
+ ],
+ "tho": [
+  {
+   "id": "tho_chien-truong",
+   "file": "ui/san/tho_chien-truong.png",
+   "y": 268,
+   "rx": 296,
+   "ry": 168
+  },
+  {
+   "id": "tho_hem-da-do",
+   "file": "ui/san/tho_hem-da-do.png",
+   "y": 325,
+   "rx": 287,
+   "ry": 110
+  },
+  {
+   "id": "tho_vong-da-chieu",
+   "file": "ui/san/tho_vong-da-chieu.png",
+   "y": 296,
+   "rx": 267,
+   "ry": 139
+  }
+ ],
+ "kim": [
+  {
+   "id": "kim_dai-tuyet",
+   "file": "ui/san/kim_dai-tuyet.png",
+   "y": 280,
+   "rx": 296,
+   "ry": 156
+  },
+  {
+   "id": "kim_nui-tuyet",
+   "file": "ui/san/kim_nui-tuyet.png",
+   "y": 299,
+   "rx": 266,
+   "ry": 109
+  }
+ ],
+ "chung": [
+  {
+   "id": "chung_dao-may",
+   "file": "ui/san/chung_dao-may.png",
+   "y": 298,
+   "rx": 265,
+   "ry": 137
+  },
+  {
+   "id": "chung_rung-rune",
+   "file": "ui/san/chung_rung-rune.png",
+   "y": 288,
+   "rx": 296,
+   "ry": 147
+  }
+ ]
+}

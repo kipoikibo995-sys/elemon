@@ -12,6 +12,10 @@ creature packs, see PET_CRY) on top; and chieu/fight + chieu/ko, the announcer a
           luot (dash / leap), khien (shield / buff / guard), gong (ultimate charging), ult (ultimate lands),
           nang (a heavy hit: stun, knock-up, big shot)
 Usage: python make_skill_sfx.py
+
+Since 27/10/2026 the 45 <he>_<loai> sounds the game uses come from scripts/make_chieu_cc0.py (real CC0 recordings),
+copied into assets/am-thanh/chieu and preview/dau-truong/sfx; this script's own are kept in chieu/_cu-truoc-cc0.
+Running this again writes its versions back over them (the pet sets, fight and ko are still this script's).
 """
 import json, os, wave, subprocess
 import numpy as np

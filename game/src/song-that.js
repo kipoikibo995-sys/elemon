@@ -3,6 +3,10 @@
 // comes into the game with the next build (game/build_game.py). What it adds:
 //   - the save: the whole game state (S) in localStorage (on the R36S a file in ports/holua-save), written every
 //     20 s, after the big moments and on quitting; "Tiếp tục" on the title screen loads it
+//   - several pets (the user, 31/10/2026): one save a pet, holua-save-1 .. -6; "Chơi mới" starts the next free one
+//     and leaves the others as they are, "Tiếp tục" lists them (game/src/man-chao.js, through __luu)
+//   - a new game starts with no gems (the demo's test bag of gems and its free Ngọc Hồn at Trưởng thành are gone):
+//     gems and Ngọc Hồn come from the bosses of Vùng đất
 //   - real time: needs, droppings and crops run by the hour instead of by the second, everywhere in the game, and
 //     keep going while it is off (made up for when it starts again, at most 72 h; a clock gone back counts as 0)
 //   - growing up at the pace of THIET-KE.md mục 5 (Con ~1 ngày, Nhi 3-4 ngày, Thiếu niên 1-2 tuần, Trưởng thành
@@ -10,11 +14,13 @@
 // The demo keeps its timers in performance.now(): here that clock is the game's own, carried over in the save
 // (plus the time the game was off), so every timer the demo sets keeps its meaning across a restart.
 (() => {
-  const KEY = 'holua-save-1';
+  const SLOT = n => `holua-save-${n}`, SLOTS = 6, LAST = 'holua-cuoi';   // LAST: the slot played last
+  let KEY = SLOT(1);
   // demo seconds -> real: No 0.55/s -> 6.6/h (a full belly lasts ~15 h), a dropping every 2.5-4.2 h, so a day at
   // work or school leaves the pet hungry and its room dirty, not ill
   const SPEED = 1 / 300;
-  const SLEEP_PER_MS = 20 / 3600e3;          // Năng lượng asleep: +20 an hour (the demo: +8 a second)
+  const SLEEP_PER_MS = 10 / 60e3;            // Năng lượng asleep: +10 a minute, full in ~10 min (was +20 an hour: the bar
+                                             // did not visibly move, and a Solo match costs 8); the demo: +8 a second
   const FARM = 1 / 1000;                     // a crop stage per ~2 h of wet soil; watering lasts ~6 h; dies ~8 h dry
   const OFFLINE_MAX = 72 * 3600e3, OFFLINE_STEP = 60e3;
   const AUTOSAVE_MS = 20e3;
@@ -23,10 +29,13 @@
   const EXP_X = { baby: 2, child: 4, teen: 8, adult: 20, legend: 30 };
   const HOURS = { baby: 20, child: 84, teen: 250, adult: 1000, legend: 2000 };
   const POOL_HOLD = 8;
-  const OUT = ['title', 'pickEgg', 'pickPet', 'egg', 'evo'];      // no pet to look after (yet), or evolving
+  const OUT = ['title', 'phim', 'pickEgg', 'pickPet', 'egg', 'evo',   // no pet to look after (yet), or evolving
+               'dsPet', 'caiDat', 'thoat'];                                     // (phim: the opening film, game/src/phim.js;
+                                                                       // the pet list, settings: game/src/man-chao.js)
   const RESET = { fade: 0.001, stats: null, popup: 0, popupGoal: 0, picker: 0, pickerGoal: 0, gemMode: null, walk: null,
                   toast: null, emo: null, fish: null, askedKey: null, bagKind: null, view: [] };
-  const NOSAVE = new Set(['pickList', 'view']);                    // the egg pick's whole pet list (120 KB), the bag view
+  const NOSAVE = new Set(['pickList', 'view', 'veChao']);   // the egg pick's whole pet list (120 KB), the bag view,
+                                                                 // the open "Về màn chào?" question (man-chao.js)
   // what this layer hooks onto: if the demo has renamed any of it, the page runs as the plain demo (and says why)
   const HOOKS = ['press', 'frame', 'tickNeeds', 'gainExp', 'loadCreature', 'fadeTo', 'toast', 'act', 'drawTitle', 'text'];
   const missing = HOOKS.filter(n => typeof globalThis[n] !== 'function');
@@ -43,9 +52,15 @@
   globalThis.requestAnimationFrame = cb => raf0(() => cb(performance.now()));
 
   // ---------- the save ----------
-  let SAVE = null, loading = false, pending = null, newAsk = 0, savedAt = -1e9, saveKey = '', poolDry = false;
-  try { const t = localStorage.getItem(KEY); if (t) { SAVE = JSON.parse(t); if (!SAVE || !SAVE.S || !SAVE.pet) SAVE = null; } }
-  catch (e) { SAVE = null; }
+  let SAVE = null, loading = false, pending = null, savedAt = -1e9, saveKey = '', poolDry = false;
+  function read(key) {
+    try { const t = localStorage.getItem(key), sv = t && JSON.parse(t); return sv && sv.S && sv.pet ? sv : null; }
+    catch (e) { return null; }
+  }
+  const slots = () => { const out = []; for (let n = 1; n <= SLOTS; n++) { const sv = read(SLOT(n)); if (sv) out.push({ n, sv }); } return out; };
+  try { const k = localStorage.getItem(LAST); if (k && read(k)) KEY = k; } catch (e) {}
+  SAVE = read(KEY) || (slots()[0] || {}).sv || null;
+  if (SAVE && !read(KEY)) KEY = SLOT(slots()[0].n);
   if (SAVE) S.titleSel = 1;
   const inGame = () => !OUT.includes(S.mode) && !loading && !!S.need;
   function save() {
@@ -54,6 +69,7 @@
       const t = JSON.stringify({ v: 1, wall: Date.now(), clock: performance.now(), pet: { ...DATA.pet }, S },
                                function (k, v) { return this === S && NOSAVE.has(k) ? undefined : v; });
       localStorage.setItem(KEY, t);
+      if (lastKey !== KEY) { localStorage.setItem(LAST, KEY); lastKey = KEY; }
       SAVE = JSON.parse(t);
     } catch (e) { console.log('save failed: ' + e); }
     savedAt = real();
@@ -62,6 +78,7 @@
   addEventListener('pagehide', save);
   addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') save(); });
 
+  let lastKey = null;
   function startLoad() {
     loading = true;
     toast('Đang mở bản lưu…');
@@ -115,10 +132,14 @@
     S.pool = Math.min(cap, S.pool + Math.max(0, t - S.poolT) / 3600e3 * rate());
     S.poolT = t;
   }
+  // the pool gets smaller stage by stage (Con ~128, Trưởng thành ~61), so a reward is the demo's amount as a share of
+  // a pool of EXP_REF: a meal (25) is ~15% of the pool at every stage, not two meals and the pool dry (THIET-KE.md 6.5)
+  const EXP_REF = 160;
   const gain0 = gainExp;
   globalThis.gainExp = function (n) {
     if (!STAGE_EXP[S.stage] || S.xp >= STAGE_EXP[S.stage]) return gain0(n);
     fillPool();
+    n *= rate() * POOL_HOLD / EXP_REF;
     const g = Math.max(0, Math.min(n, S.pool));
     S.pool -= g;
     // said once when the pool runs dry, and again only after it has refilled a quarter (before, every 20 s it was
@@ -129,6 +150,13 @@
       setTimeout(() => toast(`${DATA.pet.name} học đủ rồi, nghỉ chút nhé (EXP hồi theo giờ)`), 0);
     }
     return gain0(g);
+  };
+  // a boss's reward, k of a level, not out of the pool (a one-off: never "EXP hôm nay đã đầy"); the EXP it gave back
+  globalThis.__expThuong = k => {
+    if (!STAGE_EXP[S.stage] || !LV[S.stage]) return 0;
+    const [lo, hi] = LV[S.stage], xp0 = S.xp;
+    gain0(STAGE_EXP[S.stage] / Math.max(1, hi - lo) * k);
+    return Math.max(0, Math.round(S.xp - xp0));
   };
 
   // ---------- needs and droppings by the hour ----------
@@ -164,15 +192,38 @@
       if (loading) return;
       if ((btn === 'A' || btn === 'START') && S.fade === 0) {
         if (S.titleSel === 1) { if (SAVE) startLoad(); else toast('Chưa có bản lưu'); return; }
-        if (SAVE && real() - newAsk > 3000) { newAsk = real(); toast('Bấm A lần nữa: chơi mới, xóa bản lưu cũ'); return; }
+        if (S.titleSel === 0) {                                     // a new pet in the next free slot
+          const free = freeSlot();
+          if (!free) return toast(`Đã nuôi đủ ${SLOTS} pet: vào Tiếp tục xóa bớt`);
+          KEY = free; SAVE = null;
+        }
       }
       return press0(btn);
+    }
+    // the demo's free Ngọc Hồn on reaching Trưởng thành: taken back (it drops from the bosses now)
+    if (S.mode === 'evo' && S.waitA && btn === 'A' && S.fade === 0 && S.evoTo === 'adult') {
+      const n0 = S.ngoc || 0, r = press0(btn), cb = fadeCb;
+      if (cb) fadeCb = () => { const v = cb(); if ((S.ngoc || 0) > n0) { S.ngoc = n0; toast('Tiến hóa xong: +1000 vàng'); } return v; };
+      return r;
     }
     // the demo's L2 fast-forward: gone (at a stage's last level L2 still opens the evolve panel)
     if (btn === 'L2' && S.mode === 'room' && S.stats === null && S.popupGoal === 0 && S.pickerGoal === 0 && S.fade === 0 &&
         S.night <= 0.5 && !atCap() && !(S.stage === 'legend' && S.level >= LV.legend[1]))
       return toast('Không tua nhanh được: chăm mỗi ngày để lớn');
     return press0(btn);
+  };
+
+  // ---------- the saves, for the title screen's pet list (game/src/man-chao.js) ----------
+  function freeSlot() { for (let n = 1; n <= SLOTS; n++) if (!read(SLOT(n))) return SLOT(n); return null; }
+  globalThis.__luu = {
+    max: SLOTS,
+    list: slots,                                                   // [{ n, sv }]
+    open(n) { const sv = read(SLOT(n)); if (!sv || loading) return false; KEY = SLOT(n); SAVE = sv; startLoad(); return true; },
+    remove(n) {
+      try { localStorage.removeItem(SLOT(n)); } catch (e) {}
+      if (KEY === SLOT(n)) { const f = slots()[0]; KEY = f ? SLOT(f.n) : SLOT(1); SAVE = f ? f.sv : null; }
+    },
+    any: () => !!SAVE,
   };
 
   // ---------- the title screen: "Tiếp tục" is open when there is a save ----------
@@ -223,7 +274,11 @@
       if (asleep && S.night > 0.5) S.need.nl = Math.min(100, nl + dt * SLEEP_PER_MS);
     }
     // a new game: the real starting purse once the egg has hatched
-    if (mode0 === 'egg' && S.mode === 'room' && !S.real) { Object.assign(S, START); S.real = true; S.pool = undefined; fillPool(); }
+    if (mode0 === 'egg' && S.mode === 'room' && !S.real) {
+      Object.assign(S, START); S.real = true; S.pool = undefined; fillPool();
+      S.gemBag = {}; S.ngoc = 0;                                   // no gems: they drop from the bosses
+      if (Array.isArray(S.gems)) S.gems = S.gems.map(() => null);
+    }
     mode0 = S.mode;
     const key = [S.mode, S.stage, S.level, S.house].join();
     if (inGame() && S.fade === 0 && (key !== saveKey || real() - savedAt > AUTOSAVE_MS)) { saveKey = key; save(); }

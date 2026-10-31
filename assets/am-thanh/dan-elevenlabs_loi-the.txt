@@ -1,0 +1,21 @@
+Lời dẫn đọc bằng ElevenLabs, giọng "Bà lão kể chuyện (Elemon)" (Voice Design, Eleven v4). Chữ trong game không có
+thẻ; thẻ [..] chỉ đưa vào ElevenLabs cho cảm xúc, tiếng ho, thở dài. Tải về: <key>.mp3 -> make_giong.py --nhap.
+
+phim_mo-dau_0 | [slowly] Quần đảo Elemon... [sighs] Nơi tinh linh năm hệ sống cùng con người, và Linh khí chảy trong từng ngọn núi... dòng sông.
+phim_mo-dau_1 | [coughs] Ngàn năm trước... từ một khe nứt của đất trời, Hư Ảnh tràn ra: [hushed] một bóng khói không thuộc hệ nào, nuốt sạch Linh khí của muôn loài.
+phim_mo-dau_2 | [firmly] Năm Thần thú hộ vùng đứng lên chống lại nó: Thủy Long, Kim Ưng, Thụ Nhân, Viêm Long... và Thổ Long.
+phim_mo-dau_3 | Họ hợp sức phong ấn Hư Ảnh dưới Đài Ngũ Hành, [sighs] rồi trở về canh giữ năm vùng đất.
+phim_mo-dau_4 | Quanh Đài, Làng Ngũ Sắc mọc lên. Ngàn năm trôi qua, chuyện ấy chỉ còn là truyền thuyết... [whispers] và phong ấn yếu dần.
+phim_dem-ay_1 | [hushed] Đêm ấy, khi cả làng đã ngủ, Đài Ngũ Hành bỗng rung lên. [tense] Một vệt khói tím vọt lên, tách làm năm... rồi bay về năm phía của quần đảo.
+mo-dau_0 | [softly] Sáng hôm sau, quả trứng khẽ cựa mình. Bấm A để gõ nhẹ lên vỏ.
+h1-chao_0 | [warmly] Bé chớp chớp mắt nhìn quanh, rồi dụi đầu vào tay bạn.
+h1-ket_0 | [coughs] Chiều hôm ấy, Già Quy chống gậy ghé qua nhà.
+h1-ket_5 | Bé nhìn theo bóng Già Quy, [softly] khẽ kêu lên một tiếng.
+h2-truyen-thuyet_0 | Tối hôm ấy, Già Quy lại tìm đến. [sadly] Lần này ông không cười.
+h2-vung_0_hoa | Rìa Núi lửa. [sighs] Không khí nặng mùi khói, cỏ cây ngả màu xám tro.
+h2-vung_0_kim | Rìa Núi pha lê. [sighs] Không khí nặng mùi khói, cỏ cây ngả màu xám tro.
+h2-vung_0_moc | Rìa Rừng cổ thụ. [sighs] Không khí nặng mùi khói, cỏ cây ngả màu xám tro.
+h2-vung_0_thuy | Rìa Hồ thác. [sighs] Không khí nặng mùi khói, cỏ cây ngả màu xám tro.
+h2-vung_0_tho | Rìa Hẻm vực. [sighs] Không khí nặng mùi khói, cỏ cây ngả màu xám tro.
+h2-vung_1 | [whispers] Xa xa, giữa làn khói tím, một bóng khổng lồ khẽ cựa mình... Rồi tất cả lại im lặng.
+h2-vung_2 | [tense] Bé dựng lông, gầm gừ thật khẽ. Phía trước, những bóng Hư nhỏ đang lảng vảng.

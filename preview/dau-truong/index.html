@@ -435,8 +435,8 @@ const VS_PET = { thuy: 'thuy', moc: 'moc', tho: 'tho', kim: 'kim', hoa: 'hoa', q
 const VS = new URLSearchParams(location.search).get('vs') || '';
 const BOTPET = PETS[VS_PET[VS]] || null;
 const WB = {};   // the bot pet's sheets
-// &teen: the pet at Thiếu niên (Lv3); only Mộc Hùng has its Lv3 body drawn so far
-const PET_STAGE = PET === PETS.moc && /teen/.test(location.search) ? 'teen' : 'child';
+// &teen: the pet at Thiếu niên (Lv3), its body in img/<pet>/teen/ (scripts/lam_lv3.py)
+const PET_STAGE = PET && /teen/.test(location.search) ? 'teen' : 'child';
 // the page title and the skill help follow the pet being played
 const TIER_KEY = ' · <b>G</b> đổi hiệu ứng chiêu bậc 1 / bậc 2 (thêm <b>&amp;lv2</b> vào địa chỉ để vào thẳng bậc 2).';
 const HELP = {
@@ -489,7 +489,17 @@ function drawCell(cell, x, y, flip, k, alpha = 1) {
   ctx.drawImage(cell.c, -w / 2, -h, w, h);
   ctx.restore();
 }
+// in-between frames (chieu/<..>_<n>_lv2_mid.png): a cell with a .mid shows it through the second half of its time on
+// screen, so a 4-frame effect plays as 8. How long a cell stays up is learned from its last run (90 ms until then).
+function midOf(cell) {
+  if (!cell.mid) return cell;
+  if (now - (cell.seen || -1e9) > 40) { if (cell.since !== undefined) cell.dur = Math.max(40, cell.seen - cell.since + 16); cell.since = now; }
+  cell.seen = now;
+  const v = now - cell.since, d = cell.dur || 90;
+  return v >= d / 2 && v < d ? cell.mid : cell;
+}
 function drawFx(cell, x, y, ang, h, anchor = 'center', alpha = 1) {
+  cell = midOf(cell);
   const k = h / cell.h, w = cell.w * k;
   ctx.save(); ctx.globalAlpha = alpha; ctx.translate(x, y);
   if (anchor === 'center') { ctx.rotate(ang); if (Math.cos(ang) < -0.01) ctx.scale(1, -1); }
@@ -1081,10 +1091,10 @@ function updateVolcano(u) {
   });
 }
 function drawVolcano(u) {
-  const v = now - u.t0, w = v - 1300, sh = sheetOf(u.by);
+  const v = now - u.t0, w = v - 1300, sh = sheetOf(u.by), sl = slowFx(u.by);
   let fr;
   if (w < 0) fr = v < 900 ? null : Math.floor(v / 120) % 2;   // the shadow ring while the turtle is in the air
-  else fr = w < 120 ? 2 : w < 260 ? 3 : w < 1150 ? 4 + Math.floor(w / 110) % 4 : w < 1500 ? 8 + Math.min(3, Math.floor((w - 1150) / 90)) : null;
+  else fr = w < 120 ? 2 : w < 260 ? 3 : w < 1150 ? 4 + Math.floor(w / (110 * sl)) % 4 : w < 1500 + 350 * (sl - 1) ? 8 + Math.min(3, Math.floor((w - 1150) / (90 * sl))) : null;
   if (fr === null) return;
   const cell = sh.fx4[fr], k = ULT_RX * 2.3 / sh.fx4[0].w;
   drawFx(cell, u.x, u.y + ULT_RY * 0.6, 0, cell.h * k, 'ground');
@@ -1423,10 +1433,19 @@ function updateSteelBall(u, dt) {
     fxs.push({ kind: 'kHit', by: f, x: o.x, y: o.y - 20, sheet: 'fx4', a: 5, n: 3, big: 200, t0: now }); shake = Math.max(shake, 15); zoom = { t0: real, x: o.x, y: o.y - 30, k: 0.08 };
   }
 }
+// where the ball sits in each rolling cell (fx4 0-3), as a share of the cropped cell from its middle: the comet tail
+// trails behind it, so the cell's middle is not the ball, and it moves a little from frame to frame
+const KG_BALL = { lv1: [[0.147, 0.017], [0.118, 0.055], [0.143, 0.030], [0.155, 0.046]],
+                  lv2: [[0.115, 0.030], [0.064, 0.041], [0.123, 0.040], [0.141, 0.071]],
+                  mid: [[0.165, 0.070], [0.073, 0.007], [0.115, 0.006], [0.151, 0.043]] };
 function drawSteelBall(u) {
   const v = now - u.t0 - 900, f = u.by, sh = sheetOf(f);
   if (v < 0 || v > 2000) return;
-  drawFx(sh.fx4[Math.floor(now / 80) % 4], f.x, f.y - 40, 0, 110 * f.fxk, 'center', 1);
+  // the ball held on the fighter's spot, the tail turned to point back along the roll
+  const i = Math.floor(now / 80) % 4, cell = midOf(sh.fx4[i]), h = 110 * f.fxk, w = cell.w * h / cell.h;
+  const [ox, oy0] = KG_BALL[cell !== sh.fx4[i] ? 'mid' : sh === W2 && W2.fx4 !== W.fx4 ? 'lv2' : 'lv1'][i];
+  const a = u.ang || 0, c = Math.cos(a), s = Math.sin(a), oy = c < -0.01 ? -oy0 : oy0;
+  drawFx(cell, f.x - (c * ox * w - s * oy * h), f.y - 40 - (s * ox * w + c * oy * h), a, h, 'center', 1);
 }
 
 // ---------- Kim Ưng kit ----------
@@ -3413,11 +3432,11 @@ function draw() {
     if (s.kind === 'homing') { const sh = sheetOf(s.by); drawFx(sh.fx4[Math.floor((now - s.t0) / 90) % 4], s.x, s.y, s.ang, 34 * s.by.fxk); continue; }
     if (s.kind === 'swirl') { const sh = sheetOf(s.by); drawFx(sh.fx3[4 + Math.floor((now - s.t0) / 60) % 4], s.x, s.y, s.ang, 44 * s.by.fxk); continue; }
     if (s.kind === 'wave') { const sh = sheetOf(s.by); drawFx(sh.fx4[4 + Math.floor((now - s.t0) / 70) % 4], s.x, s.y, s.ang, 64 * s.by.fxk); continue; }
-    const sh = sheetOf(s.by), rows = s.kind === 1 ? sh.fx1 : sh.fx2, f = Math.floor((now - s.t0) / 80) % 4;
+    const sh = sheetOf(s.by), rows = s.kind === 1 ? sh.fx1 : sh.fx2, f = Math.floor((now - s.t0) / (80 * slowFx(s.by))) % 4;
     drawFx(rows[f], s.x, s.y, s.ang, (s.kind === 2 ? 46 : s.kind === 'vine' ? 40 : s.kind === 'kiss' ? 34 : 30) * s.by.fxk * tierFx(s.by));
   }
   for (const e of fxs) {
-    const v = now - e.t0, f = Math.floor(v / 90);
+    const v = now - e.t0, f = Math.floor(v / (90 * slowFx(e.by)));
     if (e.kind === 'dmg') {           // pop up fast, hang, then drop and blink out
       if (v > 700) { e.dead = true; continue; }
       const pop = v < 80 ? 1 + (1 - v / 80) * 0.6 : 1, y = e.y - Math.min(v, 220) * 0.12 + Math.max(0, v - 420) * 0.05;
@@ -3446,7 +3465,8 @@ function draw() {
       ctx.beginPath(); ctx.arc(e.x, e.y, 20 + v / 4, 0, Math.PI * 2); ctx.stroke(); ctx.restore(); } else e.dead = true; continue; }
     if (e.kind === 'kHit') { const sh = sheetOf(e.by), g = Math.floor(v / 80); if (g < e.n) drawFx(sh[e.sheet][e.a + g], e.x, e.y, e.ang || 0, (e.big || 50) * e.by.fxk); else e.dead = true; continue; }
     if (e.kind === 'kCone') { const sh = sheetOf(e.by), g = Math.floor(v / 80); if (g < 5) drawFx(sh.fx2[g % 4], e.x, e.y, e.ang, 130 * e.by.fxk); else e.dead = true; continue; }
-    if (e.kind === 'kTrail') { const sh = sheetOf(e.by), g = Math.floor(v / 90); if (g < 4) drawFx(sh.fx3[g], e.x, e.y, e.ang, 70 * e.by.fxk); else e.dead = true; continue; }
+    // the steel ball's wake: a puff of dust and grit left on the ground, fading (fx3 0-3 are whole balls: a row of them read as more balls)
+    if (e.kind === 'kTrail') { const sh = sheetOf(e.by); if (v < 360) drawFx(sh.fx4[7], e.x, e.y, 0, 46 * e.by.fxk * (1 + v / 900), 'ground', 0.85 * (1 - v / 360)); else e.dead = true; continue; }
     if (e.kind === 'ttSmash' || e.kind === 'taPunch' || e.kind === 'trBash') { const sh = sheetOf(e.by), g = Math.floor(v / 70); if (g < 4) drawFx(sh.fx1[g], e.x, e.y, 0, 50 * e.by.fxk); else e.dead = true; continue; }
     if (e.kind === 'ttSpray') { const sh = sheetOf(e.by), g = Math.floor(v / 80); if (g < 5) drawFx(sh.fx1[4 + g % 4], e.x, e.y, e.ang, 80 * e.by.fxk); else e.dead = true; continue; }
     if (e.kind === 'ttStomp') { const sh = sheetOf(e.by), g = Math.floor(v / 90); if (g < 4) { const c = sh.fx2[4 + g]; drawFx(c, e.x, e.y + 6, 0, STOMP_R * 2.2 * c.h / c.w, 'ground'); } else e.dead = true; continue; }
@@ -3501,8 +3521,8 @@ function draw() {
     if (e.kind === 'dnSpark') { const sh = sheetOf(e.by), g = Math.floor(v / 100); if (g < 2) drawFx(sh.fx3[5 + g], e.x, e.y, 0, 34 * e.by.fxk); else e.dead = true; continue; }
     if (e.kind === 'breathHit') { const sh = sheetOf(e.by), g = Math.floor(v / 80); if (g < 2) drawFx(sh.fx2[4 + g], e.x, e.y, 0, (e.big ? 50 : 34) * e.by.fxk); else e.dead = true; continue; }
     if (e.kind === 'kissHit') { const sh = sheetOf(e.by), g = Math.floor(v / 100); if (g < 2) drawFx(sh.fx2[4 + g], e.x, e.y, 0, 60 * e.by.fxk); else e.dead = true; continue; }
-    if (e.kind === 'rollHit') { const sh = sheetOf(e.by), g = Math.floor(v / 90); if (g < 4) drawFx(sh.fx2[4 + g], e.x, e.y, 0, 90 * e.by.fxk); else e.dead = true; continue; }
-    if (e.kind === 'spinEnd') { const sh = sheetOf(e.by), g = Math.floor(v / 90); if (g < 3) drawSpinRing(sh.fx3[5 + g], e.x, e.y); else e.dead = true; continue; }
+    if (e.kind === 'rollHit') { const sh = sheetOf(e.by), g = Math.floor(v / (90 * slowFx(e.by))); if (g < 4) drawFx(sh.fx2[4 + g], e.x, e.y, 0, 90 * e.by.fxk); else e.dead = true; continue; }
+    if (e.kind === 'spinEnd') { const sh = sheetOf(e.by), g = Math.floor(v / (90 * slowFx(e.by))); if (g < 3) drawSpinRing(sh.fx3[5 + g], e.x, e.y); else e.dead = true; continue; }
     if (e.kind === 'pounce') { const sh = sheetOf(e.by), g = Math.floor(v / 110); if (g < 2) drawFx(sh.vo[2 + g], e.x, e.y + 12, 0, 120 * e.by.fxk, 'ground'); else e.dead = true; continue; }
     if (e.kind === 'waveHit') { const sh = sheetOf(e.by), g = Math.floor(v / 90); if (g < 4) drawFx(sh.fx4[8 + g], e.x, e.y, 0, 80 * e.by.fxk); else e.dead = true; continue; }
     if (e.kind === 'punch') {         // a jab arc, or the charged shockwave cone for a strong punch
@@ -3667,6 +3687,9 @@ let skillTier = PET_STAGE !== 'child' || /lv2/.test(location.search) ? 2 : 1;
 const W2 = {};
 // the level-2 Mộc effects are painted bold and simple to be shown big
 const tierFx = f => PET && PET.kit === 'moc' && f.kit === 'moc' && sheetOf(f) === W2 ? 1.3 : 1;
+// level-2 effects (8 frames with their in-betweens) step a little slower than level 1 so they read; looks only, the hits keep their timing
+const TIER2_SLOW = 1.35;
+const slowFx = f => f && sheetOf(f) === W2 ? TIER2_SLOW : 1;
 // the quake's cracked ground: the crack frames (fx4 0-3) tiled in rows over the whole arena, getting wider over time
 function drawQuakeGround(u) {
   const w = now - u.t0 - 900, sh = sheetOf(u.by);
@@ -3829,7 +3852,7 @@ function drawFighter(f) {
   if (f.act === 'dash') for (let i = 1; i <= 3; i++) drawCell(cell, f.x - Math.cos(f.dashAng) * i * 14, f.y - Math.sin(f.dashAng) * i * 14, flip, k, 0.25);
   if (now < f.shield) drawFx(sh.fx3[Math.floor(now / 110) % 4], f.x, f.y + 4, 0, 74 * K, 'ground', 0.95);
   const charging = (f.aiming && !moving) || (f.act === 'k' && u < 320 && f.kit !== 'cao') || (f.act === 'i' && u < (f.kit === 'hl' ? GATHER2_MS : 900));
-  if (charging && sh.aura && !(f.kit === 'tho' && f.act !== 'i')) drawFx(sh.aura[Math.floor(now / 90) % 4], f.x, f.y + 6, 0, (f.act === 'i' ? 120 : 96) * K, 'ground');
+  if (charging && sh.aura && !(f.kit === 'tho' && f.act !== 'i')) drawFx(sh.aura[Math.floor(now / (90 * slowFx(f))) % 4], f.x, f.y + 6, 0, (f.act === 'i' ? 120 : 96) * K, 'ground');
   if (f.kit === 'kim') {
     if (f.hold && f.hold.k === 'l') {     // the nova charging: the cage of lightning grows through its 4 frames
       const g = Math.min(1, (now - f.hold.t0) / NOVA_MS), fr = Math.min(3, Math.floor(g * 4));
@@ -3865,8 +3888,8 @@ function drawFighter(f) {
     drawFx(sh.fx3[Math.floor(healV / 110) % 4], f.x, f.y + 6, 0, f.h * 0.9 * K, 'ground');
   }
   if (f.kit === 'quy') {
-    if (f.act === 'k' && !f.roll.endT) drawFx(sh.fx2[Math.floor(now / 90) % 4], f.x - Math.cos(f.rollAng) * 10, f.y - f.h * 0.3, f.rollAng, f.h * 1.1 * K);
-    if (f.act === 'l') drawSpinRing(sh.fx3[u < 120 ? 4 : Math.floor(now / 80) % 4], f.x, f.y);
+    if (f.act === 'k' && !f.roll.endT) drawFx(sh.fx2[Math.floor(now / (90 * slowFx(f))) % 4], f.x - Math.cos(f.rollAng) * 10, f.y - f.h * 0.3, f.rollAng, f.h * 1.1 * K);
+    if (f.act === 'l') drawSpinRing(sh.fx3[u < 120 ? 4 : Math.floor(now / (80 * slowFx(f))) % 4], f.x, f.y);
   }
   if (f.kit === 'hl') drawOrbs(f, false, K);          // the orbs passing behind the body
   if (f.kit === 'dn') {
@@ -3923,7 +3946,8 @@ function drawFighter(f) {
     const dx = -14 + i * 14, dy = (now / 5 + i * 23) % 28;
     blk(f.x + dx, f.y - f.h * 0.7 + dy, WATER[3]); blk(f.x + dx, f.y - f.h * 0.7 + dy - 2, WATER[4]);
   }
-  if (f.act === 'i' && u >= 900 && u < 1500 && sh.aura) drawFx(sh.aura[4 + Math.min(3, Math.floor((u - 900) / 120))], f.x, f.y - (f.z || 0) - f.h - 40 * K, 0, 90 * K);
+  // (not over Kim Giáp's rolling ball: its burst has a ball in it, a second ball over the first)
+  if (f.act === 'i' && u >= 900 && u < 1500 && sh.aura && !(f.kit === 'kg' && f.flyUp)) drawFx(sh.aura[4 + Math.min(3, Math.floor((u - 900) / 120))], f.x, f.y - (f.z || 0) - f.h - 40 * K, 0, 90 * K);
   if (f.bot && !over) {      // small bar over the bot's head
     ctx.fillStyle = '#000'; ctx.fillRect(f.x - 30, f.y - f.h - 18, 60, 6);
     ctx.fillStyle = '#4ab0ff'; ctx.fillRect(f.x - 30, f.y - f.h - 18, 60 * f.hp / MAX_HP, 6);
@@ -4071,9 +4095,18 @@ function recolourBot() {
                        T('fx1', 4, 2), T('fx2', 4, 2), T('fx3', 4, 2), T('fx4', 4, 3), T('aura', 4, 2)]
                        .concat(PET.kit === 'hoa' ? [T('vo', 4, 2), T('no', 4, 2)] : []));
     W.cutin = cut(await load(body + 'cutin.png'), 1, 1)[0];
-    const L2 = async (n, c, r) => [n, cut(await load(dir + n + '_lv2.png'), c, r)];
-    if (!['tho', 'kim', 'hoa', 'quy', 'cao', 'vl', 'dn', 'hl', 'md', 'rl', 'mt', 'ml', 'tn', 'dl', 'sa', 'gi', 'ch', 'bt', 'ga', 'tt', 'tc', 'ta', 'tr', 'tl', 'kt', 'kg', 'ku', 'kn', 'ld'].includes(PET.kit))   // Thổ Ngưu has no level-2 effects yet
-      Object.assign(W2, W, Object.fromEntries(await Promise.all([L2('fx1', 4, 2), L2('fx2', 4, 2), L2('fx3', 4, 2), L2('fx4', 4, 3), L2('aura', 4, 2)])));
+    // level-2 sheets as far as they are drawn; a sheet not drawn yet keeps its level-1 cells
+    const may = src => new Promise((ok, no) => { const i = new Image(); i.onload = () => ok(i); i.onerror = no; i.src = src; });
+    const L2 = async (n, c, r) => { try { return [n, cut(await may(dir + n + '_lv2.png'), c, r)]; } catch (e) { return null; } };
+    const got = (await Promise.all([L2('fx1', 4, 2), L2('fx2', 4, 2), L2('fx3', 4, 2), L2('fx4', 4, 3), L2('aura', 4, 2)]
+                                   .concat(PET.kit === 'hoa' ? [L2('vo', 4, 2), L2('no', 4, 2)] : []))).filter(Boolean);
+    if (got.length) Object.assign(W2, W, Object.fromEntries(got));
+    // their in-between sheets, cell for cell
+    await Promise.all(got.map(async ([n, cells]) => {
+      const [, mids] = (await L2(n + '_mid', 4, cells.length / 4)) || [];
+      // an in-between drawn (nearly) empty would blink the effect out: that cell keeps playing its own frame
+      if (mids) cells.forEach((c, i) => { if (mids[i] && mids[i].w * mids[i].h > 0.3 * c.w * c.h) c.mid = mids[i]; });
+    }));
   }
   recolourBot();
   await Promise.all([['khung', 'thanh_khung'], ['fill_xanh', 'thanh_fill_xanh-reu'], ['fill_vang', 'thanh_fill_vang'], ['fill_do', 'thanh_fill_do'],

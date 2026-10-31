@@ -1,0 +1,977 @@
+{
+ "phim_mo-dau_0": {
+  "hash": "6d044abf91d0",
+  "ms": 10498,
+  "chu": "Quần đảo Elemon. Nơi tinh linh năm hệ sống cùng con người, và Linh khí chảy trong từng ngọn núi, dòng sông."
+ },
+ "phim_mo-dau_1": {
+  "hash": "b1f56a094788",
+  "ms": 11741,
+  "chu": "Ngàn năm trước, từ một khe nứt của đất trời, Hư Ảnh tràn ra: một bóng khói không thuộc hệ nào, nuốt sạch Linh khí của muôn loài."
+ },
+ "phim_mo-dau_2": {
+  "hash": "37b8b7534168",
+  "ms": 6455,
+  "chu": "Năm Thần thú hộ vùng đứng lên chống lại nó: Thủy Long, Kim Ưng, Thụ Nhân, Viêm Long và Thổ Long."
+ },
+ "phim_mo-dau_3": {
+  "hash": "04bd18a0437d",
+  "ms": 6900,
+  "chu": "Họ hợp sức phong ấn Hư Ảnh dưới Đài Ngũ Hành, rồi trở về canh giữ năm vùng đất."
+ },
+ "phim_mo-dau_4": {
+  "hash": "46235cb66cbc",
+  "ms": 9534,
+  "chu": "Quanh Đài, Làng Ngũ Sắc mọc lên. Ngàn năm trôi qua, chuyện ấy chỉ còn là truyền thuyết... và phong ấn yếu dần."
+ },
+ "phim_dem-ay_1": {
+  "hash": "a82faabd92b3",
+  "ms": 9103,
+  "chu": "Đêm ấy, khi cả làng đã ngủ, Đài Ngũ Hành bỗng rung lên. Một vệt khói tím vọt lên, tách làm năm rồi bay về năm phía của quần đảo."
+ },
+ "phim_dai-mo_1": {
+  "hash": "d9e3b356106a",
+  "ms": 9167,
+  "chu": "Năm Ngọc Hồn trở về Đài Ngũ Hành. Viên cuối cùng vừa đặt lên trụ đá, năm luồng sáng nối lại thành ngôi sao năm cánh."
+ },
+ "phim_dai-mo_2": {
+  "hash": "956637bde0f3",
+  "ms": 7641,
+  "chu": "Phong ấn ngàn năm vỡ tung. Năm mảnh khói tím tụ lại làm một, và Hư Ảnh hiện nguyên hình trên Đài."
+ },
+ "phim_dai-mo_3": {
+  "hash": "cec7b99bc4a6",
+  "ms": 5295,
+  "chu": "Bé không lùi bước. Năm Thần thú đã được giải thoát, giờ chỉ còn lại chính Hư Ảnh."
+ },
+ "phim_dai-ket_0": {
+  "hash": "4dba9ac12dc2",
+  "ms": 7759,
+  "chu": "Bình minh trở lại quần đảo Elemon. Khói tím tan hết, năm vùng đất xanh tươi như ngàn năm trước."
+ },
+ "phim_dai-ket_1": {
+  "hash": "fe81c41c4352",
+  "ms": 7937,
+  "chu": "Năm Thần thú cúi đầu trước bé. Hư Ảnh đã bị phong ấn lại, lần này bằng sức của cả năm hệ."
+ },
+ "phim-gia-quy_0": {
+  "hash": "275e8ebf32a3",
+  "ms": 5360,
+  "chu": "Một người lạ... Đã lâu lắm rồi mới có người tìm đến Làng Ngũ Sắc."
+ },
+ "phim-gia-quy_1": {
+  "hash": "72695dbc6e47",
+  "ms": 4519,
+  "chu": "Ta là Già Quy, trưởng làng, cũng là người giữ Đài Ngũ Hành."
+ },
+ "phim-gia-quy_2": {
+  "hash": "1fdb74b23471",
+  "ms": 6391,
+  "chu": "Ở đây, ai cũng có một tinh linh đồng hành. Làng còn giữ những quả trứng của đủ năm hệ."
+ },
+ "phim-gia-quy_3": {
+  "hash": "95f342f0f973",
+  "ms": 4385,
+  "chu": "Hãy chọn lấy một quả. Nó sẽ theo cháu suốt chặng đường phía trước."
+ },
+ "trao-trung_0_hoa": {
+  "hash": "0d06cdbdeae6",
+  "ms": 6137,
+  "chu": "Trứng hệ Hỏa... Lựa chọn tốt. Ủ nó cho ấm và trò chuyện với nó mỗi ngày."
+ },
+ "trao-trung_0_kim": {
+  "hash": "15d8e9620adf",
+  "ms": 6115,
+  "chu": "Trứng hệ Kim... Lựa chọn tốt. Ủ nó cho ấm và trò chuyện với nó mỗi ngày."
+ },
+ "trao-trung_0_moc": {
+  "hash": "5d9a93d81338",
+  "ms": 6022,
+  "chu": "Trứng hệ Mộc... Lựa chọn tốt. Ủ nó cho ấm và trò chuyện với nó mỗi ngày."
+ },
+ "trao-trung_0_thuy": {
+  "hash": "156b3693489d",
+  "ms": 6301,
+  "chu": "Trứng hệ Thủy... Lựa chọn tốt. Ủ nó cho ấm và trò chuyện với nó mỗi ngày."
+ },
+ "trao-trung_0_tho": {
+  "hash": "f42fc9aeb686",
+  "ms": 6173,
+  "chu": "Trứng hệ Thổ... Lựa chọn tốt. Ủ nó cho ấm và trò chuyện với nó mỗi ngày."
+ },
+ "trao-trung_1": {
+  "hash": "a2c9f9d788c2",
+  "ms": 4721,
+  "chu": "Trứng tinh linh nghe được tiếng người. Nó sẽ nở khi nó tin cháu."
+ },
+ "dem-ay_0": {
+  "hash": "62589c22a938",
+  "ms": 2173,
+  "chu": "Phong ấn... nứt rồi sao?"
+ },
+ "dem-ay_1": {
+  "hash": "37e70453ee94",
+  "ms": 6442,
+  "chu": "Năm luồng... bay về năm vùng đất. Ngàn năm rồi, cuối cùng nó cũng tới."
+ },
+ "mo-dau_0": {
+  "hash": "771d097fe6c6",
+  "ms": 5849,
+  "chu": "Sáng hôm sau, quả trứng khẽ cựa mình. Bấm A để gõ nhẹ lên vỏ."
+ },
+ "h1-chao_0": {
+  "hash": "3f9816676476",
+  "ms": 3687,
+  "chu": "Bé chớp chớp mắt nhìn quanh, rồi dụi đầu vào tay bạn."
+ },
+ "h1-chao_1": {
+  "hash": "4d971b67f840",
+  "ms": 4256,
+  "chu": "Nở rồi! Chào bé, chào mừng con đến Làng Ngũ Sắc."
+ },
+ "h1-chao_2": {
+  "hash": "f7096ebc5548",
+  "ms": 8164,
+  "chu": "Tinh linh mới nở cũng như em bé: đói thì cho ăn, mệt thì cho ngủ, bẩn thì tắm rửa, dọn dẹp."
+ },
+ "h1-chao_3": {
+  "hash": "b1018d68df84",
+  "ms": 6327,
+  "chu": "Nhớ chơi với nó và vuốt ve nó. Tinh linh vui thì mau lớn, lại thương chủ."
+ },
+ "h1-chao_4": {
+  "hash": "b270694ba8ff",
+  "ms": 7933,
+  "chu": "Lúc rảnh thì ra bản đồ đi dạo. Trong làng có Trường học, Chợ và Võ đường, ai cũng sẵn lòng giúp cháu."
+ },
+ "h1-chao_5": {
+  "hash": "90a083671af5",
+  "ms": 4149,
+  "chu": "Thôi, ta về Đài đây. Có gì lạ thì cứ đến tìm ta."
+ },
+ "h1-ban-do_0": {
+  "hash": "dd5ecce301cf",
+  "ms": 3962,
+  "chu": "Đây là Làng Ngũ Sắc, nằm ngay giữa quần đảo Elemon."
+ },
+ "h1-ban-do_1": {
+  "hash": "c7fdbfee0d2f",
+  "ms": 9099,
+  "chu": "Quanh làng có năm vùng đất, mỗi vùng một hệ: Núi lửa, Núi pha lê, Rừng cổ thụ, Hẻm vực và Hồ thác."
+ },
+ "h1-ban-do_2": {
+  "hash": "eeb4a62ae4c9",
+  "ms": 5189,
+  "chu": "Bé còn nhỏ lắm, chưa ra khỏi làng được đâu. Đợi nó lớn thêm chút đã."
+ },
+ "h1-ban-do_3": {
+  "hash": "003a868aba6c",
+  "ms": 3351,
+  "chu": "Giờ thì ghé Trường học đi. Cô Rắn dạy hay lắm."
+ },
+ "h1-truong_0": {
+  "hash": "b9832cbdec91",
+  "ms": 5366,
+  "chu": "Chào trò mới! Cô là cô Rắn. Hôm nay mình học bài đầu tiên: Ngũ Hành."
+ },
+ "h1-truong_1_hoa": {
+  "hash": "9b4814cdca3e",
+  "ms": 7922,
+  "chu": "Mọi thứ trên quần đảo đều thuộc một trong năm hệ: Kim, Mộc, Thủy, Hỏa, Thổ. Bé của trò thuộc hệ Hỏa."
+ },
+ "h1-truong_1_kim": {
+  "hash": "9e2ada7b021d",
+  "ms": 7998,
+  "chu": "Mọi thứ trên quần đảo đều thuộc một trong năm hệ: Kim, Mộc, Thủy, Hỏa, Thổ. Bé của trò thuộc hệ Kim."
+ },
+ "h1-truong_1_moc": {
+  "hash": "f762e206e845",
+  "ms": 7967,
+  "chu": "Mọi thứ trên quần đảo đều thuộc một trong năm hệ: Kim, Mộc, Thủy, Hỏa, Thổ. Bé của trò thuộc hệ Mộc."
+ },
+ "h1-truong_1_thuy": {
+  "hash": "ff7f37dd46cd",
+  "ms": 7965,
+  "chu": "Mọi thứ trên quần đảo đều thuộc một trong năm hệ: Kim, Mộc, Thủy, Hỏa, Thổ. Bé của trò thuộc hệ Thủy."
+ },
+ "h1-truong_1_tho": {
+  "hash": "73bf696a0307",
+  "ms": 7771,
+  "chu": "Mọi thứ trên quần đảo đều thuộc một trong năm hệ: Kim, Mộc, Thủy, Hỏa, Thổ. Bé của trò thuộc hệ Thổ."
+ },
+ "h1-truong_2": {
+  "hash": "4f46e11d067f",
+  "ms": 9760,
+  "chu": "Năm hệ nuôi nhau thành một vòng, gọi là tương sinh: Mộc sinh Hỏa, Hỏa sinh Thổ, Thổ sinh Kim, Kim sinh Thủy, Thủy sinh Mộc."
+ },
+ "h1-truong_3": {
+  "hash": "daf7ef748274",
+  "ms": 8421,
+  "chu": "Nhưng có hệ lại khắc hệ, gọi là tương khắc: Thủy dập Hỏa, Hỏa nung chảy Kim. Khi đấu thì nhớ điều này nhé."
+ },
+ "h1-truong_4": {
+  "hash": "2a8745566417",
+  "ms": 5560,
+  "chu": "Mà lạ lắm, mấy hôm nay con suối sau trường cứ đục ngầu. Chắc tại mưa thôi..."
+ },
+ "h1-truong_5": {
+  "hash": "ceac3de32422",
+  "ms": 1469,
+  "chu": "Thôi, vào học nào!"
+ },
+ "h1-cho_0": {
+  "hash": "7c8c8a4dcf9f",
+  "ms": 4696,
+  "chu": "Ối, khách mới! Bác là Bác Sóc, chuyên bán hạt giống với nông sản cho cả làng."
+ },
+ "h1-cho_1_hoa": {
+  "hash": "824664ad86ed",
+  "ms": 4212,
+  "chu": "Bác mách cháu nhé: ăn đồ đúng hệ Hỏa thì bé lên Linh khí nhanh nhất."
+ },
+ "h1-cho_1_kim": {
+  "hash": "5c8a024d16eb",
+  "ms": 4425,
+  "chu": "Bác mách cháu nhé: ăn đồ đúng hệ Kim thì bé lên Linh khí nhanh nhất."
+ },
+ "h1-cho_1_moc": {
+  "hash": "ea8531bba75c",
+  "ms": 4242,
+  "chu": "Bác mách cháu nhé: ăn đồ đúng hệ Mộc thì bé lên Linh khí nhanh nhất."
+ },
+ "h1-cho_1_thuy": {
+  "hash": "0d8f5458553b",
+  "ms": 4398,
+  "chu": "Bác mách cháu nhé: ăn đồ đúng hệ Thủy thì bé lên Linh khí nhanh nhất."
+ },
+ "h1-cho_1_tho": {
+  "hash": "89b4f1d4fe5e",
+  "ms": 4293,
+  "chu": "Bác mách cháu nhé: ăn đồ đúng hệ Thổ thì bé lên Linh khí nhanh nhất."
+ },
+ "h1-cho_2": {
+  "hash": "4504dcd7e48f",
+  "ms": 5226,
+  "chu": "Mà dạo này lạ lắm. Hạt giống mang từ Rừng cổ thụ về, gieo mãi chẳng lên."
+ },
+ "h1-cho_3": {
+  "hash": "269a53cb7140",
+  "ms": 7358,
+  "chu": "Mấy người buôn từ Núi lửa về còn kể khói trên miệng núi chuyển màu tím. Bán hàng mấy chục năm, bác chưa thấy bao giờ."
+ },
+ "h1-cho_4": {
+  "hash": "415a9422018d",
+  "ms": 3468,
+  "chu": "Thôi, chuyện người lớn để người lớn lo. Cháu xem hàng đi!"
+ },
+ "h1-vo-duong_0": {
+  "hash": "14a08b65ff9a",
+  "ms": 3218,
+  "chu": "Đệ tử mới hả? Ta là sư phụ của Võ đường này."
+ },
+ "h1-vo-duong_1": {
+  "hash": "e806322fc166",
+  "ms": 6624,
+  "chu": "Bé còn nhỏ, nhưng tập từ nhỏ thì lớn lên mới khỏe. Đấm bao cát cho đúng nhịp, rồi lướt tới mà ra đòn."
+ },
+ "h1-vo-duong_2": {
+  "hash": "f12588c0b721",
+  "ms": 7038,
+  "chu": "Sáng nay ta lên đồi tập, thấy phía Núi lửa bốc khói tím. Năm chục năm luyện võ, ta chưa thấy khói màu ấy."
+ },
+ "h1-vo-duong_3": {
+  "hash": "4e3079826af2",
+  "ms": 2716,
+  "chu": "Có chuyện gì đó sắp tới. Cứ tập cho chăm vào."
+ },
+ "h1-ket_0": {
+  "hash": "99ad892e49b9",
+  "ms": 4734,
+  "chu": "Chiều hôm ấy, Già Quy chống gậy ghé qua nhà."
+ },
+ "h1-ket_1": {
+  "hash": "b5a1ed5ddf2c",
+  "ms": 3195,
+  "chu": "Bé lớn nhanh quá! Cháu chăm khéo đấy."
+ },
+ "h1-ket_2": {
+  "hash": "09ffe1f68705",
+  "ms": 7551,
+  "chu": "Ta vừa đi một vòng làng, ai cũng kể chuyện lạ: cây héo, suối đục, núi lửa bốc khói tím."
+ },
+ "h1-ket_3": {
+  "hash": "d7b56f769195",
+  "ms": 4829,
+  "chu": "Chuyện này làm ta nhớ đến một truyền thuyết rất cũ, về Đài Ngũ Hành..."
+ },
+ "h1-ket_4": {
+  "hash": "bfe31e4b7b33",
+  "ms": 5662,
+  "chu": "Đợi bé lớn thêm chút nữa, ta sẽ kể cháu nghe. Giờ cứ chăm nó cho thật tốt."
+ },
+ "h1-ket_5": {
+  "hash": "a0ba2646793a",
+  "ms": 3624,
+  "chu": "Bé nhìn theo bóng Già Quy, khẽ kêu lên một tiếng."
+ },
+ "h2-truyen-thuyet_0": {
+  "hash": "46c66c004f4a",
+  "ms": 5629,
+  "chu": "Tối hôm ấy, Già Quy lại tìm đến. Lần này ông không cười."
+ },
+ "h2-truyen-thuyet_1": {
+  "hash": "393d3ddca14b",
+  "ms": 4184,
+  "chu": "Bé đã lớn rồi. Đến lúc cháu nghe câu chuyện ta đã hứa."
+ },
+ "h2-truyen-thuyet_2": {
+  "hash": "fee85624299a",
+  "ms": 8331,
+  "chu": "Ngàn năm trước, Hư Ảnh tràn ra từ một khe nứt của đất trời. Nó không thuộc hệ nào, chỉ biết nuốt Linh khí."
+ },
+ "h2-truyen-thuyet_3": {
+  "hash": "c7da57e3abc5",
+  "ms": 7525,
+  "chu": "Năm Thần thú hộ vùng đã phong ấn nó dưới Đài Ngũ Hành. Từ đó, mỗi Thần thú canh giữ một vùng đất."
+ },
+ "h2-truyen-thuyet_4": {
+  "hash": "9e322dde67fd",
+  "ms": 7965,
+  "chu": "Đêm trứng của cháu đến, phong ấn đã nứt. Năm mảnh Hư Ảnh bay về năm vùng, nhập vào chính các Thần thú."
+ },
+ "h2-truyen-thuyet_5": {
+  "hash": "f38aa613c61d",
+  "ms": 8395,
+  "chu": "Cây héo, suối đục, núi lửa khói tím... là vì vậy. Những kẻ canh giữ giờ thành thứ phải canh chừng."
+ },
+ "h2-truyen-thuyet_6_hoa": {
+  "hash": "1510047ab9c9",
+  "ms": 7396,
+  "chu": "Núi lửa là vùng cùng hệ với bé. Đường tới đó đã mở. Hãy đi, nhưng chỉ ở phần rìa thôi."
+ },
+ "h2-truyen-thuyet_6_kim": {
+  "hash": "87fa62b72a3c",
+  "ms": 7246,
+  "chu": "Núi pha lê là vùng cùng hệ với bé. Đường tới đó đã mở. Hãy đi, nhưng chỉ ở phần rìa thôi."
+ },
+ "h2-truyen-thuyet_6_moc": {
+  "hash": "c7a85197a63e",
+  "ms": 7844,
+  "chu": "Rừng cổ thụ là vùng cùng hệ với bé. Đường tới đó đã mở. Hãy đi, nhưng chỉ ở phần rìa thôi."
+ },
+ "h2-truyen-thuyet_6_thuy": {
+  "hash": "c314bbfb22f6",
+  "ms": 7247,
+  "chu": "Hồ thác là vùng cùng hệ với bé. Đường tới đó đã mở. Hãy đi, nhưng chỉ ở phần rìa thôi."
+ },
+ "h2-truyen-thuyet_6_tho": {
+  "hash": "9b4f1bd3eba0",
+  "ms": 7323,
+  "chu": "Hẻm vực là vùng cùng hệ với bé. Đường tới đó đã mở. Hãy đi, nhưng chỉ ở phần rìa thôi."
+ },
+ "h2-truyen-thuyet_7": {
+  "hash": "86cfd6e299f0",
+  "ms": 8214,
+  "chu": "Giải thoát những bóng Hư nhỏ, nhặt những gì còn sót lại. Khi bé đủ mạnh, ta sẽ nói cháu biết phải làm gì tiếp."
+ },
+ "h2-ban-do_0_hoa": {
+  "hash": "ee1acab5f0d8",
+  "ms": 5577,
+  "chu": "Núi lửa ở phía kia. Thấy làn khói tím trên đó không? Đó là dấu vết của Hư Ảnh."
+ },
+ "h2-ban-do_0_kim": {
+  "hash": "07e79eb014d4",
+  "ms": 5879,
+  "chu": "Núi pha lê ở phía kia. Thấy làn khói tím trên đó không? Đó là dấu vết của Hư Ảnh."
+ },
+ "h2-ban-do_0_moc": {
+  "hash": "4fc14bedf0f1",
+  "ms": 6144,
+  "chu": "Rừng cổ thụ ở phía kia. Thấy làn khói tím trên đó không? Đó là dấu vết của Hư Ảnh."
+ },
+ "h2-ban-do_0_thuy": {
+  "hash": "24f0692fb503",
+  "ms": 5419,
+  "chu": "Hồ thác ở phía kia. Thấy làn khói tím trên đó không? Đó là dấu vết của Hư Ảnh."
+ },
+ "h2-ban-do_0_tho": {
+  "hash": "9b436137529a",
+  "ms": 5396,
+  "chu": "Hẻm vực ở phía kia. Thấy làn khói tím trên đó không? Đó là dấu vết của Hư Ảnh."
+ },
+ "h2-ban-do_1": {
+  "hash": "48bb3890ae7e",
+  "ms": 5930,
+  "chu": "Mỗi chuyến đi tốn Năng lượng, làm bé đói và lấm lem, bị thương còn mất Sức khỏe. Cho nó ăn, tắm, ngủ đủ rồi hẵng đi."
+ },
+ "h2-vung_0_hoa": {
+  "hash": "7848d24c6c38",
+  "ms": 7816,
+  "chu": "Rìa Núi lửa. Không khí nặng mùi khói, cỏ cây ngả màu xám tro."
+ },
+ "h2-vung_0_kim": {
+  "hash": "8f939878fa36",
+  "ms": 7861,
+  "chu": "Rìa Núi pha lê. Không khí nặng mùi khói, cỏ cây ngả màu xám tro."
+ },
+ "h2-vung_0_moc": {
+  "hash": "c7064eadc621",
+  "ms": 8365,
+  "chu": "Rìa Rừng cổ thụ. Không khí nặng mùi khói, cỏ cây ngả màu xám tro."
+ },
+ "h2-vung_0_thuy": {
+  "hash": "fb75ae7219d7",
+  "ms": 7658,
+  "chu": "Rìa Hồ thác. Không khí nặng mùi khói, cỏ cây ngả màu xám tro."
+ },
+ "h2-vung_0_tho": {
+  "hash": "0b0ad84fb647",
+  "ms": 7314,
+  "chu": "Rìa Hẻm vực. Không khí nặng mùi khói, cỏ cây ngả màu xám tro."
+ },
+ "h2-vung_1": {
+  "hash": "e62072adc420",
+  "ms": 7750,
+  "chu": "Xa xa, giữa làn khói tím, một bóng khổng lồ khẽ cựa mình. Rồi tất cả lại im lặng."
+ },
+ "h2-vung_2": {
+  "hash": "e027c472c58d",
+  "ms": 6314,
+  "chu": "Bé dựng lông, gầm gừ thật khẽ. Phía trước, những bóng Hư nhỏ đang lảng vảng."
+ },
+ "h2-vo-duong_0_hoa": {
+  "hash": "b5f98adfd80d",
+  "ms": 5175,
+  "chu": "Cháu ra rìa Núi lửa rồi à? Bóng Hư ở đó là tinh linh bị khói tím nhập, không phải quái vật."
+ },
+ "h2-vo-duong_0_kim": {
+  "hash": "3f4cdfa47e7d",
+  "ms": 5143,
+  "chu": "Cháu ra rìa Núi pha lê rồi à? Bóng Hư ở đó là tinh linh bị khói tím nhập, không phải quái vật."
+ },
+ "h2-vo-duong_0_moc": {
+  "hash": "5dda9e5f7f85",
+  "ms": 5466,
+  "chu": "Cháu ra rìa Rừng cổ thụ rồi à? Bóng Hư ở đó là tinh linh bị khói tím nhập, không phải quái vật."
+ },
+ "h2-vo-duong_0_thuy": {
+  "hash": "157b1a21360c",
+  "ms": 5285,
+  "chu": "Cháu ra rìa Hồ thác rồi à? Bóng Hư ở đó là tinh linh bị khói tím nhập, không phải quái vật."
+ },
+ "h2-vo-duong_0_tho": {
+  "hash": "89142c097b07",
+  "ms": 5219,
+  "chu": "Cháu ra rìa Hẻm vực rồi à? Bóng Hư ở đó là tinh linh bị khói tím nhập, không phải quái vật."
+ },
+ "h2-vo-duong_1": {
+  "hash": "ffaefd14f584",
+  "ms": 5910,
+  "chu": "Đánh để giải thoát chúng, không phải để giết. Khói tan rồi, chúng sẽ trở về với núi rừng."
+ },
+ "h2-vo-duong_2": {
+  "hash": "39c8b48dcd1d",
+  "ms": 5037,
+  "chu": "Khói tím ra đòn bất ngờ lắm. Thấy đòn tới thì lướt đi mà né, đừng đứng đó chịu trận."
+ },
+ "h2-truong_0": {
+  "hash": "a19c4b5cf295",
+  "ms": 7349,
+  "chu": "Ra vùng đất thì nhớ bài tương khắc: đánh vào hệ mình khắc thì mạnh gấp rưỡi, gặp hệ khắc mình thì yếu đi."
+ },
+ "h2-truong_1": {
+  "hash": "a55a1af556bd",
+  "ms": 6876,
+  "chu": "Còn Hư Ảnh không thuộc hệ nào... nên cũng chẳng hệ nào khắc được nó. Cô nghĩ mãi vẫn chưa ra."
+ },
+ "h2-cho_0_hoa": {
+  "hash": "3222bbbf0c9d",
+  "ms": 5239,
+  "chu": "Cháu ra vùng đất rồi hả? Cẩn thận đấy. Giờ mấy người buôn chẳng ai dám đi đường Núi lửa nữa."
+ },
+ "h2-cho_0_kim": {
+  "hash": "18b465148f9d",
+  "ms": 5593,
+  "chu": "Cháu ra vùng đất rồi hả? Cẩn thận đấy. Giờ mấy người buôn chẳng ai dám đi đường Núi pha lê nữa."
+ },
+ "h2-cho_0_moc": {
+  "hash": "cbe92710dab1",
+  "ms": 5596,
+  "chu": "Cháu ra vùng đất rồi hả? Cẩn thận đấy. Giờ mấy người buôn chẳng ai dám đi đường Rừng cổ thụ nữa."
+ },
+ "h2-cho_0_thuy": {
+  "hash": "2fe50f68e3c0",
+  "ms": 5313,
+  "chu": "Cháu ra vùng đất rồi hả? Cẩn thận đấy. Giờ mấy người buôn chẳng ai dám đi đường Hồ thác nữa."
+ },
+ "h2-cho_0_tho": {
+  "hash": "1f30781f9f34",
+  "ms": 5532,
+  "chu": "Cháu ra vùng đất rồi hả? Cẩn thận đấy. Giờ mấy người buôn chẳng ai dám đi đường Hẻm vực nữa."
+ },
+ "h2-cho_1": {
+  "hash": "28d4f9124eeb",
+  "ms": 4052,
+  "chu": "Nhớ cho bé ăn đúng hệ trước khi đi. Bụng đói thì đánh đấm gì được."
+ },
+ "h2-suc-khoe_0": {
+  "hash": "60a9e93914e6",
+  "ms": 3046,
+  "chu": "Già Quy lại ghé qua, ngồi xuống cạnh bé."
+ },
+ "h2-suc-khoe_1": {
+  "hash": "4f2d156a5e2d",
+  "ms": 8038,
+  "chu": "Cháu để ý thanh Sức khỏe của bé chưa? Sức khỏe còn bao nhiêu phần thì ra trận máu cũng chỉ còn bấy nhiêu phần."
+ },
+ "h2-suc-khoe_2": {
+  "hash": "e0619a30b3d2",
+  "ms": 7477,
+  "chu": "Ngất đi thì chỉ còn 10, dưới 15 là phải ở nhà. Sức khỏe đã yếu mà còn để nó đói, để nó bẩn là đổ bệnh đấy."
+ },
+ "h2-suc-khoe_3": {
+  "hash": "ea8de549f767",
+  "ms": 7331,
+  "chu": "Muốn hồi thì cho nó ngủ, cho ăn đồ hệ Mộc. Ốm, hay Sức khỏe dưới 60, thì vào Vệ sinh lấy thuốc cho uống."
+ },
+ "h2-vo-duong-bai_0": {
+  "hash": "7ef3a0acd99f",
+  "ms": 7117,
+  "chu": "Ở Võ đường này, tập luyện thì lên Sức mạnh, thắng Solo đối kháng thì lên Tinh thần, mỗi thứ một lần một ngày."
+ },
+ "h2-vo-duong-bai_1": {
+  "hash": "7b6e50d020ed",
+  "ms": 8210,
+  "chu": "Solo là đấu tay đôi với đối thủ cùng Level. Thắng thì bé vui, thua thì buồn, mà trận nào cũng đói, mệt, lấm lem."
+ },
+ "h2-vo-duong-bai_2": {
+  "hash": "13f90ec54adf",
+  "ms": 7934,
+  "chu": "Mệt thì đòn yếu và chậm, đói thì Linh lực hồi chậm, buồn thì khó ra đòn hiểm. Còn bé vui hẳn thì đòn mạnh thêm đấy."
+ },
+ "h2-nau-an_0": {
+  "hash": "b80d646231e4",
+  "ms": 7477,
+  "chu": "Cháu biết nấu ăn chưa? Ở nhà vào Hoạt động, chọn Nấu ăn nè. Nấu khéo thì món được sao, càng nhiều sao càng bổ."
+ },
+ "h2-nau-an_1": {
+  "hash": "803fdc1a409e",
+  "ms": 8501,
+  "chu": "Món Mộc ăn vô là hồi Sức khỏe liền. Món Hỏa thêm Sức mạnh, Thủy thêm Nhanh nhẹn, Thổ thêm Bền bỉ, Kim thêm Thủ."
+ },
+ "h2-nau-an_2": {
+  "hash": "74c4418d8c82",
+  "ms": 5995,
+  "chu": "Mà mấy món kia chỉ có tác dụng tới hết chuyến đi hay trận Solo kế tiếp, mỗi lần giữ được một món thôi nha."
+ },
+ "h2-linh-khi_0": {
+  "hash": "9de22d03e9bf",
+  "ms": 8143,
+  "chu": "Bài mới: Linh khí. Bé ăn đồ hệ nào thì Linh khí hệ ấy tăng, mà đã tăng rồi thì không bao giờ mất."
+ },
+ "h2-linh-khi_1": {
+  "hash": "5d6612b1f1c0",
+  "ms": 10893,
+  "chu": "Level 20 cần một hệ đạt 30, Level 45 cần hệ cao nhất đạt 60 thì mới tiến hóa. Lên Level, điểm thuộc tính cũng chia theo Linh khí."
+ },
+ "h2-linh-khi_2": {
+  "hash": "f824febc6aa5",
+  "ms": 10164,
+  "chu": "Hệ nào cao cũng có cái hay: Kim thêm Thủ, lâu đói; Mộc tự hồi Sức khỏe, ít ốm; Thủy vui lâu, câu cá nấu ăn dễ hơn."
+ },
+ "h2-linh-khi_3": {
+  "hash": "1ed56ef4b751",
+  "ms": 7113,
+  "chu": "Hỏa đánh mạnh nhưng mau đói; Thổ ngủ là hồi Năng lượng nhanh. Trò muốn bé giỏi gì thì cho ăn hệ ấy nhé."
+ },
+ "h2-ngoc_0": {
+  "hash": "968b8fce7379",
+  "ms": 11149,
+  "chu": "Ngọc nhặt ở vùng đất thì gắn ở trang Thuộc tính, ngọc hệ nào tăng hai thuộc tính hệ ấy. Ô mở ở Level 6, 15, 21, 46, 100."
+ },
+ "h3-khu-sau_0": {
+  "hash": "36c42874f0b1",
+  "ms": 5650,
+  "chu": "Sáng sớm, Già Quy đã đứng chờ trước cửa, cây gậy chống cắm sâu xuống đất."
+ },
+ "h3-khu-sau_1": {
+  "hash": "1facae37edfb",
+  "ms": 4364,
+  "chu": "Bé thành Thiếu niên rồi! Nhìn nó xem, mắt sáng, chân vững hẳn ra."
+ },
+ "h3-khu-sau_2": {
+  "hash": "43c6c021a03b",
+  "ms": 6623,
+  "chu": "Giờ nó đủ sức vào sâu hơn phần rìa. Khói Hư ở khu thứ hai dày hơn, bóng Hư cũng mạnh hơn nhiều."
+ },
+ "h3-khu-sau_3": {
+  "hash": "b9e0f10c3e8e",
+  "ms": 5740,
+  "chu": "Ta phải nói thật với cháu. Ở khu sâu nhất mỗi vùng, chính Thần thú canh giữ đang bị Hư Ảnh nhập."
+ },
+ "h3-khu-sau_4": {
+  "hash": "3faf2c6dfc0b",
+  "ms": 6030,
+  "chu": "Chưa đến lúc gặp nó đâu. Cứ thanh tẩy từng khu một. Mỗi khu sạch khói, Thần thú lại nhẹ đi một phần."
+ },
+ "h3-khu-sau_5": {
+  "hash": "99689a5d9ca8",
+  "ms": 3826,
+  "chu": "Đi đi. Nhớ về nhà ăn ngủ cho đủ, đừng để bé kiệt sức."
+ },
+ "h3-vo-duong_0": {
+  "hash": "fe954f52dc61",
+  "ms": 2719,
+  "chu": "Thiếu niên rồi à? Đòn của bé đã có lực rồi đấy."
+ },
+ "h3-vo-duong_1": {
+  "hash": "f2406aa61046",
+  "ms": 5673,
+  "chu": "Bóng Hư ở khu sâu biết vây đánh. Đừng lao vào giữa bầy, đánh từ rìa vào, hạ từng con một."
+ },
+ "h3-vo-duong_2": {
+  "hash": "9294fa8c00d3",
+  "ms": 4908,
+  "chu": "Gặp con đầu đàn chặn lối thì đánh tới cùng. Hạ được nó, lối đi tiếp mới mở."
+ },
+ "h3-truong_0": {
+  "hash": "19d9931260df",
+  "ms": 7093,
+  "chu": "Cô đọc lại sách cổ rồi. Ngày xưa năm Thần thú không đánh Hư Ảnh từng con, mà cùng lúc cả năm."
+ },
+ "h3-truong_1": {
+  "hash": "a688d4d08d40",
+  "ms": 6022,
+  "chu": "Không hệ nào khắc được nó, nhưng cả năm hệ hợp lại thì khác hẳn. Trò nhớ điều này nhé."
+ },
+ "h3-cho_0": {
+  "hash": "3ba69b7dd860",
+  "ms": 5797,
+  "chu": "Cháu nghe chưa? Có người thấy một con rồng lửa khổng lồ lượn quanh miệng núi, khói tím quấn đầy mình."
+ },
+ "h3-cho_1": {
+  "hash": "4bbf0df0051c",
+  "ms": 5802,
+  "chu": "Chắc là Viêm Long. Ngày xưa nó canh Núi lửa, giờ thì chẳng ai dám bén mảng lên đó nữa."
+ },
+ "h3-cho_2": {
+  "hash": "0757ee6816d6",
+  "ms": 4007,
+  "chu": "Đi sâu thì mang nhiều đồ ăn vào. Bụng no mới đánh lâu được."
+ },
+ "h4-than-thu_0": {
+  "hash": "30261d11b08a",
+  "ms": 3974,
+  "chu": "Đêm ấy, Già Quy mang tới một cuộn da cũ đã ngả màu."
+ },
+ "h4-than-thu_1": {
+  "hash": "30d4c8434609",
+  "ms": 8048,
+  "chu": "Đây là bản đồ ngàn năm trước. Năm chấm sáng là năm Thần thú: Viêm Long, Kim Ưng, Thụ Nhân, Thủy Long và Thổ Long."
+ },
+ "h4-than-thu_2": {
+  "hash": "4a3105c92570",
+  "ms": 4763,
+  "chu": "Giờ cả năm đều mang khói tím trong người. Chúng không còn nhận ra ai nữa."
+ },
+ "h4-than-thu_3": {
+  "hash": "91454a9d68d5",
+  "ms": 5025,
+  "chu": "Bé đã Trưởng thành. Đến lúc vào khu sâu nhất, đối mặt với Thần thú của vùng nhà."
+ },
+ "h4-than-thu_4": {
+  "hash": "9ef7fc839b82",
+  "ms": 5961,
+  "chu": "Đánh để giải thoát, đừng đánh vì căm giận. Thắng rồi, Thần thú sẽ để lại một viên Ngọc Hồn."
+ },
+ "h4-than-thu_5": {
+  "hash": "3d60234516bc",
+  "ms": 6370,
+  "chu": "Thần thú được giải thoát sẽ mở đường sang vùng kế tiếp, theo vòng tương sinh. Gom đủ năm viên thì về tìm ta."
+ },
+ "h4-vo-duong_0": {
+  "hash": "704cba5b0511",
+  "ms": 5669,
+  "chu": "Thần thú không phải bóng Hư. Nó đánh mạnh, lại biết đổi đòn. Đứng yên một nhịp là ngã ngay."
+ },
+ "h4-vo-duong_1": {
+  "hash": "f23b93a5a844",
+  "ms": 6180,
+  "chu": "Lướt né cho khéo, giữ thanh tuyệt chiêu cho lúc nó sơ hở. Đánh trúng một đòn ấy hơn chục đòn thường."
+ },
+ "tt-hoa-gap_0": {
+  "hash": "f07f0633644a",
+  "ms": 8567,
+  "chu": "Lối vào khu sâu nhất của Núi lửa. Dung nham chảy thành sông, khói tím cuộn lên che kín bầu trời."
+ },
+ "tt-hoa-gap_1": {
+  "hash": "711603d629ad",
+  "ms": 6440,
+  "chu": "Trên miệng núi, Viêm Long vươn mình gầm vang. Ngọn lửa của nó giờ cháy một màu tím lạnh."
+ },
+ "tt-hoa-gap_2": {
+  "hash": "04b825e2eb64",
+  "ms": 2822,
+  "chu": "Bé ngẩng nhìn lên đỉnh núi, không lùi lấy một bước."
+ },
+ "tt-hoa-thoat_0": {
+  "hash": "98f7a8e3fe31",
+  "ms": 5538,
+  "chu": "Khói tím tan dần. Ngọn lửa của Viêm Long đỏ rực trở lại."
+ },
+ "tt-hoa-thoat_1": {
+  "hash": "0f553753de54",
+  "ms": 8285,
+  "chu": "Viêm Long cúi đầu thật thấp trước bé, rồi thả xuống một viên ngọc đỏ rực: Ngọc Hồn hệ Hỏa."
+ },
+ "tt-hoa-thoat_2": {
+  "hash": "d743d6f23703",
+  "ms": 5097,
+  "chu": "Mảnh khói Hư cuối cùng rời khỏi nó, bay vụt về phía Đài Ngũ Hành giữa làng."
+ },
+ "tt-kim-gap_0": {
+  "hash": "b0a42cb43028",
+  "ms": 7217,
+  "chu": "Lối vào khu sâu nhất của Núi pha lê. Những cột pha lê đã đục màu tím, rạn nứt từng mảng."
+ },
+ "tt-kim-gap_1": {
+  "hash": "6fed21364072",
+  "ms": 7418,
+  "chu": "Kim Ưng lượn vòng trên cao, đôi cánh bạc phủ kín khói Hư. Tiếng rít của nó làm pha lê rung lên."
+ },
+ "tt-kim-gap_2": {
+  "hash": "0830213dd2a7",
+  "ms": 3115,
+  "chu": "Bé dõi theo bóng cánh ấy, móng bấu chặt xuống nền đá."
+ },
+ "tt-kim-thoat_0": {
+  "hash": "51843cfc1a4c",
+  "ms": 5870,
+  "chu": "Đôi cánh Kim Ưng sáng bạc trở lại. Khói Hư rơi xuống như tro tàn."
+ },
+ "tt-kim-thoat_1": {
+  "hash": "8d0e5459187c",
+  "ms": 6090,
+  "chu": "Nó đáp xuống trước bé, nhả ra một viên ngọc trắng bạc: Ngọc Hồn hệ Kim."
+ },
+ "tt-kim-thoat_2": {
+  "hash": "d743d6f23703",
+  "ms": 5010,
+  "chu": "Mảnh khói Hư cuối cùng rời khỏi nó, bay vụt về phía Đài Ngũ Hành giữa làng."
+ },
+ "tt-moc-gap_0": {
+  "hash": "83ab3229b9e2",
+  "ms": 7847,
+  "chu": "Lối vào khu sâu nhất của Rừng cổ thụ. Cây cối khô héo, rễ cây quằn quại như đang đau."
+ },
+ "tt-moc-gap_1": {
+  "hash": "cd336eb862d2",
+  "ms": 6550,
+  "chu": "Giữa rừng, Thụ Nhân chậm rãi đứng dậy. Từng nhánh cành trên người nó rỉ ra khói tím."
+ },
+ "tt-moc-gap_2": {
+  "hash": "e91aacaca827",
+  "ms": 2935,
+  "chu": "Bé hít một hơi thật sâu, rồi bước tới."
+ },
+ "tt-moc-thoat_0": {
+  "hash": "1346b5d32c5f",
+  "ms": 4692,
+  "chu": "Lá non bật ra trên những nhánh cành khô. Thụ Nhân đã tỉnh lại."
+ },
+ "tt-moc-thoat_1": {
+  "hash": "a27e68f09da9",
+  "ms": 6552,
+  "chu": "Nó chìa bàn tay gỗ, đặt trước mặt bé một viên ngọc xanh lá: Ngọc Hồn hệ Mộc."
+ },
+ "tt-moc-thoat_2": {
+  "hash": "d743d6f23703",
+  "ms": 5110,
+  "chu": "Mảnh khói Hư cuối cùng rời khỏi nó, bay vụt về phía Đài Ngũ Hành giữa làng."
+ },
+ "tt-thuy-gap_0": {
+  "hash": "1322d4719e53",
+  "ms": 7021,
+  "chu": "Lối vào khu sâu nhất của Hồ thác. Nước hồ đen đặc, thác đổ xuống mà không một tiếng động."
+ },
+ "tt-thuy-gap_1": {
+  "hash": "7ff0d9831679",
+  "ms": 5882,
+  "chu": "Mặt hồ dậy sóng. Thủy Long trồi lên, đôi mắt sáng một màu tím lạnh lẽo."
+ },
+ "tt-thuy-gap_2": {
+  "hash": "2ce9ec070871",
+  "ms": 2552,
+  "chu": "Bé đứng vững trên bờ đá, chờ nó lao tới."
+ },
+ "tt-thuy-thoat_0": {
+  "hash": "838a6b486328",
+  "ms": 4410,
+  "chu": "Nước hồ trong vắt trở lại, tiếng thác đổ vang lên rộn ràng."
+ },
+ "tt-thuy-thoat_1": {
+  "hash": "57027cdcddec",
+  "ms": 7288,
+  "chu": "Thủy Long khẽ chạm mũi vào bé, để lại một viên ngọc xanh biếc: Ngọc Hồn hệ Thủy."
+ },
+ "tt-thuy-thoat_2": {
+  "hash": "d743d6f23703",
+  "ms": 5193,
+  "chu": "Mảnh khói Hư cuối cùng rời khỏi nó, bay vụt về phía Đài Ngũ Hành giữa làng."
+ },
+ "tt-tho-gap_0": {
+  "hash": "fbd85efeab45",
+  "ms": 6799,
+  "chu": "Lối vào khu sâu nhất của Hẻm vực. Vách đá nứt toác, bụi đất bay mù mịt trong khói tím."
+ },
+ "tt-tho-gap_1": {
+  "hash": "473a233d9264",
+  "ms": 6083,
+  "chu": "Mặt đất rung chuyển. Thổ Long trườn ra từ lòng vực, vảy đá cọ vào nhau ken két."
+ },
+ "tt-tho-gap_2": {
+  "hash": "0264817d4d88",
+  "ms": 4202,
+  "chu": "Bé trụ chân thật vững, sẵn sàng cho trận đánh lớn nhất từ trước tới giờ."
+ },
+ "tt-tho-thoat_0": {
+  "hash": "f2122a61f70a",
+  "ms": 6219,
+  "chu": "Bụi đất lắng xuống. Vảy đá của Thổ Long sáng lên một màu vàng ấm."
+ },
+ "tt-tho-thoat_1": {
+  "hash": "187bfba5b7e6",
+  "ms": 6511,
+  "chu": "Thổ Long cúi đầu, đẩy tới chân bé một viên ngọc vàng đất: Ngọc Hồn hệ Thổ."
+ },
+ "tt-tho-thoat_2": {
+  "hash": "d743d6f23703",
+  "ms": 5293,
+  "chu": "Mảnh khói Hư cuối cùng rời khỏi nó, bay vụt về phía Đài Ngũ Hành giữa làng."
+ },
+ "h5-huyen-thoai_0": {
+  "hash": "a1c12fa9bb1b",
+  "ms": 5176,
+  "chu": "Bé vừa tiến hóa lần cuối. Ánh sáng tỏa ra khắp căn nhà nhỏ."
+ },
+ "h5-huyen-thoai_1": {
+  "hash": "63d44ad2ba06",
+  "ms": 4012,
+  "chu": "Huyền thoại... Cả đời ta mới thấy một tinh linh đi tới bậc này."
+ },
+ "h5-huyen-thoai_2": {
+  "hash": "acd12cfa74ee",
+  "ms": 6127,
+  "chu": "Hồi ta còn trẻ, người ta bảo chỉ Thần thú mới mạnh được như vậy. Giờ bé đứng ngang hàng với họ rồi."
+ },
+ "h5-huyen-thoai_3": {
+  "hash": "88a0791911d4",
+  "ms": 2642,
+  "chu": "Cứ đi tiếp con đường của cháu. Ta tin hai đứa."
+ },
+ "h5-du-ngoc_0": {
+  "hash": "5c5dbb877746",
+  "ms": 8911,
+  "chu": "Năm viên Ngọc Hồn nằm cạnh nhau trên bàn, sáng lên năm màu: đỏ, bạc, xanh lá, xanh dương và vàng đất."
+ },
+ "h5-du-ngoc_1": {
+  "hash": "82a53fb02a20",
+  "ms": 3760,
+  "chu": "Đủ cả năm viên rồi sao? Ta nghe chúng ngân lên từ tận đầu làng."
+ },
+ "h5-du-ngoc_2": {
+  "hash": "5e1d0ae98012",
+  "ms": 6412,
+  "chu": "Nhưng cháu phải biết điều này. Đặt năm viên lên năm trụ, phong ấn sẽ mở, và Hư Ảnh sẽ hiện nguyên hình."
+ },
+ "h5-du-ngoc_3": {
+  "hash": "e748644ba00c",
+  "ms": 5908,
+  "chu": "Không còn cách nào khác. Năm mảnh của nó đã dồn về dưới Đài, chỉ chờ ngày phá phong ấn mà ra."
+ },
+ "h5-du-ngoc_4": {
+  "hash": "2fc3a6404512",
+  "ms": 4045,
+  "chu": "Khi nào sẵn sàng, hãy đến Đài Ngũ Hành giữa làng. Ta sẽ chờ ở đó."
+ },
+ "h5-ban-do_0": {
+  "hash": "8c97fb57280f",
+  "ms": 5868,
+  "chu": "Đài Ngũ Hành ở ngay giữa làng, giữa Trường học và Võ đường. Năm trụ đá đang chờ năm viên ngọc."
+ },
+ "dai-truoc_0": {
+  "hash": "1e13edc74017",
+  "ms": 4336,
+  "chu": "Cháu đến rồi. Năm trụ đá đã sáng cả, chúng biết Ngọc Hồn đã về."
+ },
+ "dai-truoc_1": {
+  "hash": "84c90bee8fba",
+  "ms": 5839,
+  "chu": "Ngàn năm trước, năm Thần thú cùng đứng quanh Đài này. Hôm nay chỉ có cháu và bé."
+ },
+ "dai-truoc_2": {
+  "hash": "d7e262a1569d",
+  "ms": 5262,
+  "chu": "Nhưng hai đứa không đơn độc. Năm Thần thú cháu đã giải thoát sẽ đứng sau lưng hai đứa."
+ },
+ "dai-truoc_3": {
+  "hash": "0487000a3db9",
+  "ms": 3330,
+  "chu": "Đặt ngọc đi. Dù chuyện gì xảy ra, đừng lùi bước."
+ },
+ "dai-sau_0": {
+  "hash": "ca7098dd405c",
+  "ms": 2412,
+  "chu": "Xong rồi... Thật sự xong rồi."
+ },
+ "dai-sau_1": {
+  "hash": "d5c21221e08e",
+  "ms": 6582,
+  "chu": "Ngàn năm trước phải cần tới năm Thần thú. Hôm nay, một đứa trẻ và bé đã làm được điều ấy."
+ },
+ "dai-sau_2": {
+  "hash": "dd3efbb24505",
+  "ms": 4820,
+  "chu": "Phong ấn mới giữ bằng sức của cả năm hệ, sẽ bền hơn phong ấn cũ rất nhiều."
+ },
+ "dai-sau_3": {
+  "hash": "5c787bfc2438",
+  "ms": 5250,
+  "chu": "Hư Ảnh vẫn nằm dưới Đài. Muốn so tài với nó thì đến Võ đường, Sư phụ sẽ sắp trận cho."
+ },
+ "dai-sau_4": {
+  "hash": "8db654452dc9",
+  "ms": 3385,
+  "chu": "Giờ thì về nhà nghỉ ngơi đi. Cả làng đang chờ mừng hai đứa đấy."
+ },
+ "ket-truong_0": {
+  "hash": "e9c3c5529421",
+  "ms": 4205,
+  "chu": "Trò làm được rồi! Năm hệ hợp lại, đúng như sách cổ viết."
+ },
+ "ket-truong_1": {
+  "hash": "14d29cea03f8",
+  "ms": 4441,
+  "chu": "Từ nay bài Ngũ Hành của cô có thêm một chương mới, chương về bé."
+ },
+ "ket-cho_0": {
+  "hash": "08caf16ab66d",
+  "ms": 4168,
+  "chu": "Hạt giống từ Rừng cổ thụ lên xanh mướt rồi! Người buôn lại đi đầy đường."
+ },
+ "ket-cho_1": {
+  "hash": "25463cc23ef1",
+  "ms": 4344,
+  "chu": "Cả làng nợ cháu với bé một bữa tiệc. Phần hạt giống để bác lo!"
+ },
+ "ket-vo-duong_0": {
+  "hash": "c7efeb8df23c",
+  "ms": 2988,
+  "chu": "Ta nghe hết rồi. Đệ tử của ta đã đánh bại Hư Ảnh."
+ },
+ "ket-vo-duong_1": {
+  "hash": "ae566becc611",
+  "ms": 5738,
+  "chu": "Giờ nó là một đối thủ ở Võ đường này. Muốn thử sức thì cứ vào, nhưng đừng mong nó nương tay."
+ }
+}

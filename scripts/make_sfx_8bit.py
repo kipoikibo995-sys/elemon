@@ -6,6 +6,10 @@ Writes assets/am-thanh/ (22050 Hz, mono, 16-bit WAV, read by the R36S app and us
     sfx/<name>.wav                     one per action (see SFX), plus menu sounds and footsteps
 and assets/am-thanh/nghe-thu.wav: everything one after another, to listen to on the PC.
 Usage: python make_sfx_8bit.py
+
+Since 27/10/2026 the game uses real CC0 sounds instead: sfx/ from scripts/make_sfx_cc0.py, nhac/ngay + dem from
+scripts/make_nhac_cc0.py; this script's own are kept in sfx/_cu-8bit and nhac/_cu-8bit. Running it again writes the
+8-bit ones back over them.
 """
 import os, wave
 import numpy as np

@@ -57,12 +57,13 @@ window.SOUND = (() => {
   if (!r) return;
   r.insertAdjacentHTML('afterend', ' <button class="restart" id="xoaLuu">Xóa bản lưu</button>');
   document.getElementById('xoaLuu').onclick = () => {
-    if (!confirm('Xóa bản lưu của game?')) return;
-    window.__noSave = true; localStorage.removeItem('holua-save-1'); location.reload();
+    if (!confirm('Xóa mọi bản lưu (mọi pet) của game?')) return;
+    window.__noSave = true; for (let n = 1; n <= 6; n++) localStorage.removeItem('holua-save-' + n); localStorage.removeItem('holua-cuoi'); location.reload();
   };
 })();
 </script>
 <script src="js/song-that.js"></script>
+<script src="js/chi-so.js"></script>
 <script src="js/di-bo.js"></script>
 <script src="js/ve-nhanh.js"></script>
 <script src="js/vo-duong.js"></script>
@@ -71,10 +72,23 @@ window.SOUND = (() => {
 <script src="js/am-thanh.js"></script>
 <script src="js/set-huyen-thoai.js"></script>
 <script src="js/nen-chi-so.js"></script>
+<script src="js/vung-dat.js"></script>
+<script src="js/tai-man.js"></script>
+<script src="js/truyen.js"></script>
+<script src="js/giong.js"></script>
+<script src="js/phim.js"></script>
+<script src="js/hoi-thoai.js"></script>
+<script src="js/dat-ten.js"></script>
+<script src="js/loi-noi.js"></script>
+<script src="js/man-chao.js"></script>
+<script src="js/cay-dau-truong.js"></script>
 <script data-browser-only src="js/nut-thu.js"></script>
 '''
 # the golden sparks round a Huyền thoại pet (game/src/set-huyen-thoai.js): 4x3 sparks a sheet on magenta
 SPARKS = os.path.join(ROOT, 'assets', 'source', 'tinh-linh', 'huyen-thoai-fx', 'set-vang_tia-manh*.png')
+# the evolution backdrop (the user, 30/10: the demo's EVO1_nen is too busy): assets/source/tien-hoa/TH1_nen.png when it
+# is there, its middle 4:3 cut to 640x480 over img/nen.png (the evolution, the naming after it, the demo's end screen)
+EVO_BG = os.path.join(ROOT, 'assets', 'source', 'tien-hoa', 'TH1_nen.png')
 SPARK_MAX = 96                       # px, the longest side of a cut spark (drawn at ~15 % of the pet's height)
 # small wording changes for the real game: (demo text, game text); one the demo no longer has is skipped
 WORDING = [
@@ -82,9 +96,54 @@ WORDING = [
     ("'R2 chơi · X vuốt ve · L2 tua nhanh'", "'R2 chơi · X vuốt ve'"),
     ("'Bản demo: tua nhanh ¼ giai đoạn; ở mốc cấp thì mở bảng tiến hóa'", "'Ở mốc cấp: mở bảng tiến hóa'"),
     ('<title>Elemon demo R36S - từ trứng tới Huyền thoại</title>', '<title>Elemon</title>'),
+    # pictures loaded screen by screen (game/src/tai-dan.js, tai-man.js), and at start the saved pet, not Hỏa Hổ
+    ("const jobs = files.map(f => load(f, `img/${f}.png`));",
+     "const jobs = globalThis.__lazyJobs ? __lazyJobs(files, load) : files.map(f => load(f, `img/${f}.png`));"),
+    ("Promise.all(jobs).then(() => loadCreature('hoa-ho'))",
+     "Promise.all(jobs).then(() => loadCreature(globalThis.__startPet && __startPet() || 'hoa-ho'))"),
+    # the egg screen: the story's hatching room (assets/source/phim/NEN_no-trung.png, game/src/phim.js) when it is there,
+    # without the darkening the room behind it needed
+    ("  ctx.drawImage(IMG.room, 0, 0);\n  ctx.fillStyle = 'rgba(0,0,0,0.35)'; ctx.fillRect(0, 0, 640, 480);",
+     "  const nenNo = globalThis.__nenNoTrung && __nenNoTrung();\n  ctx.drawImage(nenNo || IMG.room, 0, 0);\n"
+     "  if (!nenNo) { ctx.fillStyle = 'rgba(0,0,0,0.35)'; ctx.fillRect(0, 0, 640, 480); }"),
+    # the launch clean-up (the user, 31/10/2026): no "demo", no "chưa làm" left on screen
+    ("    c.push(['Nhà cấp 4 + Hồn lửa xanh (bản demo: bỏ qua)', true, '']);\n", ''),
+    ("  text('Lên Nhi trở đi tùy cách nuôi (sẽ làm sau)', 160, 400, 13, '#b8a080', 'left', false);\n", ''),
+    ("title('HOÀN THÀNH DEMO'", "title('HUYỀN THOẠI!'"),
+    ("`Từ trứng tới Huyền thoại: ${Math.floor(secs / 60)} phút ${secs % 60} giây · ${S.acts} lần chăm sóc`",
+     "`Từ trứng tới Huyền thoại: ${Math.floor(secs / 86400)} ngày ${Math.floor(secs / 3600) % 24} giờ · ${S.acts} lần chăm sóc`"),
+    ("'A: chơi tiếp với Huyền thoại · R: chơi lại từ đầu'", "'A: chơi tiếp với Huyền thoại'"),
+    ("`${p.name}: đã mở (nội dung vùng làm sau)`", "`${p.name}: đã mở`"),
+    # Chợ's X (Bán): the seed shop's selling tab (crops and fish), back to Chợ
+    ("if (btn === 'X') toast('Bán: chưa làm');", "if (btn === 'X') return openSeedShop(2, 'shop');"),
+    # Hồ sơ's A (Đổi tên): the naming screen (game/src/dat-ten.js)
+    ("if (btn === 'A' && S.stats === 3) toast('Đổi tên: chưa làm');",
+     "if (btn === 'A' && S.stats === 3 && typeof __datTen === 'function') { S.stats = null; return fadeTo(() => __datTen('room')); }"),
+    # the room's START (Trang trí, not made): the settings (game/src/man-chao.js)
+    ("if (btn === 'START') toast('Trang trí phòng: chưa làm');",
+     "if (btn === 'START' && typeof __caiDat === 'function') return __caiDat('room');"),
+    # the pet's own name, not Bông's
+    ("'Khác hệ Bông: điểm hệ sẽ đổi dần · A để mua'", "`Khác hệ ${DATA.pet.name}: điểm hệ sẽ đổi dần · A để mua`"),
+    ("'Mua mấy món\\nngon cho Bông\\nnào!'", "'Mua mấy món\\nngon cho pet\\nnào!'"),
+    # the farm: each plot opened costs more than the one before (the user, 31/10/2026): 200, 300, 400... (the 9 plots
+    # open from the start do not count)
+    ("const OPEN_COST = 200;",
+     "const OPEN_COST_BASE = 200, OPEN_COST_STEP = 100;\n"
+     "const openCost = () => OPEN_COST_BASE + OPEN_COST_STEP * farmPlots().filter((p, i) => p.s !== 'khoa' && !(FIELD[i].r >= 3 && FIELD[i].c <= 2)).length;"),
+    ("`Mở ô đất (${OPEN_COST} vàng)`", "`Mở ô đất (${openCost()} vàng)`"),
+    ("    if (S.coins < OPEN_COST) return toast('Không đủ vàng');\n    S.coins -= OPEN_COST; p.s = 'tron'; toast('Đã mở thêm một ô đất');",
+     "    const cost = openCost();\n    if (S.coins < cost) return toast(`Cần ${cost} vàng để mở ô này`);\n"
+     "    S.coins -= cost; p.s = 'tron'; toast(`Đã mở thêm một ô đất · ô sau: ${openCost()} vàng`);"),
     # the stroll eases in and out (game/src/di-bo.js)
     ('    S.px = S.walk.from + (S.walk.to - S.walk.from) * t;',
      "    S.px = S.walk.from + (S.walk.to - S.walk.from) * (typeof walkEase === 'function' ? walkEase(t, S.walk.dur) : t);"),
+    # the room without the dark hint strip under the HUD and its two lines (the user's call, 27/10: the room is
+    # seen whole); matched after the 'R2 chơi' line above has been shortened
+    ("  // the hint lines never sit straight on the room picture: a dark strip (65%) under the HUD carries them\n"
+     "  ctx.fillStyle = 'rgba(12,7,5,0.65)'; ctx.fillRect(0, 38, 640, 44);\n"
+     "  ctx.fillStyle = 'rgba(255,214,120,0.25)'; ctx.fillRect(0, 82, 640, 1);\n"
+     "  text(hint(), 12, 52, 15, '#ffe6a8', 'left', true, 3);\n"
+     "  text('R2 chơi · X vuốt ve', 12, 71, 13, '#c9bba8', 'left', false, 2);\n", ''),
 ]
 
 
@@ -141,6 +200,100 @@ def cut_sparks():
     return n
 
 
+def evo_background():
+    """TH1_nen.png over the demo's img/nen.png; whether it was there."""
+    if not os.path.exists(EVO_BG):
+        return False
+    from PIL import Image
+    im = Image.open(EVO_BG).convert('RGB')
+    w, h = im.size
+    cw, ch = min(w, round(h * 4 / 3)), min(h, round(w * 3 / 4))
+    x, y = (w - cw) // 2, (h - ch) // 2
+    im.crop((x, y, x + cw, y + ch)).resize((640, 480), Image.LANCZOS).save(os.path.join(PAGE, 'img', 'nen.png'), optimize=True)
+    return True
+
+
+# the title screen without its two painted buttons (game/src/man-chao.js draws four in a row, the user 31/10): the
+# buttons' box covered with the grass to its right, the edges feathered
+TITLE_PILLS = (232, 355, 408, 446)            # x0, y0, x1, y1 on the 640x480 title_b
+
+
+def title_without_buttons():
+    import numpy as np
+    from PIL import Image
+    src = os.path.join(PAGE, 'img', 'title_b.png')
+    if not os.path.exists(src):
+        return False
+    a = np.array(Image.open(src).convert('RGB')).astype(float)
+    x0, y0, x1, y1 = TITLE_PILLS
+    w, h, f = x1 - x0, y1 - y0, 8
+    m = np.ones((h, w))
+    for i in range(f):
+        k = (i + 1) / (f + 1)
+        m[:, i] *= k; m[:, w - 1 - i] *= k; m[i, :] *= k; m[h - 1 - i, :] *= k
+    a[y0:y1, x0:x1] = a[y0:y1, x0:x1] * (1 - m[..., None]) + a[y0:y1, x1:x1 + w] * m[..., None]
+    Image.fromarray(a.round().astype(np.uint8)).save(os.path.join(PAGE, 'img', 'title_b_trong.png'), optimize=True)
+    return True
+
+
+# the Đấu trường tree (game/src/cay-dau-truong.js): one painted tree an element (assets/source/dau-truong/cay/
+# CAY_<he>.png, a candelabra of six branches, ChatGPT) and the node frames (CAY_khung.png: open, picked, locked, Hư Ảnh
+# on magenta). A tree is scaled to 640x560 and its top 480 kept (the trunk's foot goes under the bottom line); its six
+# branches found where the picture stands out from its row's own colour, between the tips and the bough
+CAY = os.path.join(ROOT, 'assets', 'source', 'dau-truong', 'cay')
+CAY_HE = ('hoa', 'kim', 'moc', 'thuy', 'tho')
+CAY_FRAME = 66                                 # px, a node frame's side on the screen
+
+
+def cay_tree():
+    """img/cay/<he>.png and khung_<0-3>.png; the layout for the page: {he: {x: [6], tip, bough}, frame}."""
+    import numpy as np
+    from PIL import Image
+    out = os.path.join(PAGE, 'img', 'cay')
+    os.makedirs(out, exist_ok=True)
+    lay = {'frame': CAY_FRAME, 'trees': {}}
+    for he in CAY_HE:
+        src = os.path.join(CAY, f'CAY_{he}.png')
+        if not os.path.exists(src):
+            continue
+        im = Image.open(src).convert('RGB').resize((640, 560), Image.LANCZOS).crop((0, 0, 640, 480))
+        im.save(os.path.join(out, he + '.png'), optimize=True)
+        a = np.array(im).astype(float)
+        fg = np.abs(a - np.median(a, axis=1, keepdims=True)).sum(2) > 60
+        band = np.convolve(fg[150:250].sum(0).astype(float), np.ones(9) / 9, 'same')
+        xs = []
+        for x in np.argsort(-band):
+            if all(abs(int(x) - p) > 60 for p in xs):
+                xs.append(int(x))
+            if len(xs) == 6:
+                break
+        xs.sort()
+        rows = np.convolve(fg[220:340].sum(1).astype(float), np.ones(7) / 7, 'same')
+        bough = 220 + int(np.argmax(rows))                # the bough: between the tips and the trunk's glowing foot
+        tips = []
+        for x in xs:
+            col = np.nonzero(fg[40:bough, max(0, x - 5):x + 6].any(1))[0]
+            tips.append(40 + int(col.min()) if len(col) else 80)
+        lay['trees'][he] = {'x': xs, 'tip': int(np.median(tips)), 'bough': bough}
+    sheet = os.path.join(CAY, 'CAY_khung.png')
+    if os.path.exists(sheet):
+        b = np.array(Image.open(sheet).convert('RGBA'))
+        key = (b[..., 0] > 200) & (b[..., 1] < 80) & (b[..., 2] > 200)
+        b[key, 3] = 0
+        cols = np.nonzero((b[..., 3] > 0).sum(0) > 3)[0]
+        runs, st = [], cols[0]
+        for p, q in zip(cols, cols[1:]):
+            if q - p > 5:
+                runs.append((st, p)); st = q
+        runs.append((st, cols[-1]))
+        for i, (x0, x1) in enumerate(runs[:4]):
+            part = b[:, x0:x1 + 1]
+            ys = np.nonzero(part[..., 3].sum(1) > 3)[0]
+            f = Image.fromarray(part[ys.min():ys.max() + 1])
+            f.resize((CAY_FRAME, CAY_FRAME), Image.LANCZOS).save(os.path.join(out, f'khung_{i}.png'), optimize=True)
+    return lay
+
+
 SIDE_PX = 190                       # px, the larger side of the Solo pick screen's standing pet
 
 
@@ -152,8 +305,14 @@ DITHER_RUNS = ("{ const u = new Uint32Array(p.buffer, p.byteOffset, o.width * o.
                "for (let xx = (yy / b | 0) % 2 ? 0 : b; xx < W; xx += 2 * b) u.fill(0, r + xx, r + Math.min(W, xx + b)); } }")
 # the aiming funnel and arrow: drawn cell by cell every frame (~8000 cells, thousands of 2 px fills) they cost the
 # R36S more than the fight; here each funnel (its base angle) and arrow (its 32 directions) is drawn once into a
-# picture, put down on the same 2 px grid round the pet
-AIM = r'''const AIM_FUNNELS = new Map(), AIM_ARROWS = new Map(), AIM_SHAPES = new Map();
+# picture, put down on the same 2 px grid round the pet; the arrow in 128 directions (the original's 32 made it
+# step visibly across the funnel), all of them made while the VS screen shows (__aimWarm)
+AIM = r'''// the shapes are plain data, kept from match to match (the pictures belong to a match and are freed with it)
+const AIM_FUNNELS = new Map(), AIM_ARROWS = new Map(), AIM_SHAPES = globalThis.__aimShapes || (globalThis.__aimShapes = new Map());
+const AIM_DIRS = 64, ARROW_DIRS = 128;   // the funnel drawn in 64 directions, the arrow in 128 (2.8 degree steps)
+const AIM_R = 88 / BLK, AIM_N = 2 * (Math.ceil(88 / BLK) + 1) + 1;
+const ARROW_LEN = AIM_R * 0.66, ARROW_L = Math.ceil(AIM_R * 0.66) + 4, ARROW_N = 2 * ARROW_L + 1;
+const AIM_PAL = { P: ['#ffb347', '#e0702a', '#8a3414', '#ffe08a'], B: ['#8fd8ff', '#2a76b8', '#123a66', '#cff0ff'] };
 function aimCanvas(n) { const c = document.createElement('canvas'); c.width = c.height = n * BLK; return c; }
 // a picture made in one go from cells: cells[i] = 0 (empty) or an RGBA colour, n x n cells of BLK x BLK pixels
 function aimPaint(n, cells) {
@@ -166,67 +325,82 @@ function aimPaint(n, cells) {
   return c;
 }
 const aimRgba = h => { const v = parseInt(h.slice(1), 16); return (255 << 24 | (v & 255) << 16 | (v >> 8 & 255) << 8 | v >> 16) >>> 0; };
+const aimMod = (k, n) => ((k % n) + n) % n;
+// the funnel's cells for one of AIM_DIRS directions (both sides, both checker phases): 1 edge, 2 outer band, 3 inside
+function aimShape(sk) {
+  let shape = AIM_SHAPES.get(sk);
+  if (shape) return shape;
+  const n = AIM_N, R = (n - 1) / 2, r = AIM_R, b = sk * (Math.PI * 2 / AIM_DIRS);
+  shape = new Uint8Array(n * n);
+  const angIn = t => { const d = ((t - b + Math.PI * 3) % (Math.PI * 2)) - Math.PI; return Math.abs(d) <= HALF; };
+  for (let ly = 0; ly < n; ly++) for (let lx = 0; lx < n; lx++) {
+    const dx = lx - R + 0.5, dy = ly - R + 0.5, d = Math.hypot(dx, dy);
+    if (d < 10 || d > r) continue;
+    const t = Math.atan2(dy, dx);
+    if (!angIn(t)) continue;
+    shape[ly * n + lx] = d > r - 1.2 || !angIn(t + 1.4 / d) || !angIn(t - 1.4 / d) ? 1 : d > r - 6 ? 2 : 3;
+  }
+  AIM_SHAPES.set(sk, shape);
+  return shape;
+}
+function aimFunnel(side, par, sk) {
+  const fk = side + par + ':' + sk;
+  let c = AIM_FUNNELS.get(fk);
+  if (c) return c;
+  const n = AIM_N, shape = aimShape(sk), cells = new Uint32Array(n * n), P = AIM_PAL[side].map(aimRgba);
+  for (let ly = 0; ly < n; ly++) for (let lx = 0; lx < n; lx++) {
+    const v = shape[ly * n + lx];
+    if (v) cells[ly * n + lx] = v === 1 ? P[0] : (lx + ly + par) % 2 === 0 ? P[v - 1] : 0;
+  }
+  c = aimPaint(n, cells);
+  AIM_FUNNELS.set(fk, c);
+  if (AIM_FUNNELS.size > 32) AIM_FUNNELS.delete(AIM_FUNNELS.keys().next().value);
+  return c;
+}
+function aimArrow(side, st) {
+  const ak = side + st;
+  let c = AIM_ARROWS.get(ak);
+  if (c) return c;
+  const a = st * (Math.PI * 2 / ARROW_DIRS), ca = Math.cos(a), sa = Math.sin(a), len = ARROW_LEN, L = ARROW_L, n = ARROW_N;
+  const inArrow = (lx, ly) => {
+    const px = lx - L + 0.5, py = ly - L + 0.5, u = px * ca + py * sa, v = -px * sa + py * ca;
+    if (u >= 10 && u <= len - 5 && Math.abs(v) <= 0.75) return true;
+    return u > len - 6 && u <= len && Math.abs(v) <= (len - u) * 0.7;
+  };
+  // the arrow's cells lit, the cells round them dark (worked from the ~100 arrow cells, not every cell's neighbours)
+  const lit = aimRgba(AIM_PAL[side][3]), dark = aimRgba('#1a0c06'), cells = new Uint32Array(n * n), on = [];
+  for (let ly = 0; ly < n; ly++) for (let lx = 0; lx < n; lx++) if (inArrow(lx, ly)) { on.push(ly * n + lx); cells[ly * n + lx] = lit; }
+  for (const i of on) {
+    const lx = i % n, ly = (i - lx) / n;
+    for (let yy = -1; yy <= 1; yy++) for (let xx = -1; xx <= 1; xx++) {
+      const X = lx + xx, Y = ly + yy, j = Y * n + X;
+      if (X >= 0 && Y >= 0 && X < n && Y < n && cells[j] !== lit) cells[j] = dark;
+    }
+  }
+  c = aimPaint(n, cells);
+  AIM_ARROWS.set(ak, c);
+  return c;
+}
+// made ahead while the VS screen shows (game/src/solo.js calls it until it says false): every funnel shape and the
+// player's arrows, so aiming never stops to work one out mid-fight (the bot points straight where it aims: one each)
+let aimWarmI = 0;
+globalThis.__aimWarm = () => {
+  const i = aimWarmI++;
+  if (i < AIM_DIRS) { aimShape(i); return true; }
+  const k = i - AIM_DIRS;
+  if (k < ARROW_DIRS) { aimArrow('P', k); return true; }
+  return false;
+};
 function drawAim(f) {
   const a = f.aiming;
   if (!a) return;
-  const pal = f.bot ? ['#8fd8ff', '#2a76b8', '#123a66', '#cff0ff'] : ['#ffb347', '#e0702a', '#8a3414', '#ffe08a'];
-  // the funnel's drawn direction in 64 steps (the hit test keeps a.base as it is): the bot faces any way at all
-  const ox = Math.round(f.x / BLK), oy = Math.round((f.y - 24) / BLK), r = 88 / BLK, R = Math.ceil(r) + 1;
-  const bs = Math.round(a.base / (Math.PI / 32)), b = bs * (Math.PI / 32);
-  const fk = (f.bot ? 'B' : 'P') + ((ox + oy) & 1) + ':' + (((bs % 64) + 64) % 64);
-  let fn = AIM_FUNNELS.get(fk);
-  if (!fn) {
-    // the shape for this direction (shared by both sides and both checker phases): 1 edge, 2 outer band, 3 inside
-    const n = 2 * R + 1, sk = ((bs % 64) + 64) % 64;
-    let shape = AIM_SHAPES.get(sk);
-    if (!shape) {
-      shape = new Uint8Array(n * n);
-      const angIn = t => { const d = ((t - b + Math.PI * 3) % (Math.PI * 2)) - Math.PI; return Math.abs(d) <= HALF; };
-      for (let ly = 0; ly < n; ly++) for (let lx = 0; lx < n; lx++) {
-        const dx = lx - R + 0.5, dy = ly - R + 0.5, d = Math.hypot(dx, dy);
-        if (d < 10 || d > r) continue;
-        const t = Math.atan2(dy, dx);
-        if (!angIn(t)) continue;
-        shape[ly * n + lx] = d > r - 1.2 || !angIn(t + 1.4 / d) || !angIn(t - 1.4 / d) ? 1 : d > r - 6 ? 2 : 3;
-      }
-      AIM_SHAPES.set(sk, shape);
-    }
-    const cells = new Uint32Array(n * n), par = (ox + oy) & 1, P = pal.map(aimRgba);
-    for (let ly = 0; ly < n; ly++) for (let lx = 0; lx < n; lx++) {
-      const v = shape[ly * n + lx];
-      if (v) cells[ly * n + lx] = v === 1 ? P[0] : (lx + ly + par) % 2 === 0 ? P[v - 1] : 0;
-    }
-    fn = { c: aimPaint(n, cells), R };
-    AIM_FUNNELS.set(fk, fn);
-    if (AIM_FUNNELS.size > 32) { const k0 = AIM_FUNNELS.keys().next().value; AIM_FUNNELS.delete(k0); }
-  }
-  ctx.drawImage(fn.c, (ox - fn.R) * BLK, (oy - fn.R) * BLK);
-  const step = Math.round(a.ang / (Math.PI / 16)), ak = (f.bot ? 'B' : 'P') + ((step % 32) + 32) % 32;
-  let ar = AIM_ARROWS.get(ak);
-  if (!ar) {
-    const sa32 = step * (Math.PI / 16), ca = Math.cos(sa32), sa = Math.sin(sa32), len = r * 0.66, L = Math.ceil(len) + 4;
-    const inArrow = (lx, ly) => {
-      const px = lx - L + 0.5, py = ly - L + 0.5, u = px * ca + py * sa, v = -px * sa + py * ca;
-      if (u >= 10 && u <= len - 5 && Math.abs(v) <= 0.75) return true;
-      return u > len - 6 && u <= len && Math.abs(v) <= (len - u) * 0.7;
-    };
-    const n = 2 * L + 1, on = new Uint8Array(n * n);
-    for (let ly = 0; ly < n; ly++) for (let lx = 0; lx < n; lx++) if (inArrow(lx, ly)) on[ly * n + lx] = 1;
-    const cells = new Uint32Array(n * n), dark = aimRgba('#1a0c06'), lit = aimRgba(pal[3]);
-    for (let ly = 0; ly < n; ly++) for (let lx = 0; lx < n; lx++) {
-      if (on[ly * n + lx]) { cells[ly * n + lx] = lit; continue; }
-      let near = false;
-      for (let yy = -1; yy <= 1 && !near; yy++) for (let xx = -1; xx <= 1; xx++) {
-        const X = lx + xx, Y = ly + yy;
-        if (X >= 0 && Y >= 0 && X < n && Y < n && on[Y * n + X]) { near = true; break; }
-      }
-      if (near) cells[ly * n + lx] = dark;
-    }
-    ar = { c: aimPaint(n, cells), L };
-    AIM_ARROWS.set(ak, ar);
-  }
-  ctx.drawImage(ar.c, (ox - ar.L) * BLK, (oy - ar.L) * BLK);
-  if (a.k === 'i') ring(a.tx, a.ty, pal[0], 0);
+  // the funnel's drawn direction in AIM_DIRS steps (the hit test keeps a.base as it is): the bot faces any way at all
+  const side = f.bot ? 'B' : 'P', ox = Math.round(f.x / BLK), oy = Math.round((f.y - 24) / BLK), R = (AIM_N - 1) / 2;
+  const sk = aimMod(Math.round(a.base / (Math.PI * 2 / AIM_DIRS)), AIM_DIRS);
+  ctx.drawImage(aimFunnel(side, (ox + oy) & 1, sk), (ox - R) * BLK, (oy - R) * BLK);
+  const st = aimMod(Math.round(a.ang / (Math.PI * 2 / ARROW_DIRS)), ARROW_DIRS);
+  ctx.drawImage(aimArrow(side, st), (ox - ARROW_L) * BLK, (oy - ARROW_L) * BLK);
+  if (a.k === 'i') ring(a.tx, a.ty, AIM_PAL[side][0], 0);
 }
 function drawAim0(f) {'''
 OUTLINED = r'''function drawOutlined(cell, x, y, flip, k) { const key = Math.round(k * 512), m = cell.__ol || (cell.__ol = new Map()); let o = m.get(key); if (!o) { if (m.size >= 4) return drawOutlined0(cell, x, y, flip, k); const b = black(cell), w = cell.w * k, h = cell.h * k, P = OUTLINE_PX + 1, c = document.createElement('canvas'); c.width = Math.ceil(w) + 2 * P; c.height = Math.ceil(h) + 2 * P; const g = c.getContext('2d'); for (const [dx, dy] of [[-1, 0], [1, 0], [0, -1], [0, 1], [-0.7, -0.7], [0.7, -0.7], [-0.7, 0.7], [0.7, 0.7]]) g.drawImage(b.c, P + Math.round(dx * OUTLINE_PX), P + Math.round(dy * OUTLINE_PX), w, h); g.drawImage(cell.c, P, P, w, h); o = { c, x: Math.round(-w / 2) - P, y: Math.round(-h) - P }; m.set(key, o); } ctx.save(); ctx.globalAlpha = 1; ctx.translate(Math.round(x), Math.round(y)); if (flip) ctx.scale(-1, 1); ctx.drawImage(o.c, o.x, o.y); ctx.restore(); }
@@ -314,6 +488,85 @@ def copy_dojo():
     if os.path.exists(yard):
         Image.open(yard).convert('RGB').resize((640, 480), Image.LANCZOS).save(
             os.path.join(PAGE, 'img', 'vd', 'ne', 'nen_san-da.png'), optimize=True)
+
+
+# the story's portraits (game/src/hoi-thoai.js): assets/source/npc/NPC_<name>.png, 4x2 faces on magenta, in this order
+NPC_FACES = {'gia-quy': ['cuoi', 'ke-chuyen', 'gio-gay', 'ngac-nhien', 'lo-lang', 'chi-xa', 'gat-dau', 'buon']}
+NPC_BOX = (220, 236)                 # px, the most a portrait takes (a smaller one loses the drawing's 1-2 px detail)
+
+
+def cut_npc():
+    """Each NPC sheet cut into img/npc/<name>_<n>-<face>.png: magenta (and its fringe) made clear, trimmed, every face
+    of a sheet brought down by the same factor so the bust keeps its size from face to face. Number of faces cut."""
+    import numpy as np
+    from PIL import Image
+    os.makedirs(os.path.join(PAGE, 'img', 'npc'), exist_ok=True)
+    n = 0
+    for name, faces in NPC_FACES.items():
+        path = os.path.join(ROOT, 'assets', 'source', 'npc', f'NPC_{name}.png')
+        if not os.path.exists(path):
+            continue
+        im = np.array(Image.open(path).convert('RGBA'))
+        h, w = im.shape[:2]
+        cells = []
+        for i in range(len(faces)):
+            r, c = divmod(i, 4)
+            cell = im[r * h // 2:(r + 1) * h // 2, c * w // 4:(c + 1) * w // 4].copy()
+            px = cell[..., :3].astype(int)
+            key = (px[..., 0] > 150) & (px[..., 1] < 110) & (px[..., 2] > 150)
+            # the fringe a soft-edged drawing leaves: pinkish pixels touching the cleared background
+            near = np.zeros_like(key)
+            near[1:] |= key[:-1]; near[:-1] |= key[1:]; near[:, 1:] |= key[:, :-1]; near[:, :-1] |= key[:, 1:]
+            key |= near & (px[..., 0] > 110) & (px[..., 2] > 110) & (px[..., 1] < (px[..., 0] + px[..., 2]) / 2 - 40)
+            cell[key, 3] = 0
+            ys, xs = np.nonzero(cell[..., 3])
+            cells.append(cell[ys.min():ys.max() + 1, xs.min():xs.max() + 1] if len(xs) else cell[:1, :1])
+        k = min(1.0, min(NPC_BOX[0] / max(c.shape[1] for c in cells), NPC_BOX[1] / max(c.shape[0] for c in cells)))
+        for i, (face, cell) in enumerate(zip(faces, cells)):
+            p = Image.fromarray(cell)
+            p = p.resize((max(1, round(p.width * k)), max(1, round(p.height * k))), Image.LANCZOS)
+            p.save(os.path.join(PAGE, 'img', 'npc', f'{name}_{i + 1}-{face}.png'), optimize=True)
+            n += 1
+    return n
+
+
+# the films' pictures (game/src/phim.js): assets/source/phim/*.png, 16:9, brought down to FILM_PX (the film shows them
+# 640x360 between its black bars; the extra room is for its slow camera)
+FILM_PX = (800, 450)
+# backdrops that are not film shots: the part of the drawing kept, and the screen size it is brought to
+FILM_CROP = {'NEN_no-trung': ((159, 0, 1289, 848), (640, 480))}
+
+
+def film_pictures():
+    """assets/source/phim/<name>.png -> img/phim/<name>.png at FILM_PX. Number of pictures."""
+    from PIL import Image
+    os.makedirs(os.path.join(PAGE, 'img', 'phim'), exist_ok=True)
+    n = 0
+    for path in sorted(glob.glob(os.path.join(ROOT, 'assets', 'source', 'phim', '*.png'))):
+        box, size = FILM_CROP.get(os.path.splitext(os.path.basename(path))[0], (None, FILM_PX))
+        Image.open(path).convert('RGB').crop(box).resize(size, Image.LANCZOS).save(
+            os.path.join(PAGE, 'img', 'phim', os.path.basename(path)), optimize=True)
+        n += 1
+    return n
+
+
+def voices():
+    """The story's spoken lines (scripts/make_giong.py: assets/am-thanh/giong) -> sfx/giong/, and js/giong.js with their
+    lengths. Number of lines."""
+    src = os.path.join(ROOT, 'assets', 'am-thanh', 'giong')
+    ledger = os.path.join(src, '_giong.json')
+    lens = {}
+    if os.path.exists(ledger):
+        os.makedirs(os.path.join(PAGE, 'sfx', 'giong'), exist_ok=True)
+        for key, v in json.load(open(ledger, encoding='utf-8')).items():
+            wav = os.path.join(src, key + '.wav')
+            if os.path.exists(wav):
+                shutil.copy(wav, os.path.join(PAGE, 'sfx', 'giong'))
+                lens[key] = v['ms']
+    code = open(os.path.join(HERE, 'src', 'giong.js'), encoding='utf-8').read()
+    open(os.path.join(PAGE, 'js', 'giong.js'), 'w', encoding='utf-8', newline='\n').write(
+        code.replace('__GIONG__', json.dumps(lens, separators=(',', ':'))))
+    return len(lens)
 
 
 def stats_pieces():
@@ -427,26 +680,40 @@ def main():
     how = build_page()
     os.makedirs(os.path.join(PAGE, 'js'), exist_ok=True)
     shutil.copy(os.path.join(HERE, 'src', 'song-that.js'), os.path.join(PAGE, 'js'))
+    shutil.copy(os.path.join(HERE, 'src', 'chi-so.js'), os.path.join(PAGE, 'js'))     # the numbers (THIET-KE.md mục 6)
     shutil.copy(os.path.join(HERE, 'src', 'nut-thu.js'), os.path.join(PAGE, 'js'))       # test buttons (browser)
     shutil.copy(os.path.join(HERE, 'src', 'di-bo.js'), os.path.join(PAGE, 'js'))
     shutil.copy(os.path.join(HERE, 'src', 've-nhanh.js'), os.path.join(PAGE, 'js'))
+    for name in ('tai-dan.js', 'tai-man.js', 'truyen.js', 'phim.js', 'hoi-thoai.js', 'dat-ten.js', 'loi-noi.js', 'man-chao.js'):     # truyen.js: the story's words
+        shutil.copy(os.path.join(HERE, 'src', name), os.path.join(PAGE, 'js'))
     shutil.copy(os.path.join(HERE, 'src', 'vo-duong.js'), os.path.join(PAGE, 'js'))
     shutil.copy(os.path.join(HERE, 'src', 'solo.js'), os.path.join(PAGE, 'js'))
     copy_dojo()
+    cut_npc()
+    film_pictures()
     solo = solo_arena()
     shutil.copy(os.path.join(ROOT, 'r36s', 'js', 'am-thanh.js'), os.path.join(PAGE, 'js'))
     sparks = cut_sparks()
+    bg = evo_background()
+    src = open(os.path.join(HERE, 'src', 'cay-dau-truong.js'), encoding='utf-8').read()
+    open(os.path.join(PAGE, 'js', 'cay-dau-truong.js'), 'w', encoding='utf-8', newline='\n').write(
+        src.replace('__CAY__', json.dumps(cay_tree())))
+    title_without_buttons()
     src = open(os.path.join(HERE, 'src', 'set-huyen-thoai.js'), encoding='utf-8').read()
     open(os.path.join(PAGE, 'js', 'set-huyen-thoai.js'), 'w', encoding='utf-8', newline='\n').write(
         src.replace('__TIA_N__', str(sparks)))
-    import json
     src = open(os.path.join(HERE, 'src', 'nen-chi-so.js'), encoding='utf-8').read()
     open(os.path.join(PAGE, 'js', 'nen-chi-so.js'), 'w', encoding='utf-8', newline='\n').write(
         src.replace('__NEN_CHI_SO__', json.dumps(stats_pieces())))
+    import vung_dat                      # Vùng đất: the region maps and the pets' map pictures (scripts/vung_dat.py)
+    src = open(os.path.join(HERE, 'src', 'vung-dat.js'), encoding='utf-8').read()
+    open(os.path.join(PAGE, 'js', 'vung-dat.js'), 'w', encoding='utf-8', newline='\n').write(
+        src.replace('__VUNG_DAT__', json.dumps(vung_dat.build(PAGE), ensure_ascii=False, separators=(',', ':'))))
     for kind in ('sfx', 'nhac'):
         os.makedirs(os.path.join(PAGE, kind), exist_ok=True)
         for p in glob.glob(os.path.join(ROOT, 'assets', 'am-thanh', kind, '*.wav')):
             shutil.copy(p, os.path.join(PAGE, kind))
+    voices()
     path = os.path.join(PAGE, 'index.html')
     html = open(path, encoding='utf-8').read()
     skipped = []
@@ -458,11 +725,14 @@ def main():
     # a build stamp on the layers, so a browser never runs an old copy from its cache (the R36S packer drops it)
     i, stamp = html.rindex('</body>'), int(time.time())
     html = html[:i] + ADD.replace('.js"', f'.js?v={stamp}"').replace('__SND_V__', str(stamp)) + html[i:]
+    # before the demo's own script: its pictures are then loaded screen by screen (game/src/tai-dan.js)
+    j = html.index('<script>')
+    html = html[:j] + f'<script src="js/tai-dan.js?v={stamp}"></script>\n' + html[j:]
     open(path, 'w', encoding='utf-8', newline='\n').write(html)
     # the demo page this build was made from (check_minimon.py compares it with the demo now)
     shutil.copy(os.path.join(ROOT, 'scripts', 'evo_app.html'), os.path.join(HERE, 'minimon-base.html'))
     size = sum(os.path.getsize(os.path.join(dp, f)) for dp, _, fs in os.walk(PAGE) for f in fs)
-    print(f'{PAGE}: {how}, {size / 2 ** 20:.1f} MB (khung hình pet đọc qua build/game/pets), {sparks} tia sét, đấu trường {solo} pet')
+    print(f'{PAGE}: {how}, {size / 2 ** 20:.1f} MB (khung hình pet đọc qua build/game/pets), {sparks} tia sét, nền tiến hóa {'mới (TH1_nen)' if bg else 'cũ (EVO1_nen)'}, đấu trường {solo} pet')
     for s in skipped:
         print(f'  bỏ qua sửa chữ (demo không còn dòng này): {s}')
 

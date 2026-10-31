@@ -32,9 +32,15 @@ def roster():
 def sheets():
     """(path as the arena asks for it, cols, rows) of every sheet a match can load."""
     out = [(f'img/nhi/{n}.png', c, r) for n, c, r in BODY] + [(f'img/{n}.png', c, r) for n, c, r in FX]
-    for d in roster():
+    for d in dict.fromkeys(roster() + ['hu-anh']):  # and Hư Ảnh, the last boss (scripts/hu_anh.py), listed or not
         out += [(f'img/{d}/{n}.png', c, r) for n, c, r in BODY + FX + EXTRA]
         out += [(f'img/{d}/{n}_lv2.png', c, r) for n, c, r in FX if n != 'cutin']
+        out += [(f'img/{d}/{n}_mid_lv2.png', c, r) for n, c, r in FX if n != 'cutin']   # their in-between frames
+        out += [(f'img/{d}/{n}_lv5.png', c, r) for n, c, r in FX if n != 'cutin']   # Huyền thoại's (chep_lv5.py)
+        out += [(f'img/{d}/{n}{m}_lv2.png', c, r) for n, c, r in EXTRA for m in ('', '_mid')]
+        for st in ('teen', 'adult', 'legend'):    # Lv3, Lv4, Lv5 bodies (the player's, and Vùng đất's foes of those levels)
+            out += [(f'img/{d}/{st}/{n}.png', c, r) for n, c, r in BODY + [('cutin', 1, 1)]]
+            out += [(f'img/{d}/{st}/{n}_chay8.png', 4, 2) for n, c, r in BODY if n != 'chung']   # drawn run cycles (ghep_chay8.py)
     return [s for s in out if os.path.exists(os.path.join(ARENA, s[0]))]
 
 
