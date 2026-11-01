@@ -1,0 +1,492 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Elemon · game nuôi pet Ngũ Hành cho TrimUI Brick</title>
+<meta name="description" content="Ấp trứng Ngũ Hành, nuôi tinh linh tới Huyền thoại, đánh trùm năm vùng đất. Game nuôi pet miễn phí cho TrimUI Brick.">
+<meta property="og:title" content="Elemon">
+<meta property="og:description" content="Ấp trứng Ngũ Hành, nuôi tinh linh tới Huyền thoại, đánh trùm năm vùng đất. Game nuôi pet miễn phí cho TrimUI Brick.">
+<meta property="og:image" content="https://kipoikibo995-sys.github.io/elemon/img/title.jpg">
+<meta property="og:url" content="https://kipoikibo995-sys.github.io/elemon/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" href="img/icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Be+Vietnam+Pro:wght@400;500;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: a night sky like the game's evolution screen; a handheld frame holds the hero shot, then bands that walk
+   through a day of the game (care, stats, growing up, activities, the regions, the arena), each with real screens.
+   One look on purpose (the game's own night). */
+:root {
+  color-scheme: dark;
+  --sky: #131531;          /* page */
+  --sky-2: #1c1f45;        /* raised */
+  --ink: #f4ecdc;          /* text */
+  --mist: #b6b3cf;         /* secondary text */
+  --line: #34386a;         /* hairlines */
+  --gold: #ffc85a;         /* the one accent: the game's gold frames */
+  --gold-ink: #2a1a05;
+  --hoa: #ff7a3d; --kim: #e3e7ef; --moc: #7fd36b; --thuy: #5cb8ff; --tho: #d9a55a;
+  --no: #f0a040; --vui: #f070b0; --sach: #5cb8ff; --nl: #8ce16e; --sk: #ff5a5a;
+  --display: "Baloo 2", "Trebuchet MS", system-ui, sans-serif;
+  --body: "Be Vietnam Pro", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+* { box-sizing: border-box }
+body {
+  background: var(--sky); color: var(--ink); font: 400 16px/1.65 var(--body);
+  background-image: radial-gradient(1px 1px at 12% 18%, #fff8 50%, transparent 51%),
+    radial-gradient(1px 1px at 72% 9%, #fff6 50%, transparent 51%), radial-gradient(1.5px 1.5px at 88% 34%, #fff7 50%, transparent 51%),
+    radial-gradient(1px 1px at 33% 41%, #fff5 50%, transparent 51%), radial-gradient(1px 1px at 55% 26%, #fff6 50%, transparent 51%);
+  background-attachment: fixed;
+}
+.wrap { max-width: 1100px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)) }
+h1, h2, h3 { font-family: var(--display); line-height: 1.1; margin: 0; text-wrap: balance }
+h2 { font-size: clamp(1.9rem, 4.2vw, 2.7rem); font-weight: 800 }
+h3 { font-size: 1.2rem; font-weight: 800 }
+p { margin: 0; max-width: 64ch }
+a { color: var(--gold) }
+a:focus-visible, .btn:focus-visible { outline: 3px solid var(--thuy); outline-offset: 3px }
+code { font: 500 .9em var(--mono); background: #0004; padding: 1px 6px; border-radius: 5px; color: var(--ink) }
+.eyebrow { font: 500 .8rem/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--mist) }
+img.shot { display: block; width: 100%; height: auto; max-width: 100%; aspect-ratio: 4 / 3; border-radius: 6px; border: 2px solid var(--line); background: #000 }
+figure { margin: 0; min-width: 0 }
+figcaption { font: 500 .78rem/1.4 var(--mono); color: var(--mist); margin-top: 8px }
+
+/* hero */
+.hero { padding-block: 56px 40px; display: grid; grid-template-columns: 1fr 1.15fr; gap: 48px; align-items: center }
+.logo { font-size: clamp(3.6rem, 9vw, 6.2rem); font-weight: 800; letter-spacing: -.01em }
+.logo span:nth-child(1) { color: var(--hoa) } .logo span:nth-child(2) { color: var(--kim) } .logo span:nth-child(3) { color: var(--moc) }
+.logo span:nth-child(4) { color: var(--thuy) } .logo span:nth-child(5) { color: var(--tho) }
+.lede { font-size: 1.2rem; margin-top: 14px }
+.sub { color: var(--mist); margin-top: 10px }
+.cta { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-top: 28px }
+.btn { display: inline-flex; align-items: center; gap: 10px; padding: 14px 22px; border-radius: 999px; font: 800 1.05rem/1 var(--display);
+  text-decoration: none; background: var(--gold); color: var(--gold-ink); border: 3px solid #fff3; box-shadow: 0 4px 0 #b07a1c; transition: transform .12s }
+.btn:hover { transform: translateY(-2px) }
+.btn.ghost { background: transparent; color: var(--ink); border-color: var(--line); box-shadow: none }
+.meta { font: 500 .82rem/1.5 var(--mono); color: var(--mist) }
+.brick { background: linear-gradient(160deg, #3a3d4a, #22242c); border-radius: 26px 26px 38px 38px; padding: 22px 22px 30px; box-shadow: 0 30px 60px #0008, inset 0 2px 0 #fff2 }
+.brick .screen { border-radius: 8px; overflow: hidden; border: 6px solid #0b0b10 }
+.brick .screen img { display: block; width: 100%; height: auto }
+.brick .pad { display: flex; justify-content: space-between; align-items: center; margin-top: 18px; padding-inline: 10px }
+.dpad { width: 62px; height: 62px; position: relative }
+.dpad::before, .dpad::after { content: ""; position: absolute; background: #111; border-radius: 4px }
+.dpad::before { left: 21px; top: 0; width: 20px; height: 62px } .dpad::after { top: 21px; left: 0; height: 20px; width: 62px }
+.abxy { display: grid; grid-template-columns: repeat(3, 20px); grid-template-rows: repeat(3, 20px) }
+.abxy i { width: 20px; height: 20px; border-radius: 50%; background: #111 }
+.abxy i:nth-child(1) { grid-area: 1 / 2 } .abxy i:nth-child(2) { grid-area: 2 / 1 } .abxy i:nth-child(3) { grid-area: 2 / 3 } .abxy i:nth-child(4) { grid-area: 3 / 2 }
+
+/* table of contents */
+.toc { display: flex; flex-wrap: wrap; gap: 8px; padding-block: 0 8px }
+.toc a { text-decoration: none; color: var(--ink); background: var(--sky-2); border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px; font-weight: 700; font-size: .92rem }
+.toc a:hover { border-color: var(--gold) }
+
+/* bands */
+section.band { padding-block: 64px; border-top: 1px solid var(--line); scroll-margin-top: 12px }
+.head { display: grid; gap: 14px; margin-bottom: 28px }
+.head p { color: var(--mist) }
+.head p strong { color: var(--ink) }
+.split { display: grid; grid-template-columns: 1fr 1fr; gap: 44px; align-items: center }
+.text { display: grid; gap: 16px; min-width: 0 }
+.text p { color: var(--mist) }
+.text p strong { color: var(--ink) }
+.g2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px }
+.g3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px }
+.g4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px }
+
+/* chips */
+.chips { display: flex; flex-wrap: wrap; gap: 10px }
+.chip { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px 6px 8px; border-radius: 999px; border: 1px solid var(--line); background: var(--sky-2); font-weight: 700 }
+.chip b { width: 14px; height: 14px; border-radius: 50%; background: var(--c) }
+
+/* survival bars, as the game draws them */
+.bars { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none }
+.bars li { display: grid; grid-template-columns: 7.5rem 1fr; gap: 6px 14px; align-items: center; min-width: 0 }
+.bars .name { font-weight: 700 }
+.bars .meter { height: 12px; border-radius: 999px; background: #0006; border: 1px solid var(--line); overflow: hidden }
+.bars .meter i { display: block; height: 100%; width: var(--w); background: var(--c) }
+.bars .how { grid-column: 2; color: var(--mist); font-size: .9rem; margin-top: -4px }
+
+/* tables of real numbers */
+.tbl { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px }
+table { border-collapse: collapse; width: 100%; min-width: 460px; font-size: .92rem }
+th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top }
+th { font: 500 .72rem/1.3 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--mist); background: var(--sky-2) }
+tr:last-child td { border-bottom: 0 }
+td.he { font-weight: 700; color: var(--c); white-space: nowrap }
+
+/* growth stages: a real order */
+.stages { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 8px; counter-reset: s }
+.stages li { counter-increment: s; padding: 8px 14px; border-radius: 10px; background: var(--sky-2); border: 1px solid var(--line); font-weight: 700 }
+.stages li::before { content: counter(s); font: 500 .75rem var(--mono); color: var(--gold); margin-right: 8px }
+.stages li:last-child { border-color: var(--gold); color: var(--gold) }
+
+/* speech */
+.talk figure { display: grid; gap: 12px }
+.bubble { position: relative; justify-self: start; background: #fffaf0; color: #2b2116; padding: 10px 16px; border-radius: 12px; font-weight: 700; max-width: 100% }
+.bubble::after { content: ""; position: absolute; left: 22px; bottom: -9px; border: 9px solid transparent; border-bottom: 0; border-top-color: #fffaf0 }
+.bubble.rude { color: #c0261a }
+
+/* activity cards */
+.acts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px }
+.act { background: var(--sky-2); border: 1px solid var(--line); border-radius: 14px; padding: 12px 12px 18px; display: grid; gap: 12px; align-content: start; min-width: 0 }
+.act h3 { padding-inline: 4px }
+.act p { color: var(--mist); font-size: .94rem; padding-inline: 4px }
+
+/* the update band */
+.ota { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; list-style: none; padding: 0; margin: 0; counter-reset: o }
+.ota li { counter-increment: o; background: var(--sky-2); border: 1px solid var(--line); border-radius: 14px; padding: 20px; display: grid; gap: 8px; align-content: start }
+.ota li::before { content: "A"; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: #c0392b; color: #fff; font: 800 1rem var(--display) }
+.ota li p { color: var(--mist) }
+
+/* install */
+.steps { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; counter-reset: st }
+.steps li { counter-increment: st; background: var(--sky-2); border: 1px solid var(--line); border-radius: 14px; padding: 20px; display: grid; gap: 8px; align-content: start }
+.steps li::before { content: counter(st); font: 800 1.6rem/1 var(--display); color: var(--gold) }
+.facts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; margin-top: 24px }
+.facts div { background: var(--sky-2); padding: 18px; display: grid; gap: 4px; min-width: 0 }
+.facts dt { font: 500 .72rem/1.3 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--mist) }
+.facts dd { margin: 0; font-weight: 700; font-variant-numeric: tabular-nums; overflow-wrap: anywhere }
+.final { text-align: center; display: grid; justify-items: center; gap: 16px }
+.final p { color: var(--mist) }
+footer { border-top: 1px solid var(--line); padding-block: 28px 40px; color: var(--mist); font-size: .9rem }
+footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: space-between }
+
+
+/* the game's own sprites: a strip of 4 idle frames, played in place */
+.spr { display: block; width: min(100%, calc(var(--w) * 1px)); aspect-ratio: var(--w) / var(--h); overflow: hidden }
+.spr img { display: block; width: 400%; height: 100%; max-width: none; animation: idle .9s steps(4) infinite; animation-delay: var(--d, 0s) }
+@keyframes idle { to { transform: translateX(-100%) } }
+.logo img { display: block; width: 100%; max-width: 440px; height: auto; margin-left: -6px }
+.eggs { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; align-items: end }
+.eggs li { display: grid; justify-items: center; gap: 8px; font-weight: 700; color: var(--c) }
+.eggs .spr { width: min(100%, calc(var(--w) * .9px)) }
+.evo { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; align-items: end }
+.evo .spr { width: 100% } .evo li:nth-child(1) .spr { width: 52% } .evo li:nth-child(2) .spr { width: 67% } .evo li:nth-child(3) .spr { width: 80% }
+.evo li { display: grid; justify-items: center; gap: 8px; min-width: 0; text-align: center; font-weight: 700; font-size: .88rem; line-height: 1.2 }
+.evo li:last-child { color: var(--gold) }
+.evo li span.n { font: 500 .7rem var(--mono); color: var(--gold) }
+.roster { margin-top: 44px; display: grid; gap: 22px }
+.roster h3 { color: var(--c); display: flex; align-items: baseline; gap: 10px }
+.roster h3 small { font: 500 .75rem var(--mono); color: var(--mist) }
+.pets { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 10px }
+.pets li { background: var(--sky-2); border: 1px solid var(--line); border-bottom: 3px solid var(--c); border-radius: 12px; padding: 10px 6px 8px; display: grid; justify-items: center; align-content: end; gap: 6px; min-width: 0; text-align: center; font-weight: 700; font-size: .82rem; line-height: 1.2 }
+.pets .spr { width: 100%; max-width: 120px }
+.lineup { display: flex; justify-content: center; align-items: end; gap: 4px; flex-wrap: wrap; margin-bottom: 8px }
+.lineup .spr { width: min(18%, calc(var(--w) * .8px)) }
+
+@media (max-width: 900px) {
+  .acts, .g4 { grid-template-columns: repeat(2, 1fr) }
+  .ota, .steps { grid-template-columns: 1fr }
+}
+@media (max-width: 820px) {
+  .hero, .split { grid-template-columns: 1fr; gap: 28px }
+  .g3 { grid-template-columns: repeat(2, 1fr) }
+  .facts { grid-template-columns: repeat(2, 1fr) }
+}
+@media (max-width: 480px) {
+  .g2, .g3, .g4, .acts { grid-template-columns: 1fr }
+  .brick { padding: 14px 14px 20px; border-radius: 18px 18px 26px 26px }
+  .bars li { grid-template-columns: 6rem 1fr }
+}
+@media (prefers-reduced-motion: reduce) { .btn { transition: none } .btn:hover { transform: none } }
+
+@media (max-width: 900px) { .pets { grid-template-columns: repeat(4, 1fr) } }
+@media (max-width: 480px) { .pets { grid-template-columns: repeat(3, 1fr) } .lineup .spr { width: 18% } }
+@media (prefers-reduced-motion: reduce) { .spr img { animation: none } }
+</style>
+</head>
+<body>
+
+<header class="wrap hero">
+  <div>
+    <p class="eyebrow">Game nuôi pet · máy cầm tay</p>
+    <h1 class="logo"><img src="img/game/logo.webp" alt="Elemon" width="760" height="268"></h1>
+    <p class="lede">Ấp một quả trứng Ngũ Hành, chăm tinh linh của bạn từng bữa ăn giấc ngủ, nuôi nó từ lúc lọt lòng tới Huyền thoại, rồi dẫn nó đi đánh trùm khắp năm vùng đất.</p>
+    <p class="sub">Viết riêng cho TrimUI Brick. Chơi bằng D-pad, không cần mạng, miễn phí, cập nhật ngay trên máy.</p>
+    <div class="cta">
+      <a class="btn" href="https://retrohub.info/store/app/elemon">Tải trên RetroHub</a>
+      <a class="btn ghost" href="#cai-dat">Cách cài</a>
+    </div>
+    <p class="meta" style="margin-top:14px">v1.1 · 594 MB · firmware gốc của Brick / Brick Pro</p>
+  </div>
+  <div class="brick" aria-hidden="true">
+    <div class="screen"><img src="img/title.jpg" alt="" width="640" height="480"></div>
+    <div class="pad"><span class="dpad"></span><span class="abxy"><i></i><i></i><i></i><i></i></span></div>
+  </div>
+</header>
+
+<nav class="wrap toc" aria-label="Các phần">
+  <a href="#cham-soc">Chăm pet</a><a href="#chi-so">Chỉ số</a><a href="#lon-len">Tiến hóa</a><a href="#noi">Pet biết nói</a>
+  <a href="#hoat-dong">Hoạt động</a><a href="#vo-duong">Võ đường</a><a href="#vung-dat">Vùng đất</a><a href="#dau-truong">Đấu trường</a>
+  <a href="#cap-nhat">Cập nhật</a><a href="#cai-dat">Cài đặt</a>
+</nav>
+
+<main>
+  <section class="band">
+    <div class="wrap split">
+      <div class="text">
+        <p class="eyebrow">Bắt đầu</p>
+        <h2>Năm quả trứng, năm hệ</h2>
+        <p>Chọn một quả trong năm hệ, rồi chọn bé tinh linh bạn muốn nuôi. Mỗi hệ có vùng đất, món ăn, chiêu thức và những đối thủ khắc chế riêng. Khắc hệ thì đánh mạnh gấp rưỡi, bị khắc thì chỉ còn ba phần tư.</p>
+        <ol class="eggs" aria-label="Năm quả trứng">
+          <li style="--c:var(--hoa)"><span class="spr" style="--w:56;--h:89;--d:-0.37s"><img src="img/game/egg-hoa.webp" alt="Trứng Hỏa" width="224" height="89" loading="lazy"></span>Hỏa</li>
+          <li style="--c:var(--kim)"><span class="spr" style="--w:67;--h:88;--d:-0.74s"><img src="img/game/egg-kim.webp" alt="Trứng Kim" width="268" height="88" loading="lazy"></span>Kim</li>
+          <li style="--c:var(--moc)"><span class="spr" style="--w:69;--h:90;--d:-0.21s"><img src="img/game/egg-moc.webp" alt="Trứng Mộc" width="276" height="90" loading="lazy"></span>Mộc</li>
+          <li style="--c:var(--thuy)"><span class="spr" style="--w:70;--h:88;--d:-0.58s"><img src="img/game/egg-thuy.webp" alt="Trứng Thủy" width="280" height="88" loading="lazy"></span>Thủy</li>
+          <li style="--c:var(--tho)"><span class="spr" style="--w:77;--h:89;--d:-0.05s"><img src="img/game/egg-tho.webp" alt="Trứng Thổ" width="308" height="89" loading="lazy"></span>Thổ</li>
+        </ol>
+      </div>
+      <div class="g2">
+        <figure><img class="shot" src="img/eggs.jpg" alt="Màn chọn trứng: năm quả trứng Hỏa, Kim, Mộc, Thủy, Thổ" width="640" height="480" loading="lazy"><figcaption>Chọn trứng</figcaption></figure>
+        <figure><img class="shot" src="img/hatch.jpg" alt="Bé Hỏa Hổ vừa nở" width="640" height="480" loading="lazy"><figcaption>Bông đã chào đời!</figcaption></figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="cham-soc">
+    <div class="wrap">
+      <div class="head">
+        <p class="eyebrow">Chăm pet mỗi ngày</p>
+        <h2>Đói thì cho ăn, bẩn thì tắm, mệt thì tắt đèn</h2>
+        <p>Pet sống theo năm thanh trạng thái hiện trên đầu màn hình. Để thanh nào cạn lâu là nó buồn, ốm, đánh yếu đi. Chăm đều thì nó vui, khỏe và lên cấp nhanh.</p>
+      </div>
+      <div class="split">
+        <ul class="bars">
+          <li style="--c:var(--no);--w:80%"><span class="name">No</span><span class="meter"><i></i></span><span class="how">Cho ăn. Mỗi món theo hệ còn tăng Linh khí.</span></li>
+          <li style="--c:var(--vui);--w:70%"><span class="name">Vui</span><span class="meter"><i></i></span><span class="how">Chơi, vuốt ve, đi câu cá, thắng trận.</span></li>
+          <li style="--c:var(--sach);--w:55%"><span class="name">Sạch</span><span class="meter"><i></i></span><span class="how">Dọn phòng, đưa vào nhà tắm. Đi vùng đất về thường lấm bùn.</span></li>
+          <li style="--c:var(--nl);--w:65%"><span class="name">Năng lượng</span><span class="meter"><i></i></span><span class="how">Tắt đèn cho ngủ. Ngủ dậy còn được thêm EXP.</span></li>
+          <li style="--c:var(--sk);--w:90%"><span class="name">Sức khỏe</span><span class="meter"><i></i></span><span class="how">Chính là máu khi vào trận. Hồi khi ngủ, ăn món Mộc, uống thuốc.</span></li>
+        </ul>
+        <div class="g2">
+          <figure><img class="shot" src="img/phong.jpg" alt="Phòng nuôi với thanh trạng thái và thanh nút ở dưới" width="640" height="480" loading="lazy"><figcaption>Phòng nuôi</figcaption></figure>
+          <figure><img class="shot" src="img/tam.jpg" alt="Pet đang tắm trong chậu gỗ" width="640" height="480" loading="lazy"><figcaption>Nhà tắm</figcaption></figure>
+          <figure><img class="shot" src="img/ngu.jpg" alt="Phòng tắt đèn, pet cuộn tròn ngủ" width="640" height="480" loading="lazy"><figcaption>Tắt đèn đi ngủ</figcaption></figure>
+          <figure><img class="shot" src="img/om.jpg" alt="Pet bị ốm, có dấu chấm than trên đầu" width="640" height="480" loading="lazy"><figcaption>Bỏ bê là ốm</figcaption></figure>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="chi-so">
+    <div class="wrap">
+      <div class="head">
+        <p class="eyebrow">Chỉ số</p>
+        <h2>Ăn gì thì thành con nấy</h2>
+        <p>Mỗi bữa ăn theo hệ tăng <strong>Linh khí</strong> của hệ đó. Linh khí quyết định pet lớn lên mạnh về đâu: lên cấp, điểm thuộc tính chia theo Linh khí. Sáu thuộc tính còn tăng nhờ món ăn, buổi tập ở Võ đường và ngọc khảm vào.</p>
+      </div>
+      <div class="g3" style="margin-bottom:24px">
+        <figure><img class="shot" src="img/chi-so.jpg" alt="Trang Sinh tồn: No, Vui, Sạch, Năng lượng, Sức khỏe" width="640" height="480" loading="lazy"><figcaption>Sinh tồn</figcaption></figure>
+        <figure><img class="shot" src="img/linh-khi.jpg" alt="Trang Linh khí: biểu đồ năm cạnh theo năm hệ" width="640" height="480" loading="lazy"><figcaption>Linh khí 5 hệ</figcaption></figure>
+        <figure><img class="shot" src="img/thuoc-tinh.jpg" alt="Trang Thuộc tính: sáu thanh thuộc tính" width="640" height="480" loading="lazy"><figcaption>Sáu thuộc tính</figcaption></figure>
+      </div>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Hệ</th><th>Linh khí đầy 100 thì</th></tr></thead>
+          <tbody>
+            <tr><td class="he" style="--c:var(--kim)">Kim</td><td>Thủ +15, đói chậm hơn</td></tr>
+            <tr><td class="he" style="--c:var(--moc)">Mộc</td><td>Sức khỏe tự hồi 2 mỗi giờ, khó ốm hơn</td></tr>
+            <tr><td class="he" style="--c:var(--thuy)">Thủy</td><td>Vui lâu hơn, câu cá và nấu ăn dễ hơn 20%</td></tr>
+            <tr><td class="he" style="--c:var(--hoa)">Hỏa</td><td>Công +15%, nhưng đói nhanh hơn</td></tr>
+            <tr><td class="he" style="--c:var(--tho)">Thổ</td><td>Ngủ hồi năng lượng nhanh gấp rưỡi</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="meta" style="margin-top:12px">Sáu thuộc tính: Sức mạnh · Nhanh nhẹn · Bền bỉ · Thông minh · Trí tuệ · Tinh thần</p>
+    </div>
+  </section>
+
+  <section class="band" id="lon-len">
+    <div class="wrap split">
+      <div class="text">
+        <p class="eyebrow">Lớn lên</p>
+        <h2>Năm bậc tiến hóa, mỗi lần một cái tên mới</h2>
+        <p>Đủ cấp và đủ điều kiện là pet tiến hóa: thân hình đổi hẳn, mở thêm ô khảm ngọc. Sau mỗi lần tiến hóa bạn đặt lại tên bằng bàn phím có <strong>đủ dấu tiếng Việt</strong>.</p>
+        <ol class="evo" aria-label="Năm bậc của Hỏa Hổ"><li><span class="spr" style="--w:110;--h:106;--d:-0.42s"><img src="img/game/evo-baby.webp" alt="Hỏa Hổ bậc Con" width="440" height="106" loading="lazy"></span><span class="n">1</span>Con</li><li><span class="spr" style="--w:141;--h:141;--d:-0.79s"><img src="img/game/evo-child.webp" alt="Hỏa Hổ bậc Nhi" width="564" height="141" loading="lazy"></span><span class="n">2</span>Nhi</li><li><span class="spr" style="--w:159;--h:181;--d:-0.26s"><img src="img/game/evo-teen.webp" alt="Hỏa Hổ bậc Thiếu niên" width="636" height="181" loading="lazy"></span><span class="n">3</span>Thiếu niên</li><li><span class="spr" style="--w:211;--h:220;--d:-0.63s"><img src="img/game/evo-adult.webp" alt="Hỏa Hổ bậc Trưởng thành" width="844" height="220" loading="lazy"></span><span class="n">4</span>Trưởng thành</li><li><span class="spr" style="--w:211;--h:220;--d:-0.10s"><img src="img/game/evo-legend.webp" alt="Hỏa Hổ bậc Huyền thoại" width="844" height="220" loading="lazy"></span><span class="n">5</span>Huyền thoại</li></ol>
+      </div>
+      <div class="g2">
+        <figure><img class="shot" src="img/evo.jpg" alt="Màn tiến hóa: Hỏa Hổ lên bậc Nhi" width="640" height="480" loading="lazy"><figcaption>Tiến hóa!</figcaption></figure>
+        <figure><img class="shot" src="img/name.jpg" alt="Bàn phím đặt tên có dấu tiếng Việt" width="640" height="480" loading="lazy"><figcaption>Đặt tên lại</figcaption></figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="noi">
+    <div class="wrap">
+      <div class="head">
+        <p class="eyebrow">Pet biết nói</p>
+        <h2>Lúc nhỏ ngoan, lớn lên thì láo</h2>
+        <p>Pet nói theo việc bạn làm: lúc ăn, lúc tắm, lúc bị đánh thức. Càng lớn giọng càng đổi. Tới Huyền thoại thì nó xưng tao, gọi bạn là con sen.</p>
+      </div>
+      <div class="g2 talk">
+        <figure>
+          <span class="bubble">Có gì ăn không chú?</span>
+          <img class="shot" src="img/baby.jpg" alt="Hỏa Hổ bậc Con hỏi xin ăn" width="640" height="480" loading="lazy">
+          <figcaption>Bậc Con</figcaption>
+        </figure>
+        <figure>
+          <span class="bubble rude">Thiên hạ này là của tao.</span>
+          <img class="shot" src="img/legend.jpg" alt="Hỏa Hổ Huyền thoại nói giọng ngạo mạn" width="640" height="480" loading="lazy">
+          <figcaption>Bậc Huyền thoại</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="hoat-dong">
+    <div class="wrap">
+      <div class="head">
+        <p class="eyebrow">Hoạt động</p>
+        <h2>Câu cá, trồng rau, nấu ăn, đi học</h2>
+        <p>Rảnh tay thì dẫn pet đi làm việc. Cá câu được và rau trồng ra vào bếp thành món có <strong>1 tới 3 sao</strong>, ăn vào được thêm sức cho chuyến đi hay trận đấu kế tiếp.</p>
+      </div>
+      <div class="acts">
+        <article class="act">
+          <img class="shot" src="img/cau-ca.jpg" alt="Pet ngồi câu cá trên bến gỗ cạnh thác nước" width="640" height="480" loading="lazy">
+          <h3>Câu cá</h3>
+          <p>A quăng câu, phao chìm thì giật, rồi giữ A cho thanh xanh bám theo con cá. Bốn hạng: cá con, cá vừa, cá quý, cá thần. Cần câu và mồi tốt kéo được cá hiếm hơn.</p>
+        </article>
+        <article class="act">
+          <img class="shot" src="img/farm.jpg" alt="Nông trại với các ô đất" width="640" height="480" loading="lazy">
+          <h3>Nông trại</h3>
+          <p>Gieo hạt theo hệ, chờ lớn rồi thu hoạch. Mua đất mở thêm ô, ô sau đắt hơn ô trước.</p>
+        </article>
+        <article class="act">
+          <img class="shot" src="img/nau-an.jpg" alt="Bếp với các món và nguyên liệu cần" width="640" height="480" loading="lazy">
+          <h3>Nấu ăn</h3>
+          <p>Chọn món, gom đủ nguyên liệu, khuấy cho khéo. Món Mộc hồi Sức khỏe ngay; món hệ khác cho thêm Sức mạnh, Nhanh nhẹn, Bền bỉ hay Thủ cho trận tới.</p>
+        </article>
+        <article class="act">
+          <img class="shot" src="img/truong-hoc.jpg" alt="Trường học với ba môn Toán, Tiếng Anh, Học Hệ" width="640" height="480" loading="lazy">
+          <h3>Trường học</h3>
+          <p>Học với cô Rắn ba môn: Toán, Tiếng Anh và Học Hệ.</p>
+        </article>
+        <article class="act">
+          <img class="shot" src="img/shop.jpg" alt="Cửa hàng bán đồ ăn" width="640" height="480" loading="lazy">
+          <h3>Cửa hàng</h3>
+          <p>Mua đồ ăn, hạt giống, đồ câu. Bán bớt cá và nông sản lấy vàng.</p>
+        </article>
+        <article class="act">
+          <img class="shot" src="img/pets.jpg" alt="Danh sách pet đang nuôi" width="640" height="480" loading="lazy">
+          <h3>Nuôi thêm pet</h3>
+          <p>Lưu được tới 6 pet, mỗi con một bản lưu riêng. Chọn con nào thì chơi tiếp con đó.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="vo-duong">
+    <div class="wrap split">
+      <div class="text">
+        <p class="eyebrow">Võ đường</p>
+        <h2>Tập cho khỏe trước khi ra trận</h2>
+        <p>Đấm theo nhịp để tăng Sức mạnh, đấu Solo với bot để tăng Tinh thần. Mỗi bài tính điểm một buổi mỗi ngày, nên tập đều quan trọng hơn tập dồn. Đánh nhau tốn sức thật: mất Năng lượng, No, Sạch, và máu mất đi trừ vào Sức khỏe.</p>
+      </div>
+      <figure><img class="shot" src="img/vo-duong.jpg" alt="Võ đường với hai thẻ Tập luyện và Solo đối kháng" width="640" height="480" loading="lazy"><figcaption>Tập luyện · Solo đối kháng</figcaption></figure>
+    </div>
+  </section>
+
+  <section class="band" id="vung-dat">
+    <div class="wrap">
+      <div class="head">
+        <p class="eyebrow">Vùng đất</p>
+        <h2>Mở từng vùng, hạ từng trùm</h2>
+        <p>Ra bản đồ, chọn vùng. Mỗi vùng có nhiều khu, càng vào sâu quái càng mạnh. Gặp mini boss là vào trận đối kháng thật: tự di chuyển, tự ra chiêu, lũ lâu la xông vào. Thắng mini boss thì pet đó được mở ở Đấu trường. Hạ trùm cuối vùng để giải cứu Thần thú và lấy <strong>Ngọc Hồn</strong>. Đủ năm viên thì Đài Ngũ Hành mở, nơi trùm cuối Hư Ảnh đang chờ.</p>
+      </div>
+      <div class="g3">
+        <figure><img class="shot" src="img/map.jpg" alt="Bản đồ năm vùng đất" width="640" height="480" loading="lazy"><figcaption>Bản đồ năm vùng</figcaption></figure>
+        <figure><img class="shot" src="img/cong-vung-dat.jpg" alt="Cổng Vùng Hỏa: các khu, Thần thú và phần thưởng" width="640" height="480" loading="lazy"><figcaption>Cổng vùng: khu, Thần thú, phần thưởng</figcaption></figure>
+        <figure><img class="shot" src="img/region.jpg" alt="Đi trong Vùng Hỏa giữa đá và nham thạch" width="640" height="480" loading="lazy"><figcaption>Vùng Hỏa · khu 1</figcaption></figure>
+        <figure><img class="shot" src="img/mini-boss.jpg" alt="Mini boss lao tới với dòng cảnh báo" width="640" height="480" loading="lazy"><figcaption>Mini boss lao tới!</figcaption></figure>
+        <figure><img class="shot" src="img/vs.jpg" alt="Màn VS trước trận đấu" width="640" height="480" loading="lazy"><figcaption>Vào trận</figcaption></figure>
+        <figure><img class="shot" src="img/lava.jpg" alt="Trận đấu trên sân dung nham" width="640" height="480" loading="lazy"><figcaption>Sân dung nham</figcaption></figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="dau-truong">
+    <div class="wrap split">
+      <div class="text">
+        <p class="eyebrow">Đấu trường</p>
+        <h2>Cây Ngũ Hành: thắng con nào, mở con đó</h2>
+        <p>Mỗi hệ là một cây, mỗi nhánh là một loài, mỗi nút là một bậc. Thắng một mini boss ở Vùng đất thì nút đó sáng lên và bạn đấu lại được nó bất cứ lúc nào, đối thủ mang đúng thân của bậc đó. Thắng bậc Trưởng thành ở đây sẽ mở luôn bậc Huyền thoại.</p>
+        <p class="meta">5 cây · 30 loài · 121 nút</p>
+      </div>
+      <div class="g2">
+        <figure><img class="shot" src="img/tree.jpg" alt="Cây Kim trong Đấu trường với các nút pet" width="640" height="480" loading="lazy"><figcaption>Cây Kim</figcaption></figure>
+        <figure><img class="shot" src="img/arena.jpg" alt="Hỏa Hổ đấu Kim Tê Trưởng thành trên sân băng" width="640" height="480" loading="lazy"><figcaption>Hỏa Hổ đấu Kim Tê</figcaption></figure>
+      </div>
+    </div>
+
+    <div class="wrap roster">
+      <div class="head" style="margin-bottom:0"><p class="eyebrow">Tinh linh</p><h2>Đủ năm hệ, loài nào cũng lên được Huyền thoại</h2><p>Đây là dáng Huyền thoại của từng loài, đúng hình trong game. Gặp chúng ở Vùng đất, thắng rồi đấu lại ở Đấu trường.</p></div>
+      <div style="--c:var(--hoa)"><h3>Hỏa <small>6 loài</small></h3>
+        <ul class="pets" style="margin-top:12px"><li><span class="spr" style="--w:211;--h:220;--d:-0.47s"><img src="img/game/pet-hoa-ho.webp" alt="Hỏa Hổ" width="844" height="220" loading="lazy"></span>Hỏa Hổ</li><li><span class="spr" style="--w:210;--h:212;--d:-0.84s"><img src="img/game/pet-hoa-quy.webp" alt="Hỏa Quy" width="840" height="212" loading="lazy"></span>Hỏa Quy</li><li><span class="spr" style="--w:230;--h:230;--d:-0.31s"><img src="img/game/pet-hoa-ho-cao.webp" alt="Hỏa Hồ" width="920" height="230" loading="lazy"></span>Hỏa Hồ</li><li><span class="spr" style="--w:185;--h:232;--d:-0.68s"><img src="img/game/pet-viem-long.webp" alt="Viêm Long" width="740" height="232" loading="lazy"></span>Viêm Long</li><li><span class="spr" style="--w:199;--h:210;--d:-0.15s"><img src="img/game/pet-dung-nham-ve.webp" alt="Dung Nham Vệ" width="796" height="210" loading="lazy"></span>Dung Nham Vệ</li><li><span class="spr" style="--w:176;--h:232;--d:-0.52s"><img src="img/game/pet-hoa-linh.webp" alt="Hỏa Linh" width="704" height="232" loading="lazy"></span>Hỏa Linh</li></ul></div>
+      <div style="--c:var(--kim)"><h3>Kim <small>6 loài</small></h3>
+        <ul class="pets" style="margin-top:12px"><li><span class="spr" style="--w:197;--h:232;--d:-0.89s"><img src="img/game/pet-kim-te.webp" alt="Kim Tê" width="788" height="232" loading="lazy"></span>Kim Tê</li><li><span class="spr" style="--w:170;--h:224;--d:-0.36s"><img src="img/game/pet-tinh-kim-hiep.webp" alt="Tinh Kim Hiệp" width="680" height="224" loading="lazy"></span>Tinh Kim Hiệp</li><li><span class="spr" style="--w:225;--h:200;--d:-0.73s"><img src="img/game/pet-kim-giap.webp" alt="Kim Giáp" width="900" height="200" loading="lazy"></span>Kim Giáp</li><li><span class="spr" style="--w:217;--h:225;--d:-0.20s"><img src="img/game/pet-kim-ung.webp" alt="Kim Ưng" width="868" height="225" loading="lazy"></span>Kim Ưng</li><li><span class="spr" style="--w:231;--h:244;--d:-0.57s"><img src="img/game/pet-kim-thach-nhan.webp" alt="Kim Thạch Nhân" width="924" height="244" loading="lazy"></span>Kim Thạch Nhân</li><li><span class="spr" style="--w:171;--h:233;--d:-0.04s"><img src="img/game/pet-liem-dao.webp" alt="Liêm Đao" width="684" height="233" loading="lazy"></span>Liêm Đao</li></ul></div>
+      <div style="--c:var(--moc)"><h3>Mộc <small>7 loài</small></h3>
+        <ul class="pets" style="margin-top:12px"><li><span class="spr" style="--w:224;--h:226;--d:-0.41s"><img src="img/game/pet-moc-hung.webp" alt="Mộc Hùng" width="896" height="226" loading="lazy"></span>Mộc Hùng</li><li><span class="spr" style="--w:217;--h:232;--d:-0.78s"><img src="img/game/pet-moc-duong.webp" alt="Mộc Đường" width="868" height="232" loading="lazy"></span>Mộc Đường</li><li><span class="spr" style="--w:221;--h:221;--d:-0.25s"><img src="img/game/pet-reu-linh.webp" alt="Rêu Linh" width="884" height="221" loading="lazy"></span>Rêu Linh</li><li><span class="spr" style="--w:233;--h:236;--d:-0.62s"><img src="img/game/pet-moc-tru.webp" alt="Mộc Trư" width="932" height="236" loading="lazy"></span>Mộc Trư</li><li><span class="spr" style="--w:182;--h:238;--d:-0.09s"><img src="img/game/pet-moc-loc.webp" alt="Mộc Lộc" width="728" height="238" loading="lazy"></span>Mộc Lộc</li><li><span class="spr" style="--w:204;--h:236;--d:-0.46s"><img src="img/game/pet-thu-nhan.webp" alt="Thụ Nhân" width="816" height="236" loading="lazy"></span>Thụ Nhân</li><li><span class="spr" style="--w:211;--h:238;--d:-0.83s"><img src="img/game/pet-diep-linh.webp" alt="Diệp Linh" width="844" height="238" loading="lazy"></span>Diệp Linh</li></ul></div>
+      <div style="--c:var(--thuy)"><h3>Thủy <small>6 loài</small></h3>
+        <ul class="pets" style="margin-top:12px"><li><span class="spr" style="--w:206;--h:234;--d:-0.30s"><img src="img/game/pet-thuy-sa.webp" alt="Thủy Sa" width="824" height="234" loading="lazy"></span>Thủy Sa</li><li><span class="spr" style="--w:202;--h:236;--d:-0.67s"><img src="img/game/pet-thuy-long.webp" alt="Thủy Long" width="808" height="236" loading="lazy"></span>Thủy Long</li><li><span class="spr" style="--w:238;--h:212;--d:-0.14s"><img src="img/game/pet-thuy-giai.webp" alt="Thủy Giải" width="952" height="212" loading="lazy"></span>Thủy Giải</li><li><span class="spr" style="--w:177;--h:224;--d:-0.51s"><img src="img/game/pet-thuy-chien.webp" alt="Thủy Chiến" width="708" height="224" loading="lazy"></span>Thủy Chiến</li><li><span class="spr" style="--w:227;--h:225;--d:-0.88s"><img src="img/game/pet-bao-thuy.webp" alt="Bão Thủy" width="908" height="225" loading="lazy"></span>Bão Thủy</li><li><span class="spr" style="--w:209;--h:222;--d:-0.35s"><img src="img/game/pet-thuy-giao.webp" alt="Thủy Giao" width="836" height="222" loading="lazy"></span>Thủy Giao</li></ul></div>
+      <div style="--c:var(--tho)"><h3>Thổ <small>6 loài</small></h3>
+        <ul class="pets" style="margin-top:12px"><li><span class="spr" style="--w:210;--h:233;--d:-0.72s"><img src="img/game/pet-tho-nguu.webp" alt="Thổ Ngưu" width="840" height="233" loading="lazy"></span>Thổ Ngưu</li><li><span class="spr" style="--w:219;--h:230;--d:-0.19s"><img src="img/game/pet-tho-tuong.webp" alt="Thổ Tượng" width="876" height="230" loading="lazy"></span>Thổ Tượng</li><li><span class="spr" style="--w:231;--h:224;--d:-0.56s"><img src="img/game/pet-tho-tich.webp" alt="Thổ Tích" width="924" height="224" loading="lazy"></span>Thổ Tích</li><li><span class="spr" style="--w:229;--h:231;--d:-0.03s"><img src="img/game/pet-thach-nhan.webp" alt="Thạch Nhân" width="916" height="231" loading="lazy"></span>Thạch Nhân</li><li><span class="spr" style="--w:218;--h:229;--d:-0.40s"><img src="img/game/pet-thanh-tri.webp" alt="Thành Trì" width="872" height="229" loading="lazy"></span>Thành Trì</li><li><span class="spr" style="--w:230;--h:225;--d:-0.77s"><img src="img/game/pet-tho-long.webp" alt="Thổ Long" width="920" height="225" loading="lazy"></span>Thổ Long</li></ul></div>
+    </div>
+  </section>
+
+  <section class="band" id="cap-nhat">
+    <div class="wrap">
+      <div class="head">
+        <p class="eyebrow">Cập nhật ngay trên máy</p>
+        <h2>Có bản mới thì bấm A, không cần cắm máy tính</h2>
+        <p>Vào <strong>Cài đặt → Cập nhật</strong> khi máy có wifi. Game chỉ tải những file đã đổi, không tải lại cả gói.</p>
+      </div>
+      <ol class="ota">
+        <li><h3>Kiểm tra</h3><p>Game hỏi máy chủ có bản mới không, báo số file và dung lượng cần tải.</p></li>
+        <li><h3>Tải về</h3><p>Vừa tải vừa chơi tiếp được. Từng file được kiểm tra; mất wifi giữa chừng thì lần sau tải tiếp.</p></li>
+        <li><h3>Cài</h3><p>Game tự thoát, cài, rồi tự mở lại. Bản mới không chạy được thì tự quay về bản cũ.</p></li>
+      </ol>
+      <p class="meta" style="margin-top:14px">Bản lưu nằm riêng, cập nhật không bao giờ đụng tới.</p>
+    </div>
+  </section>
+
+  <section class="band" id="cai-dat">
+    <div class="wrap">
+      <div class="head">
+        <p class="eyebrow">Cài trong 3 bước</p>
+        <h2>Chép vào thẻ là chơi</h2>
+      </div>
+      <ol class="steps">
+        <li><h3>Tải gói</h3><p>Tải Elemon trên <a href="https://retrohub.info/store/app/elemon">RetroHub</a>.</p></li>
+        <li><h3>Chép vào thẻ</h3><p>Giải nén, chép thư mục <code>Apps</code> vào gốc thẻ nhớ của Brick.</p></li>
+        <li><h3>Mở game</h3><p>Bật máy, vào mục <strong>Apps</strong>, chọn <strong>Elemon</strong>.</p></li>
+      </ol>
+      <dl class="facts">
+        <div><dt>Máy</dt><dd>TrimUI Brick / Brick Pro</dd></div>
+        <div><dt>Hệ điều hành</dt><dd>Firmware gốc</dd></div>
+        <div><dt>Dung lượng</dt><dd>594 MB</dd></div>
+        <div><dt>Bản lưu</dt><dd><code>Saves/elemon/</code></dd></div>
+      </dl>
+      <p class="meta" style="margin-top:14px">Phím: D-pad đi và chọn · A đồng ý · B quay lại · SELECT trong phòng về màn chào · START trong phòng mở Cài đặt. Thoát: nút Thoát game ở màn chào, hoặc giữ SELECT + START. Nút âm lượng của máy chỉnh tiếng game.</p>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="wrap final">
+      <div class="lineup"><span class="spr" style="--w:211;--h:220;--d:-0.24s"><img src="img/game/pet-hoa-ho.webp" alt="Hỏa Hổ" width="844" height="220" loading="lazy"></span><span class="spr" style="--w:197;--h:232;--d:-0.61s"><img src="img/game/pet-kim-te.webp" alt="Kim Tê" width="788" height="232" loading="lazy"></span><span class="spr" style="--w:224;--h:226;--d:-0.08s"><img src="img/game/pet-moc-hung.webp" alt="Mộc Hùng" width="896" height="226" loading="lazy"></span><span class="spr" style="--w:206;--h:234;--d:-0.45s"><img src="img/game/pet-thuy-sa.webp" alt="Thủy Sa" width="824" height="234" loading="lazy"></span><span class="spr" style="--w:210;--h:233;--d:-0.82s"><img src="img/game/pet-tho-nguu.webp" alt="Thổ Ngưu" width="840" height="233" loading="lazy"></span></div>
+      <h2>Trứng đang chờ nở</h2>
+      <p>Miễn phí, không quảng cáo, không cần mạng để chơi.</p>
+      <a class="btn" href="https://retrohub.info/store/app/elemon">Tải Elemon trên RetroHub</a>    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>Elemon · game làm tay cho máy cầm tay</span>
+    <span>Gặp lỗi? Bình luận trên <a href="https://retrohub.info/store/app/elemon">RetroHub</a>, kèm file <code>Apps/Elemon/log.txt</code></span>
+  </div>
+</footer>
+</body>
+</html>
