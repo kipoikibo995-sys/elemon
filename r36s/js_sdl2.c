@@ -198,7 +198,8 @@ int main(int argc, char **argv) {
     SDL_Renderer *renderer;
     SDL_Texture *texture;
     SDL_AudioSpec want;
-    int audio = 0, running = 1, i, n = 0;
+    int audio = 0, running = 1, i, n = 0, wide = 0;
+    SDL_Rect game_rect = { 0, 0, 0, 0 }, side_rect = { 0, 0, 0, 0 };
     Uint32 start, quit_since = 0, vol_t = 0;
     (void)argc; (void)argv;
     setvbuf(stdout, 0, _IOLBF, 0);                         /* log.txt is written line by line */
@@ -213,7 +214,22 @@ int main(int argc, char **argv) {
     renderer = window ? SDL_CreateRenderer(window, -1, 0) : 0;
     texture = renderer ? SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, JS_SCREEN_W, JS_SCREEN_H) : 0;
     if (!texture) { printf("no window: %s\n", SDL_GetError()); SDL_Quit(); return 1; }
-    SDL_RenderSetLogicalSize(renderer, JS_SCREEN_W, JS_SCREEN_H);
+    /* a screen wider than the game's 4:3 (the TrimUI Smart Pro S, 1280x720): the game in the middle at full height,
+       the sides a dimmed, enlarged copy of the same frame instead of black bars; a 4:3 screen as before */
+    {
+        int ow = 0, oh = 0;
+        if (SDL_GetRendererOutputSize(renderer, &ow, &oh) == 0 && oh > 0 && ow * JS_SCREEN_H > oh * JS_SCREEN_W + oh / 8) {
+            wide = 1;
+            game_rect.h = oh; game_rect.w = oh * JS_SCREEN_W / JS_SCREEN_H;
+            game_rect.x = (ow - game_rect.w) / 2; game_rect.y = 0;
+            side_rect.w = ow; side_rect.h = ow * JS_SCREEN_H / JS_SCREEN_W;
+            side_rect.x = 0; side_rect.y = (oh - side_rect.h) / 2;
+            printf("screen %dx%d: wide, the game at %dx%d in the middle\n", ow, oh, game_rect.w, game_rect.h);
+        } else {
+            SDL_RenderSetLogicalSize(renderer, JS_SCREEN_W, JS_SCREEN_H);
+            printf("screen %dx%d\n", ow, oh);
+        }
+    }
     {
         SDL_RendererInfo info;
         if (SDL_GetRendererInfo(renderer, &info) == 0)
@@ -294,7 +310,12 @@ int main(int argc, char **argv) {
         if (audio) { SDL_LockAudio(); jsrt_audio_commit(); SDL_UnlockAudio(); }
         SDL_UpdateTexture(texture, 0, screen, JS_SCREEN_W * 4);
         SDL_RenderClear(renderer);
-        SDL_RenderCopy(renderer, texture, 0, 0);
+        if (wide) {
+            SDL_SetTextureColorMod(texture, 60, 60, 70);
+            SDL_RenderCopy(renderer, texture, 0, &side_rect);
+            SDL_SetTextureColorMod(texture, 255, 255, 255);
+            SDL_RenderCopy(renderer, texture, 0, &game_rect);
+        } else SDL_RenderCopy(renderer, texture, 0, 0);
         SDL_RenderPresent(renderer);
         p2 = SDL_GetPerformanceCounter();
         stat_js += p1 - p0; stat_show += p2 - p1; ++stat_n;
