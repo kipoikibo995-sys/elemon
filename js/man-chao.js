@@ -18,17 +18,32 @@
   const HE_COL = { hoa: '#ff8a4a', kim: '#e8e8f0', moc: '#7ad86a', thuy: '#6ab8ff', tho: '#d8a860' };
 
   // ---------- the settings, and the sound through them ----------
-  const CD = globalThis.CAI_DAT = { nhac: true, tiengDong: 10, giong: true, noi: true };
-  try { Object.assign(CD, JSON.parse(localStorage.getItem(KEY) || '{}')); } catch (e) {}
+  // three loudnesses, 0..10 (the user, 01/11: the music, the buttons' sounds and the rest each on its own; the
+  // handheld's volume buttons still move all of them): nhac the music (7 = as loud as before), tiengNut the menu
+  // sounds, tiengDong everything else; a save from before (nhac on/off, no tiengNut) reads as it sounded
+  const CD = globalThis.CAI_DAT = { nhac: 7, tiengNut: 10, tiengDong: 10, giong: true, noi: true };
+  try {
+    const old = JSON.parse(localStorage.getItem(KEY) || '{}');
+    Object.assign(CD, old);
+    if (typeof old.nhac === 'boolean') CD.nhac = old.nhac ? 7 : 0;
+    if (old.tiengNut === undefined && old.tiengDong !== undefined) CD.tiengNut = old.tiengDong;
+  } catch (e) {}
   const keep = () => { try { localStorage.setItem(KEY, JSON.stringify(CD)); } catch (e) {} };
+  const NUT = new Set(['menu', 'chon', 'quay-lai', 'chuyen', 'loi']);   // the buttons' sounds
   let song = '';
   if (typeof SOUND === 'object' && SOUND) {
     const S0 = SOUND;
+    const musicVol = () => { if (S0.vol) S0.vol(CD.nhac * 20); };
     globalThis.SOUND = {
-      sfx(name, vol) { if (CD.tiengDong > 0) S0.sfx(name, Math.round(vol * CD.tiengDong / 10)); },
+      sfx(name, vol) {
+        const lv = name.startsWith('giong/') ? 10 : NUT.has(name) ? CD.tiengNut : CD.tiengDong;   // the voice: Giọng đọc's
+        if (lv > 0) S0.sfx(name, Math.round(vol * lv / 10));
+      },
       music(name) { song = name || ''; S0.music(CD.nhac ? song : ''); },
       _music: n => S0.music(n),
+      _vol: musicVol,
     };
+    musicVol();
   }
   if (typeof __giong === 'function') {
     const g0 = __giong;
@@ -170,9 +185,10 @@
   // Cập nhật (the in-device update): only on the handheld build, where elemon runs ota.sh (packaging/trimui-brick)
   const OTA = typeof __cv === 'object' && !!__cv.ota && !__cv.test && __cv.readText('ota.sh') !== null;
   const ROWS = [
-    ['nhac', 'Nhạc nền'], ['tiengDong', 'Tiếng động'], ['giong', 'Giọng đọc truyện'], ['noi', 'Pet nói chuyện'],
+    ['nhac', 'Nhạc nền'], ['tiengNut', 'Tiếng nút bấm'], ['tiengDong', 'Hiệu ứng'], ['giong', 'Giọng đọc truyện'], ['noi', 'Pet nói chuyện'],
     ...(OTA ? [['capNhat', 'Cập nhật']] : []), ['ve', 'Quay lại'],
   ];
+  const LEVEL = new Set(['nhac', 'tiengNut', 'tiengDong']);   // the rows with a 0..10 bar
   function openSettings(back = 'title') { S.cd = { sel: 0, back }; S.mode = 'caiDat'; }
 
   // the update: ota.sh writes .ota/state ("status=..." lines); the version here is files.txt's "#version"
@@ -224,7 +240,7 @@
     pickBack();
     ctx.fillStyle = 'rgba(10,6,4,0.45)'; ctx.fillRect(0, 0, 640, 480);
     title('CÀI ĐẶT', 320, 44, 32, '#ffecaa', 5);
-    const X = 90, W = 460, Y0 = 92, H = OTA ? 46 : 54, G = OTA ? 8 : 10;
+    const X = 90, W = 460, Y0 = 88, H = OTA ? 40 : 46, G = OTA ? 7 : 9;
     const ota = OTA ? otaLine(otaState(now)) : null;
     ROWS.forEach(([k, name], i) => {
       const y = Y0 + i * (H + G), on = i === S.cd.sel;
@@ -233,12 +249,12 @@
       if (k === 've') return;
       const vx = X + W - 22, cy = y + H / 2 + 1;
       if (k === 'capNhat') return text(ota[0], vx, cy, 15, '#ffe6a8', 'right', true, 3);
-      if (k === 'tiengDong') {
+      if (LEVEL.has(k)) {
         for (let j = 0; j < 10; j++) {
-          ctx.fillStyle = j < CD.tiengDong ? '#ffd36e' : 'rgba(255,255,255,0.15)';
-          ctx.fillRect(vx - 200 + j * 16, cy - 8, 12, 16);
+          ctx.fillStyle = j < CD[k] ? '#ffd36e' : 'rgba(255,255,255,0.15)';
+          ctx.fillRect(vx - 214 + j * 16, cy - 8, 12, 16);
         }
-        text(CD.tiengDong ? String(CD.tiengDong) : 'Tắt', vx - 30, cy, 15, '#ffe6a8', 'right', true, 2);
+        text(CD[k] ? String(CD[k]) : 'Tắt', vx - 30, cy, 15, '#ffe6a8', 'right', true, 2);
       } else text(CD[k] ? '◄ Bật ►' : '◄ Tắt ►', vx, cy, 16, CD[k] ? '#8ce16e' : '#c98a7a', 'right', true, 3);
     });
     if (ota && ROWS[S.cd.sel][0] === 'capNhat') text(ota[1], 320, 436, 14, '#fff2d8', 'center', true, 3);
@@ -252,11 +268,14 @@
     }
     if (k === 'capNhat') { if (btn === 'A') { sfx('chon', 190); otaPress(performance.now()); } return; }
     if (!['LEFT', 'RIGHT', 'A'].includes(btn) || k === 've') return;
-    if (k === 'tiengDong') {
-      const dir = btn === 'LEFT' ? -1 : 1;
-      CD.tiengDong = btn === 'A' ? (CD.tiengDong ? 0 : 10) : Math.max(0, Math.min(10, CD.tiengDong + dir));
+    if (LEVEL.has(k)) {
+      const dir = btn === 'LEFT' ? -1 : 1, was = CD[k];
+      CD[k] = btn === 'A' ? (CD[k] ? 0 : k === 'nhac' ? 7 : 10) : Math.max(0, Math.min(10, CD[k] + dir));
+      if (k === 'tiengNut') sfx('menu', 160);                 // heard at the new loudness
+      if (k === 'tiengDong') sfx('vui', 230);
+      if (k === 'nhac' && SOUND._vol) SOUND._vol();
+      if (k === 'nhac' && !was !== !CD.nhac && SOUND._music) SOUND._music(CD.nhac ? song : '');
     } else CD[k] = !CD[k];
-    if (k === 'nhac' && SOUND._music) SOUND._music(CD.nhac ? song : '');
     keep();
     sfx('chon', 190);                                        // heard at the new loudness
   }

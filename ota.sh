@@ -1,5 +1,6 @@
 #!/bin/sh
-# Elemon's in-device update (OTA) for the TrimUI Brick. The game runs "check" and "get" in the background from
+# Elemon's in-device update (OTA) for the TrimUI Brick and the R36S / ArkOS build (scripts/pack_r36s.py packs it beside
+# ota-branch.txt, which names that build's own branch). The game runs "check" and "get" in the background from
 # Cài đặt -> Cập nhật and reads .ota/state; launch.sh runs "apply" before the game starts and "after" when it ends.
 #
 #   check  the newest version's list (ota.txt on the "ota" branch) against files.txt here -> .ota/get.txt, .ota/del.txt
@@ -21,19 +22,29 @@ OTA="$APP/.ota"
 CA="$APP/cacert.pem"
 mkdir -p "$OTA"
 # the newest list is ota.txt at the head of the "ota" branch (scripts/push_ota.py); each file is read from the
-# version's own tag, so a release made while a download runs changes nothing. .ota/branch picks another (tests)
-BRANCH="$(cat "$OTA/branch" 2>/dev/null || echo ota)"
+# version's own tag, so a release made while a download runs changes nothing. ota-branch.txt names the build's branch
+# (the R36S: ota-r36s), .ota/branch picks another (tests)
+BRANCH="$(cat "$OTA/branch" 2>/dev/null || cat "$APP/ota-branch.txt" 2>/dev/null || echo ota)"
+BRANCH="$(printf %s "$BRANCH" | tr -cd 'A-Za-z0-9._/-')"
+NOWIFI="Kiểm tra wifi rồi thử lại."
+case "$BRANCH" in *r36s*) NOWIFI="Bật wifi rồi thử lại, hoặc tải Elemon_R36S.zip mới chép đè vào thẻ." ;; esac
 LIST_URL="$RAW/$BRANCH/ota.txt"
 
 state() { printf '%s\n' "$@" > "$OTA/state.tmp" && mv "$OTA/state.tmp" "$OTA/state"; }
-fetch() { curl -sSfL --cacert "$CA" --connect-timeout 15 --retry 2 -m "${3:-600}" -o "$2" "$1"; }
+fetch() {
+    if command -v curl >/dev/null 2>&1; then
+        curl -sSfL --cacert "$CA" --connect-timeout 15 --retry 2 -m "${3:-600}" -o "$2" "$1"
+    else                                           # a handheld without curl
+        wget -q -T 30 -O "$2" "$1"
+    fi
+}
 ver_of() { sed -n 's/^#version //p' "$1" | head -1; }
 
 check() {
     state "status=checking"
     rm -f "$OTA/ota.txt" "$OTA/get.txt" "$OTA/del.txt" "$OTA/ready"
     if ! fetch "$LIST_URL" "$OTA/ota.txt.part" 120; then
-        state "status=error" "msg=Không kết nối được máy chủ. Kiểm tra wifi rồi thử lại."; return 1
+        state "status=error" "msg=Không kết nối được máy chủ. $NOWIFI"; return 1
     fi
     mv "$OTA/ota.txt.part" "$OTA/ota.txt"
     new="$(ver_of "$OTA/ota.txt")"
