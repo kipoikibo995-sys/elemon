@@ -20,6 +20,7 @@
                  moc: ['moc-loc', 'moc-tru', 'thu-nhan', 'reu-linh', 'diep-linh', 'moc-duong'],
                  thuy: ['thuy-sa', 'thuy-giai', 'thuy-long', 'bao-thuy', 'thuy-chien', 'thuy-giao'],
                  tho: ['tho-tich', 'thach-nhan', 'tho-long', 'tho-tuong', 'thanh-tri', 'tho-nguu'] };
+  globalThis.__cayPets = PETS;                          // Vùng đất counts and picks by these (game/src/vung-dat.js)
   const STAGES = ['child', 'teen', 'adult', 'legend'];
   const LV = { child: 14, teen: 34, adult: 60, legend: 90 }, BOT = { child: 1, teen: 2, adult: 3, legend: 3 };
   const HE_COL = { hoa: '#ff9a6a', kim: '#e4f0ff', moc: '#a8e88a', thuy: '#8ad0ff', tho: '#f0c880', hu: '#d8b8ff' };

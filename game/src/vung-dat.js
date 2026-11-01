@@ -42,6 +42,9 @@
   // boss stood waiting at the start, no foes, nothing to do): HUNT_NEED Bóng Hư freed, strays coming in all the while
   // (HUNT_LIVE at a time), the mini boss after HUNT_MINI of them, then the khu's boss
   const HUNT_NEED = 8, HUNT_MINI = 3, HUNT_LIVE = 4;
+  // a khu already cleansed still has a mini boss each trip (the user, 02/11: else most of Đấu trường's tree could never
+  // be opened): STRAY_MINI strays freed, then it runs in, a pet not yet opened at the khu's stage when there is one
+  const STRAY_MINI = 5;
   const ARENA = { cx: 320, cy: 322, rx: 280, ry: 128 };    // the arena floor: an ellipse inside its stone ring
   for (const kind in KIND) KIND[kind].k = VG.foeK[kind] || 1;
   const foeKey = kind => Math.round(VG.foeK[kind] * 100);
@@ -148,11 +151,19 @@
       const pool = all.filter(d => d !== skip && d !== DATA.pet.creature), fresh = pool.filter(d => !won()[d]);
       return fresh.length && Math.random() < 0.7 ? any(fresh) : any(pool.length ? pool : all);
     };
-    const mini = all.length ? choose(null) : null;
+    const st = khuStage(ki), shut = cayPets(he).filter(d => !cayHas(d, st)), others = shut.filter(d => d !== DATA.pet.creature);
+    // the mini boss: one not yet opened on the tree at this khu's stage (the pet's own kind last), else any
+    const mini = !all.length ? null : others.length ? any(others) : shut.length ? shut[0] : choose(null);
     PICK = { key, mini, boss: all.length ? choose(mini) : null };
     return PICK;
   }
   const miniDir = (he, ki) => pickFor(he, ki).mini;
+  const lvStage = lv => lv <= 20 ? 'child' : lv <= 45 ? 'teen' : lv <= 99 ? 'adult' : 'legend';
+  const khuStage = ki => lvStage(LV_KHU[Math.min(ki, LV_KHU.length - 1)].mini);   // khu 1 Nhi, 2 Thiếu niên, 3 Trưởng thành
+  const cayHas = (dir, st) => !!(S.cay && S.cay[dir + '/' + st]);           // opened on Đấu trường's tree (cay-dau-truong.js)
+  // the tree's six of a region (cay-dau-truong.js __cayPets; Mộc's spirits have one more, Mộc Hùng, not on the tree)
+  const cayPets = he => { const sp = speciesOf(he), t = globalThis.__cayPets && __cayPets[he]; return t ? t.filter(d => sp.includes(d)) : sp; };
+  const cayCount = (he, ki) => { const all = cayPets(he), st = khuStage(ki); return [all.filter(d => cayHas(d, st)).length, all.length]; };
   const broken = (he, ki) => prog(he).k[ki] || (prog(he).k[ki] = []);
   const khuClean = (he, ki) => VG.regions[he].khu[ki].nests.every((_, i) => broken(he, ki)[i]);
   // the story (game/src/truyen.js, Hồi 2-4) and THIET-KE.md 6.3: khu 1 (the region's edge) from Nhi, khu 2 from Thiếu
@@ -226,6 +237,7 @@
     // foes: a pair round each nest; on a cleansed khu a few strays
     for (const n of w.nests) for (let j = 0; j < 2; j++) spawnNear(n, now);
     w.hunt = !k.nests.length && kbDue() ? { got: 0, spawnT: now + 2500 } : null;
+    w.stray = !w.nests.length && !w.hunt ? { got: 0, spawnT: now + 2500 } : null;   // cleansed: STRAY_MINI, then the mini boss
     if (!w.nests.length) for (let j = 0; j < 5; j++) spawnFree(now);
     w.miniDone = false;
     if (kbDue() && !w.nests.length && !w.hunt) bossOut(now);   // its nests broken on an earlier trip: the boss waits
@@ -242,7 +254,7 @@
   const khuLv = ki => LV_KHU[Math.min(ki, LV_KHU.length - 1)];
   const tierOf = (ki, boss) => {
     const k = khuLv(ki), lv = boss && ki === W.R.khu.length - 1 ? LV_LAST : boss ? k.boss : k.mini;
-    return { lv, stage: lv <= 20 ? 'child' : lv <= 45 ? 'teen' : lv <= 99 ? 'adult' : 'legend', bot: lv >= LV_LAST ? 3 : k.bot };
+    return { lv, stage: lvStage(lv), bot: lv >= LV_LAST ? 3 : k.bot };
   };
   const mobLv = () => { const [a, b] = khuLv(W.ki).mob; return a + Math.floor(Math.random() * (b - a + 1)); };
   const kbDone = (he, ki) => ki === VG.regions[he].khu.length - 1 && VG.regions[he].boss ? !!prog(he).boss : !!(prog(he).kb || [])[ki];
@@ -774,7 +786,11 @@
   function leaveArena(won = true, duel = false) {
     const w = W, sv = w && w.saved, t = performance.now();
     if (!sv) return;
-    if (won && !duel) w.miniDone = true;
+    if (won && !duel) {
+      w.miniDone = true;
+      const m = w.arena && w.arena.mini;
+      if (m && typeof __cayThang === 'function') __cayThang(m.dir, tierOf(w.ki, false).stage);
+    }
     if (!duel) drop(`${w.t.he}/san`);
     Object.assign(w, { k: sv.k, map: sv.map, mobs: sv.mobs, nests: sv.nests, chest: sv.chest, boss: duel ? null : sv.boss, clean: sv.clean,
                        shots: [], fxs: [], nums: [], ults: [], saved: null, arena: null });
@@ -823,6 +839,7 @@
       sfx(`solo/${m.he}_trung`, 170);
       if (m.boss) bossDown(now);
       else if (!m.mini && W.hunt && W.hunt.got < HUNT_NEED) huntStep(now);
+      else if (!m.mini && W.stray && ++W.stray.got === STRAY_MINI && !W.miniT && !W.miniDone && miniDir(W.t.he, W.ki)) W.miniT = now + MINI_AFTER;
     }
   }
   function huntStep(now) {                                  // a Bóng Hư freed on a khu with no nests (HUNT_NEED)
@@ -1209,9 +1226,14 @@
     for (const n of w.nests) {                                  // nests send out more while they stand
       if (now > n.spawnT && n.out < 2 && n.made < 6 && Math.hypot(n.x - p.x, n.y - p.y) < 700) { spawnNear(n, now); n.spawnT = now + rnd(6000, 9000); }
     }
-    if (w.hunt && w.hunt.got < HUNT_NEED && now > w.hunt.spawnT && !w.arena) {   // the hunt: strays keep coming in
-      if (w.mobs.filter(m => m.hp > 0 && !m.mini && !m.boss).length < HUNT_LIVE) spawnFree(now);
-      w.hunt.spawnT = now + rnd(2500, 4500);
+    const sw = w.hunt && w.hunt.got < HUNT_NEED ? w.hunt : w.stray && !w.miniDone && !w.mini ? w.stray : null;
+    if (sw && now > sw.spawnT && !w.arena) {                   // the hunt, or a cleansed khu: strays keep coming in
+      const live = w.mobs.filter(m => m.hp > 0 && !m.mini && !m.boss);
+      if (live.length < HUNT_LIVE) spawnFree(now);
+      // and the nearest one not yet after the pet comes for it, so the strays do find the pet
+      const idle = live.filter(m => !m.aware).sort((a, b) => Math.hypot(a.x - p.x, a.y - p.y) - Math.hypot(b.x - p.x, b.y - p.y))[0];
+      if (idle) idle.aware = true;
+      sw.spawnT = now + rnd(2500, 4500);
     }
     if (w.chest && Math.hypot(w.chest.x - p.x, w.chest.y - p.y) < 34) openChest(now);
     if (w.miniT && now > w.miniT && !w.arena && !w.mini && !w.miniDone && !p.down) miniOut(now);
@@ -1626,6 +1648,7 @@
       if (kbDone(v.he, i)) uiMid('dau', DAU.tick, x + 86, cy + (boss ? 40 : 58));
       else if (!boss) uiMid('icon', done ? ICON.clean : ICON.nest, x + 86, cy + 14);
       if (!boss && !done && open) word(`${left}/${k.nests.length}`, x + 86, cy + 34, 10, '#e0a8ff', 'center', true, 2);
+      if (open) { const [n, all] = cayCount(v.he, i); word(`${KHU_TEN[khuStage(i)]} ${n}/${all}`, x + 50, cy + 150, 10, n >= all ? '#a8f0a0' : '#fff2d8', 'center', true, 2); }
     });
     const ks = R.khu[v.sel];
     word(ks.name, 194, 266, 13, '#fff2d8', 'center', true, 3);
