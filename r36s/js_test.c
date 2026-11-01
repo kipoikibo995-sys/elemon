@@ -64,9 +64,9 @@ static Step *read_script(const char *path, unsigned *count) {
 static void put32(FILE *f, unsigned v) { fputc(v & 255, f); fputc(v >> 8 & 255, f); fputc(v >> 16 & 255, f); fputc(v >> 24 & 255, f); }
 
 int main(int argc, char **argv) {
-    static uint8_t rgb[JS_SCREEN_W * JS_SCREEN_H * 3];
+    static uint8_t rgb[JS_SCREEN_MAX_W * JS_SCREEN_H * 3];
     char path[1024];
-    int n = 0, every = argc > 3 ? atoi(argv[3]) : 1, per = JS_AUDIO_RATE / 30;
+    int n = 0, sw, every = argc > 3 ? atoi(argv[3]) : 1, per = JS_AUDIO_RATE / 30;
     unsigned s, total = 0, i, steps = sizeof SCRIPT / sizeof *SCRIPT;
     const Step *script = SCRIPT;
     double t = 0, worst = 0, sum = 0;
@@ -75,6 +75,8 @@ int main(int argc, char **argv) {
     if (argc < 3) { fprintf(stderr, "usage: %s game out [every]\n", argv[0]); return 2; }
     if (every < 1) every = 1;
     if (argc > 4 && !(script = read_script(argv[4], &steps))) { fprintf(stderr, "no script %s\n", argv[4]); return 2; }
+    if (getenv("HOLUA_WIDTH")) jsrt_set_screen_w(atoi(getenv("HOLUA_WIDTH")));   /* a wide screen's canvas, e.g. 854 */
+    sw = jsrt_screen_w();
     if (!jsrt_init(argv[1])) return 1;
     snprintf(path, sizeof path, "%s/am-thanh.wav", argv[2]);
     wav = fopen(path, "wb");
@@ -101,14 +103,14 @@ int main(int argc, char **argv) {
             fwrite(pcm, 2, (size_t)per, wav);
             total += (unsigned)per;
             if (n % every) continue;
-            for (i = 0; i < JS_SCREEN_W * JS_SCREEN_H; ++i) {
+            for (i = 0; i < (unsigned)(sw * JS_SCREEN_H); ++i) {
                 rgb[3 * i] = screen[i] >> 16 & 255; rgb[3 * i + 1] = screen[i] >> 8 & 255; rgb[3 * i + 2] = screen[i] & 255;
             }
             snprintf(path, sizeof path, "%s/%05d.ppm", argv[2], n / every);
             f = fopen(path, "wb");
             if (!f) return 1;
-            fprintf(f, "P6 %d %d 255\n", JS_SCREEN_W, JS_SCREEN_H);
-            fwrite(rgb, 1, sizeof rgb, f);
+            fprintf(f, "P6 %d %d 255\n", sw, JS_SCREEN_H);
+            fwrite(rgb, 1, (size_t)sw * JS_SCREEN_H * 3, f);
             fclose(f);
         }
     }

@@ -1163,6 +1163,28 @@ static JSValue b_exit(JSContext *ctx, JSValueConst t, int argc, JSValueConst *ar
 }
 int jsrt_wants_exit(void) { return exit_asked; }
 
+/* exists(path): a file of the game folder is there (js/shim.js looks for a picture's drawn wide version) */
+static JSValue b_exists(JSContext *ctx, JSValueConst t, int argc, JSValueConst *argv) {
+    const char *rel = argc ? JS_ToCString(ctx, argv[0]) : 0;
+    char path[1024];
+    struct stat st;
+    int ok;
+    (void)t;
+    if (!rel) return JS_FALSE;
+    snprintf(path, sizeof path, "%s/%s", root, rel);
+    JS_FreeCString(ctx, rel);
+    ok = stat(path, &st) == 0;
+    return JS_NewBool(ctx, ok);
+}
+
+static int screen_w = JS_SCREEN_W;
+void jsrt_set_screen_w(int w) {
+    if (w < JS_SCREEN_W) w = JS_SCREEN_W;
+    if (w > JS_SCREEN_MAX_W) w = JS_SCREEN_MAX_W;
+    screen_w = w & ~1;
+}
+int jsrt_screen_w(void) { return screen_w; }
+
 /* the in-device update (Cài đặt -> Cập nhật): ota("check") or ota("get") starts ota.sh beside the game in the
    background (its output in .ota/log.txt); the game reads .ota/state to follow it. -> true when started */
 static JSValue b_ota(JSContext *ctx, JSValueConst t, int argc, JSValueConst *argv) {
@@ -1185,7 +1207,7 @@ int jsrt_init(const char *dir) {
         { "resize", b_resize, 3 }, { "loadImage", b_load_image, 1 }, { "fillRect", b_fill_rect, 14 },
         { "drawImage", b_draw_image, 22 }, { "ellipse", b_ellipse, 15 }, { "text", b_text, 17 },
         { "measure", b_measure, 3 }, { "sfx", b_sfx, 2 }, { "music", b_music, 1 }, { "musicVol", b_music_vol, 1 }, { "voice", b_voice, 1 }, { "poly", b_poly, 13 }, { "pixels", b_pixels, 5 }, { "put", b_put, 6 }, { "free", b_free, 1 }, { "seal", b_seal, 1 },
-        { "readText", b_read_text, 1 }, { "writeText", b_write_text, 2 }, { "exit", b_exit, 0 }, { "ota", b_ota, 1 } };
+        { "readText", b_read_text, 1 }, { "writeText", b_write_text, 2 }, { "exit", b_exit, 0 }, { "ota", b_ota, 1 }, { "exists", b_exists, 1 } };
     /* the scripts to run, in order: js/load.txt (one path a line, scripts/r36s_game.py), else the test page's set */
     static const char *scripts[] = { "js/shim.js", "js/data.js", "js/page.js", "js/am-thanh.js" };
     char *list, *line, *save = 0, save_dir[1200];
@@ -1193,8 +1215,8 @@ int jsrt_init(const char *dir) {
     JSValue global, cv;
     unsigned i;
     snprintf(root, sizeof root, "%s", dir);
-    surf[n_surf++] = surf_new(JS_SCREEN_W, JS_SCREEN_H);       /* canvas 0: the screen */
-    for (i = 0; i < (unsigned)(JS_SCREEN_W * JS_SCREEN_H); ++i) surf[0]->px[i] = 0xFF000000u;
+    surf[n_surf++] = surf_new(screen_w, JS_SCREEN_H);          /* canvas 0: the screen */
+    for (i = 0; i < (unsigned)(screen_w * JS_SCREEN_H); ++i) surf[0]->px[i] = 0xFF000000u;
     rt = JS_NewRuntime();
     if (!rt) return 0;
     JS_SetMaxStackSize(rt, 1 << 20);
@@ -1210,6 +1232,7 @@ int jsrt_init(const char *dir) {
         no_fast = t && !strcmp(t, "slow");
     }
     JS_SetPropertyStr(jc, cv, "test", JS_NewBool(jc, test_mode));
+    JS_SetPropertyStr(jc, cv, "screenW", JS_NewInt32(jc, screen_w));
     /* saves: HOLUA_SAVE_DIR (the launcher puts it next to the game folder, so a reinstall keeps it), else save/ */
     snprintf(save_dir, sizeof save_dir, "%s", sd && *sd ? sd : "save");
     if (save_dir[0] != '/') {

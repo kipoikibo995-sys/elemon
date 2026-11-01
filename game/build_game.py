@@ -551,6 +551,20 @@ def film_pictures():
     return n
 
 
+def wide_pictures():
+    """assets/source/rong/<path>_rong.png -> img/<path>_rong.png: a full-screen picture drawn out for a 16:9 screen (the
+    picture with its two sides added, the same height; r36s/js/shim.js shows its sides there instead of the stretched
+    edges), <path> as the page loads it under img/ (room, nen, phim/..). Number of pictures."""
+    src = os.path.join(ROOT, 'assets', 'source', 'rong')
+    n = 0
+    for path in sorted(glob.glob(os.path.join(src, '**', '*_rong.png'), recursive=True)):
+        dst = os.path.join(PAGE, 'img', os.path.relpath(path, src))
+        os.makedirs(os.path.dirname(dst), exist_ok=True)
+        shutil.copy(path, dst)
+        n += 1
+    return n
+
+
 def voices():
     """The story's spoken lines (scripts/make_giong.py: assets/am-thanh/giong) -> sfx/giong/, and js/giong.js with their
     lengths. Number of lines."""
@@ -692,6 +706,7 @@ def main():
     copy_dojo()
     cut_npc()
     film_pictures()
+    wide_pictures()
     solo = solo_arena()
     shutil.copy(os.path.join(ROOT, 'r36s', 'js', 'am-thanh.js'), os.path.join(PAGE, 'js'))
     sparks = cut_sparks()
