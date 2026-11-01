@@ -151,8 +151,12 @@
   const miniDir = (he, ki) => pickFor(he, ki).mini;
   const broken = (he, ki) => prog(he).k[ki] || (prog(he).k[ki] = []);
   const khuClean = (he, ki) => VG.regions[he].khu[ki].nests.every((_, i) => broken(he, ki)[i]);
-  // the story (game/src/truyen.js, Hồi 2): a Nhi only goes to the region's edge; the Thần thú's khu waits for Thiếu niên
-  const bossOpen = () => !['baby', 'child'].includes(S.stage);
+  // the story (game/src/truyen.js, Hồi 2-4) and THIET-KE.md 6.3: khu 1 (the region's edge) from Nhi, khu 2 from Thiếu
+  // niên, khu 3 (the Thần thú's) from Trưởng thành
+  const CAPS = ['baby', 'child', 'teen', 'adult', 'legend'], KHU_CAP = ['child', 'teen', 'adult'];
+  const KHU_TEN = { child: 'Nhi', teen: 'Thiếu niên', adult: 'Trưởng thành' };
+  const khuCap = ki => KHU_CAP[Math.min(ki, KHU_CAP.length - 1)];
+  const khuOpen = ki => CAPS.indexOf(S.stage) >= CAPS.indexOf(khuCap(ki));
   const isOpen = he => !!S.open[he] || (he === EL() && S.stage !== 'baby');
 
   // the pet's numbers: the game's one formula (game/src/chi-so.js), its needs counted in
@@ -242,7 +246,7 @@
   // open and its Thần thú not freed yet, 'da-thoat' freed; 'du-ngoc' all 5 Ngọc Hồn and Hư Ảnh not beaten; 'thang-hu'
   globalThis.__truyenDk = (dk, he) => {
     const R = VG.regions[he], last = R ? R.khu.length - 1 : 0, beat = !!(S.huAnh && S.huAnh.pha2);
-    if (dk === 'than-thu') return !!R && R.boss && (last === 0 || kbDone(he, last - 1)) && !prog(he).boss;
+    if (dk === 'than-thu') return !!R && R.boss && (last === 0 || kbDone(he, last - 1)) && khuOpen(last) && !prog(he).boss;
     if (dk === 'da-thoat') return !!R && !!prog(he).boss;
     if (dk === 'du-ngoc') return (S.ngoc || 0) >= 5 && !beat;
     if (dk === 'thang-hu') return beat;
@@ -1214,8 +1218,8 @@
     const along = side === 'top' || side === 'bottom' ? p.x : p.y;
     const i = k.exits.findIndex(e => e[0] === side && along >= e[1] - 8 && along <= e[2] + 8);
     if (i < 0) return;
-    if (i === k.on && w.ki + 1 === w.R.khu.length - 1 && !bossOpen()) {
-      if (now - w.toastT > 1500) toastV('Già Quy dặn chỉ đi phần rìa: chờ pet lên Thiếu niên', now);
+    if (i === k.on && !khuOpen(w.ki + 1)) {
+      if (now - w.toastT > 1500) toastV(`Khói Hư chặn lối: khu sau chờ pet lên ${KHU_TEN[khuCap(w.ki + 1)]}`, now);
       move(p, side === 'left' ? 20 : side === 'right' ? -20 : 0, side === 'top' ? 20 : side === 'bottom' ? -20 : 0);
     } else if (i === k.on && kbDue()) {
       if (now - w.toastT > 1500) toastV(`Giải thoát ${petName(w.boss ? w.boss.dir : kbDir(w.t.he, w.ki))} mới đi tiếp được`, now);
@@ -1552,10 +1556,9 @@
   }
 
   // ---------- the gate, loading, pause, result screens ----------
-  // the khu the trip may start at: the first, and every khu reached before (the Thần thú's from Thiếu niên on)
+  // the khu the trip may start at: the first, and every khu reached before, each only once the pet is old enough
   function canStart(he, ki) {
-    const R = VG.regions[he];
-    if (ki === R.khu.length - 1 && R.boss && !bossOpen()) return false;
+    if (!khuOpen(ki)) return false;
     return ki === 0 || ki <= (prog(he).toi || 0);
   }
   // a Ngọc Hồn (scripts/hu_anh.py ngoc(): row 1 won, row 2 not yet), its centre at x, y; false while there is none
@@ -1602,8 +1605,8 @@
     });
     const ks = R.khu[v.sel];
     word(ks.name, 194, 266, 13, '#fff2d8', 'center', true, 3);
-    if (!canStart(v.he, R.khu.length - 1) && R.boss && v.sel === R.khu.length - 2)
-      word('Khu cuối mở khi pet lên Thiếu niên', 194, 462, 11, '#ffb8a0', 'center', true, 2);
+    if (v.sel + 1 < R.khu.length && !khuOpen(v.sel + 1))
+      word(`Khu ${v.sel + 2} mở khi pet lên ${KHU_TEN[khuCap(v.sel + 1)]}`, 194, 462, 11, '#ffb8a0', 'center', true, 2);
     // the panel: the element against the pet's, the spirits here, what can be won, the energy
     const px = 404, py = 70;
     if (uiAt('bang-doc', 0, px, py)) {
