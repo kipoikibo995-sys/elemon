@@ -1,6 +1,9 @@
 
 // ---------- loading ----------
 const ctx = document.getElementById('c').getContext('2d');
+// a wide handheld screen (16:9, r36s/js/shim.js): the page still draws 640x480, with SIDE more columns on each side
+// (x from -SIDE to 640 + SIDE) where the top bar's ends and the room's menu reach out; 0 on a 4:3 screen and in a browser
+const SIDE = globalThis.__SIDE || 0;
 const IMG = {};
 // many small pictures at once: a load can fail when the browser runs short of sockets, so try again a few times
 function load(name, path, tries = 5) {
@@ -210,14 +213,14 @@ function toast(s) { S.toast = s; S.toastT = performance.now(); }
 function drawHud() {
   ctx.fillStyle = 'rgba(18,11,9,0.88)'; ctx.fillRect(0, 0, 640, 38);
   NEEDS.forEach(([icon, col, key], i) => {
-    const x = 8 + i * 104;
+    const x = 8 - SIDE + i * 104;
     ctx.drawImage(IMG[icon], x, 8); ctx.drawImage(IMG.bar, x + 26, 13);
     const f = IMG['fill_' + col], w = Math.round(4 + (f.width - 8) * S.need[key] / 100);
     ctx.drawImage(f, 0, 0, w, f.height, x + 26, 14, w, f.height);
   });
   drawCoins();
-  ctx.fillStyle = 'rgba(0,0,0,0.5)'; ctx.fillRect(444, 34, 186, 4);
-  ctx.fillStyle = '#ffd36e'; ctx.fillRect(444, 34, Math.round(186 * expFrac()), 4);
+  ctx.fillStyle = 'rgba(0,0,0,0.5)'; ctx.fillRect(444 + SIDE, 34, 186, 4);
+  ctx.fillStyle = '#ffd36e'; ctx.fillRect(444 + SIDE, 34, Math.round(186 * expFrac()), 4);
 }
 // ---------- growing up ----------
 function expFrac() {
@@ -357,19 +360,20 @@ function useItem(i) {
   consume(i);
 }
 function drawCoins() {
-  ctx.drawImage(IMG.coin_box, 444, 4); text(S.coins.toLocaleString('en-US'), 548, 19, 15, '#f0e4ce', 'right');
-  text('Lv', 566, 19, 13); ctx.drawImage(IMG.badge, 596, 3); text(String(S.level), 612, 19, 13, '#f0e4ce', 'center');
+  const x = SIDE;                               // at the right end of the bar, also on a wide screen
+  ctx.drawImage(IMG.coin_box, 444 + x, 4); text(S.coins.toLocaleString('en-US'), 548 + x, 19, 15, '#f0e4ce', 'right');
+  text('Lv', 566 + x, 19, 13); ctx.drawImage(IMG.badge, 596 + x, 3); text(String(S.level), 612 + x, 19, 13, '#f0e4ce', 'center');
 }
 function drawTop(title) {
   ctx.fillStyle = 'rgba(18,11,9,0.88)'; ctx.fillRect(0, 0, 640, 38);
-  text(title, 14, 19, 18, '#ffd67a'); drawCoins();
+  text(title, 14 - SIDE, 19, 18, '#ffd67a'); drawCoins();
 }
 
 // the menu sits right on the room (no bar): the chosen button is full bright, a bit bigger, glowing; the rest dimmed
 function drawMenu(now) {
   MENU.forEach(([n, label], i) => {
     const im = IMG[n], on = i === S.cursor, k = on ? 1.04 : 1, w = im.width * k, h = im.height * k;
-    const cx = 54 + i * 106.4, y = 476 - h - (on ? Math.round(2 + 2 * Math.sin(now / 200)) : 0);
+    const cx = 54 - SIDE + i * ((532 + 2 * SIDE) / 5), y = 476 - h - (on ? Math.round(2 + 2 * Math.sin(now / 200)) : 0);   // spread over the width
     ctx.save();
     if (on) { ctx.shadowColor = 'rgba(255,214,90,0.95)'; ctx.shadowBlur = 16; }
     else ctx.filter = 'brightness(0.62) saturate(0.8)';
@@ -377,6 +381,11 @@ function drawMenu(now) {
     ctx.restore();
     if (on) text(label, cx, y - 10, 14, '#ffe6a8', 'center', true, 4);
   });
+  // the hint lines never sit straight on the room picture: a dark strip (65%) under the HUD carries them
+  ctx.fillStyle = 'rgba(12,7,5,0.65)'; ctx.fillRect(0, 38, 640, 44);
+  ctx.fillStyle = 'rgba(255,214,120,0.25)'; ctx.fillRect(0, 82, 640, 1);
+  text(hint(), 12 - SIDE, 52, 15, '#ffe6a8', 'left', true, 3);
+  text('R2 chơi · X vuốt ve', 12 - SIDE, 71, 13, '#c9bba8', 'left', false, 2);
 }
 
 // the bag: takes the menu bar's place, so the room stays open; B goes back
@@ -568,6 +577,9 @@ function drawPopup() {
 // ---------- stats screen (SELECT): 4 pages, L1/R1 or ◀ ▶ to turn, B back ----------
 function drawStats(now) {
   const bg = IMG[`stats_${S.stage}_${S.stats}`];
+  // a wide screen: the page is a panel with its bars and sockets in the picture, so it is not stretched
+  // (r36s/js/shim.js: __wideKeep); the sides dark, as the bar above it
+  if (SIDE && bg) { bg.__wideKeep = true; ctx.fillStyle = '#120b09'; ctx.fillRect(-SIDE, 0, SIDE, 480); ctx.fillRect(640, 0, SIDE, 480); }
   ctx.drawImage(bg, 0, 0);
   drawPet(S.stage, sample(idleOf(S.stage), now), 130, 350);          // PET_FEET in preview_ui_stats.py
   if (S.stats === 2) drawAttrLive(now);
@@ -1177,25 +1189,41 @@ function farmBackdrop() {
   if (typeof __cv === 'object' && __cv.seal) __cv.seal(c.__id);
   return (farmBack = c);
 }
+// a field square stretched for a wide screen, made once (stretched each frame they cost the handheld a few ms)
+const WIDE_TILES = new Map();
+function wideTile(t, q) {
+  let c = WIDE_TILES.get(t);
+  if (!c) {
+    c = document.createElement('canvas'); c.width = Math.round(t.width * q); c.height = t.height;
+    c.getContext('2d').drawImage(t, 0, 0, c.width, c.height);
+    if (typeof __cv === 'object' && __cv.seal) __cv.seal(c.__id);
+    WIDE_TILES.set(t, c);
+  }
+  return c;
+}
 function drawFarm(now, dt) {
   farmTick(now, dt);
   ctx.drawImage(farmBackdrop(), 0, 0);
+  // a wide screen stretches the backdrop over its width (r36s/js/shim.js): the field's squares go with its soil, their
+  // places and the squares themselves q times wider (the crops keep their size); 4:3 as before
+  const q = (640 + 2 * SIDE) / 640, fx = x => SIDE ? 320 + (x - 320) * q : x;
+  const tile = (t, x, y) => { if (SIDE) t = wideTile(t, q); ctx.drawImage(t, fx(x) - t.width / 2, y - t.height / 2); };
   const ps = farmPlots();
-  FIELD.forEach((f, i) => { const t = IMG[plotTile(ps[i], now)]; if (t) ctx.drawImage(t, f.x - t.width / 2, f.y - t.height / 2); });
+  FIELD.forEach((f, i) => { const t = IMG[plotTile(ps[i], now)]; if (t) tile(t, f.x, f.y); });
   const sel = FIELD[S.farmSel], cur = IMG[ps[S.farmSel].s === 'khoa' ? 'fm_con-tro_o' : 'fm_con-tro_o_vang'];
-  if (cur) { ctx.globalAlpha = 0.55 + 0.45 * Math.abs(Math.sin(now / 260)); ctx.drawImage(cur, sel.x - cur.width / 2, sel.y - cur.height / 2); ctx.globalAlpha = 1; }
+  if (cur) { ctx.globalAlpha = 0.55 + 0.45 * Math.abs(Math.sin(now / 260)); tile(cur, sel.x, sel.y); ctx.globalAlpha = 1; }
   // crops and the pet, back to front
   const items = FIELD.map((f, i) => ({ y: f.y, draw: () => {
     const p = ps[i];
     if (p.s !== 'cay' || p.dead) return;
     const c = IMG[`fm_cay_${p.he}-${p.k}_${CROP_ST[Math.min(3, p.stage - 1)]}`];
-    if (c) ctx.drawImage(c, f.x - c.width / 2, f.y + 8 - c.height + (p.stage >= 4 ? Math.round(Math.sin(now / 300)) : 0));
-    if (p.stage >= 4 && Math.floor(now / 400) % 2) ctx.drawImage(IMG['lap-lanh'], f.x + 12, f.y - 40);
+    if (c) ctx.drawImage(c, fx(f.x) - c.width / 2, f.y + 8 - c.height + (p.stage >= 4 ? Math.round(Math.sin(now / 300)) : 0));
+    if (p.stage >= 4 && Math.floor(now / 400) % 2) ctx.drawImage(IMG['lap-lanh'], fx(f.x) + 12, f.y - 40);
   } }));
   items.sort((a, b) => a.y - b.y).forEach(it => it.draw());   // no pet here: the blinking square is the cursor
   if (S.fx && now - S.fx.t < 800 && IMG.fm_fx_nuoc) {
     const f = FIELD[S.fx.i], im = IMG.fm_fx_nuoc, k = (now - S.fx.t) / 800;
-    ctx.globalAlpha = 1 - k * 0.6; ctx.drawImage(im, f.x - im.width / 2, f.y - im.height - 6 - k * 10); ctx.globalAlpha = 1;
+    ctx.globalAlpha = 1 - k * 0.6; ctx.drawImage(im, fx(f.x) - im.width / 2, f.y - im.height - 6 - k * 10); ctx.globalAlpha = 1;
   }
   drawTop('Nông trại');
   ctx.fillStyle = 'rgba(12,7,5,0.72)'; ctx.fillRect(0, 432, 640, 48);
@@ -1868,6 +1896,9 @@ function drawSeedShop(now) {
 // welcome screen B: name plate x 131-508 y 49-130, buttons x 244-395 at y 368-391 (orange) and 410-432 (green)
 const TITLE_PET = [196, 150];      // where the cut-out upper body sits (TITLE_PET in build_evo_app.py)
 function drawTitleB(now) {
+  // a wide screen: the name plate (x 131-508) and the tiger keep their shape, only the scenery either side is stretched
+  // (r36s/js/shim.js: __wideMid); the breathing tiger and its sparks below then still sit on the painted one
+  if (SIDE && IMG.title_b) IMG.title_b.__wideMid = [110, 530];
   ctx.drawImage(IMG.title_b, 0, 0);
   // the tiger breathes: its upper body rises up to 2 px and settles (only up, so the painted one stays covered)
   const p = IMG.title_pet, lift = Math.round(1 + Math.sin(now / 420) * 1.2), [px, py] = TITLE_PET;

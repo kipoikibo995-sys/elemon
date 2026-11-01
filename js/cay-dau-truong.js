@@ -20,6 +20,7 @@
                  moc: ['moc-loc', 'moc-tru', 'thu-nhan', 'reu-linh', 'diep-linh', 'moc-duong'],
                  thuy: ['thuy-sa', 'thuy-giai', 'thuy-long', 'bao-thuy', 'thuy-chien', 'thuy-giao'],
                  tho: ['tho-tich', 'thach-nhan', 'tho-long', 'tho-tuong', 'thanh-tri', 'tho-nguu'] };
+  globalThis.__cayPets = PETS;                          // Vùng đất counts and picks by these (game/src/vung-dat.js)
   const STAGES = ['child', 'teen', 'adult', 'legend'];
   const LV = { child: 14, teen: 34, adult: 60, legend: 90 }, BOT = { child: 1, teen: 2, adult: 3, legend: 3 };
   const HE_COL = { hoa: '#ff9a6a', kim: '#e4f0ff', moc: '#a8e88a', thuy: '#8ad0ff', tho: '#f0c880', hu: '#d8b8ff' };
@@ -82,17 +83,27 @@
   const cur = c => c.t === HU_T ? { r: HU, st: 'legend' } : { r: TREES[c.t].stems[c.i].r, st: STAGES[c.j] };
 
   // ---------- drawing ----------
+  // a wide screen (SIDE, scripts/evo_app.html): a tree is drawn stretched over the whole width, sliding with it, and its
+  // nodes stand on its stretched boughs (their places q times further out, their size kept); 4:3 as before
+  const WQ = (640 + 2 * SIDE) / 640, WX = x => SIDE ? -SIDE + x * WQ : x;
+  function backdrop(bg, ox, w) {                          // the picture over a tree's width, stretched by the page itself
+    if (!SIDE) return ctx.drawImage(bg, ox, 0, w, 480);
+    const keep = bg.__wideKeep; bg.__wideKeep = true;     // (r36s/js/shim.js would stretch it once more)
+    ctx.drawImage(bg, WX(ox), 0, 640 * WQ, 480);
+    bg.__wideKeep = keep;
+  }
   function drawTree(T, ox, c) {
     const bg = img('cay/' + T.he);
-    if (bg) ctx.drawImage(bg, ox, 0); else { ctx.fillStyle = '#0c0a14'; ctx.fillRect(ox, 0, 640, 480); }
+    if (bg) { if (SIDE) backdrop(bg, ox, 640); else ctx.drawImage(bg, ox, 0); }
+    else { ctx.fillStyle = '#0c0a14'; ctx.fillRect(WX(ox), 0, 640 * WQ, 480); }
     T.stems.forEach((s, i) => {
       let any = false;
       STAGES.forEach((st, j) => {
         const o = isOpen(s.r.dir, st), on = c.t === T.t && c.i === i && c.j === j;
         any = any || o;
-        node(s.x + ox, T.rows[j], o ? (on ? 1 : 0) : 2, o ? petPic(s.r.dir, st) : null, on);
+        node(WX(s.x + ox), T.rows[j], o ? (on ? 1 : 0) : 2, o ? petPic(s.r.dir, st) : null, on);
       });
-      text(any ? s.r.name : '???', s.x + ox, T.bough + FR / 2 + 10, 12, any ? HE_COL[T.he] : '#9a8a78', 'center', true, 3);
+      text(any ? s.r.name : '???', WX(s.x + ox), T.bough + FR / 2 + 10, 12, any ? HE_COL[T.he] : '#9a8a78', 'center', true, 3);
     });
   }
   function node(x, y, f, pet, on) {                       // f: the frame (0 open, 1 picked, 2 locked, 3 Hư Ảnh)
@@ -107,8 +118,8 @@
   }
   function drawHu(ox, c) {
     const bg = IMG.nen;
-    if (bg) { ctx.drawImage(bg, ox, 0, 640, 480); ctx.fillStyle = 'rgba(20,6,30,0.55)'; ctx.fillRect(ox, 0, 640, 480); }
-    const o = huOpen(), on = c.t === HU_T, x = ox + 320, y = 230;
+    if (bg) { backdrop(bg, ox, 640); ctx.fillStyle = 'rgba(20,6,30,0.55)'; ctx.fillRect(WX(ox), 0, 640 * WQ, 480); }
+    const o = huOpen(), on = c.t === HU_T, x = WX(ox + 320), y = 230;
     if (on) {
       ctx.strokeStyle = `rgba(216,184,255,${0.6 + 0.4 * Math.sin(performance.now() / 180)})`; ctx.lineWidth = 3;
       ctx.beginPath(); ctx.arc(x, y, FR * 0.8 + 4, 0, 7); ctx.stroke();

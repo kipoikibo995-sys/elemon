@@ -44,6 +44,123 @@ const __OPS = { 'source-over': 0, 'source-atop': 1, 'source-in': 2 };
 const __ALIGN = { left: 0, start: 0, center: 1, right: 2, end: 2 };
 const __BASE = { alphabetic: 0, middle: 1, top: 2, hanging: 2 };
 
+// a wide screen (r36s/js_sdl2.c: 1280x720 -> an 854x480 canvas, __cv.screenW): the page still draws a 640x480 screen,
+// shifted into the middle; __SIDE columns on each side (page x from -__SIDE to 640 + __SIDE) are filled here. A draw
+// that spans the screen's width carries on into them: a fill as it is, a picture with its own pixels where it has more
+// (a map scrolled), else with a drawn wide version (<name>_rong.png: the picture with its sides added, same height),
+// else the whole picture stretched over the wide screen (the user, 02/11/2026: the backdrop stretched, not its edges
+// copied). A picture the page marks __wideKeep (a panel whose bars are in the picture) is left as it is, one marked
+// __wideMid keeps that middle and has only its outer parts stretched. The page
+// reads __SIDE to spread its top bar and menu out; a 4:3 screen has __SIDE 0 and draws as before
+const __SW = __cv.screenW || 640, __SIDE = (__SW - 640) >> 1;
+globalThis.__SIDE = __SIDE;
+const __SHAKE = 24;                             // a draw this far off the screen's edges still counts as over its width
+const __WIDE_STRIP = 0.75;                      // a map at its edge: the strip stretched over that side, 3/4 of its width
+// the drawn wide version of a picture (or null), looked for once
+function __rong(im) {
+  if (im.__rong !== undefined) return im.__rong;
+  im.__rong = null;
+  if (im._src && __cv.exists) {
+    const path = __file(im._src).replace(/\.(png|jpe?g|webp)$/i, '_rong.hli');
+    const r = path.endsWith('_rong.hli') && __cv.exists(path) ? __cv.loadImage(path) : null;
+    if (r) im.__rong = { __id: r[0], width: r[1], height: r[2] };
+  }
+  return im.__rong;
+}
+const __wideMade = new Map();                     // picture -> { key, id }: the last few pictures, made wide
+// canvases the page sealed (r36s/jsrt.c: done drawing, e.g. the farm's darkened backdrop) stay as they are: kept too
+const __sealed = new Set();
+if (__cv.seal) { const seal = __cv.seal; __cv.seal = id => { __sealed.add(id); return seal(id); }; }
+if (__cv.free) { const free = __cv.free; __cv.free = id => { __sealed.delete(id); return free(id); }; }
+const __still = im => im._src !== undefined || __sealed.has(im.__id);
+// a backdrop with no pixels of its own beyond the screen and no drawn wide version: the whole picture stretched over
+// the wide screen instead of drawn at 640 (true: drawn). A still picture over exactly the screen is stretched once into
+// a canvas and then only copied (stretched anew each frame it cost the handheld a few ms)
+function __wideStretch(id, im, sx, sy, sw, sh, x0, x1, y0, y1, s) {
+  const kx = sw / (x1 - x0), at = u => sx + (u - x0) * kx;
+  if ((at(-__SIDE) >= 0 || at(640 + __SIDE) <= im.width) || __rong(im)) return false;
+  // over the wide screen; a backdrop shaken a few pixels (the arena's hits) still reaches both of its edges
+  const k = im.__k || 1, h = y1 - y0, X0 = Math.min(x0 - __SIDE, -__SIDE), X1 = Math.max(x1 + __SIDE, 640 + __SIDE);
+  // the picture from X0 to X1 into canvas dst (page x u at u + e, y at y): all of it stretched alike, or, when the page
+  // marks a middle to keep (__wideMid: source columns [a, b], a title's logo and tiger), that part as it is and the
+  // two outer parts stretched over the rest
+  const paint = (dst, e, y, alpha, shadow, blur, bright, sat) => {
+    const one = (a, b, u0, u1) => __cv.drawImage(dst, im.__id, a / k, sy / k, (b - a) / k, sh / k, u0, y, u1 - u0, h, 1, 0, 0, 1, e, 0,
+                                                 alpha, __OPS[s.op], shadow, blur, bright, sat);
+    const mid = im.__wideMid;
+    if (mid && mid[0] > sx && mid[1] < sx + sw && mid[0] < mid[1]) {
+      const da = at.inv(mid[0]), db = at.inv(mid[1]);
+      one(sx, mid[0], X0, da); one(mid[0], mid[1], da, db); one(mid[1], sx + sw, db, X1);
+    } else one(sx, sx + sw, X0, X1);
+  };
+  at.inv = v => x0 + (v - sx) / kx;
+  if (!__still(im) || x0 !== 0 || x1 !== 640 || y0 !== Math.round(y0) || h !== Math.round(h) || s.alpha !== 1 ||
+      s.op !== 'source-over' || !__cv.seal) {
+    paint(id, __SIDE, y0, s.alpha, s.blur > 0 ? s.shadow : 0, s.blur, s.bright, s.sat);
+    return true;
+  }
+  const key = `wide:${sx},${sy},${sw},${sh},${y0},${y1},${s.bright},${s.sat},${im.__wideMid}`;
+  let made = __wideMade.get(im);
+  if (!made || made.key !== key) {
+    if (made) __cv.free(made.id);
+    __wideMade.delete(im);
+    if (__wideMade.size >= 4) { const [old, m] = __wideMade.entries().next().value; __cv.free(m.id); __wideMade.delete(old); }
+    made = { key, id: __cv.newCanvas(__SW, h) };
+    paint(made.id, __SIDE, 0, 1, 0, 0, s.bright, s.sat);
+    __cv.seal(made.id);
+    __wideMade.set(im, made);
+  }
+  __cv.drawImage(id, made.id, 0, 0, __SW, h, 0, y0, __SW, h, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 1);
+  return true;
+}
+// the two sides of a picture drawn over the screen's width: source (sx, sy, sw, sh) in the page's units, shown on
+// screen from x0 to x1, y0 to y1 (page x, before the shift). A picture over exactly the screen (a room, a backdrop) has
+// its sides made once into a small canvas and then only copied: drawn anew each frame they cost the handheld 3 ms
+function __wideSides(id, im, sx, sy, sw, sh, x0, x1, y0, y1, s) {
+  const h = y1 - y0;
+  if (!__still(im) || x0 !== 0 || x1 !== 640 || y0 !== Math.round(y0) || h !== Math.round(h) || s.alpha !== 1 ||
+      s.op !== 'source-over' || !__cv.seal)       // a canvas (its pixels change), a fade, a picture moving: drawn as it is
+    return __wideDraw(id, im, sx, sy, sw, sh, x0, x1, y0, y1, s, __SIDE, __SIDE, 0);
+  const key = `${sx},${sy},${sw},${sh},${y0},${y1},${s.bright},${s.sat}`;
+  let made = __wideMade.get(im);
+  if (!made || made.key !== key) {
+    if (made) __cv.free(made.id);
+    __wideMade.delete(im);
+    if (__wideMade.size >= 6) { const [old, m] = __wideMade.entries().next().value; __cv.free(m.id); __wideMade.delete(old); }
+    made = { key, id: __cv.newCanvas(2 * __SIDE, h) };   // the left side, then the right one
+    __wideDraw(made.id, im, sx, sy, sw, sh, x0, x1, y0, y1, s, __SIDE, __SIDE - 640, y0);
+    __cv.seal(made.id);
+    __wideMade.set(im, made);
+  }
+  __cv.drawImage(id, made.id, 0, 0, __SIDE, h, -__SIDE, y0, __SIDE, h, 1, 0, 0, 1, __SIDE, 0, 1, 0, 0, 0, 1, 1);
+  __cv.drawImage(id, made.id, __SIDE, 0, __SIDE, h, 640, y0, __SIDE, h, 1, 0, 0, 1, __SIDE, 0, 1, 0, 0, 0, 1, 1);
+}
+// the sides drawn into canvas id: page x u lands at u + eL on the left, u + eR on the right, y at y - top
+function __wideDraw(id, im, sx, sy, sw, sh, x0, x1, y0, y1, s, eL, eR, top) {
+  const k = im.__k || 1, kx = sw / (x1 - x0), at = u => sx + (u - x0) * kx, h = y1 - y0;
+  let e = eL;
+  const put = (a, b, c, d, u, w) =>
+    __cv.drawImage(id, im.__id, a / k, b / k, c / k, d / k, u, y0 - top, w, h, 1, 0, 0, 1, e, 0, s.alpha, __OPS[s.op], 0, 0, s.bright, s.sat);
+  const rong = sx <= 0.5 && sx + sw >= im.width - 0.5 ? __rong(im) : null;
+  for (const left of [true, false]) {
+    const u0 = left ? -__SIDE : x1, u1 = left ? x0 : 640 + __SIDE, w = u1 - u0;
+    e = left ? eL : eR;
+    if (w <= 0) continue;
+    const a = at(u0), b = at(u1);
+    if (a >= 0 && b <= im.width) { put(a, sy, b - a, sh, u0, w); continue; }   // its own pixels
+    if (rong) {                                   // the drawn wide version: its side part, at the picture's scale if it has enough
+      const r = rong.height / im.height, pad = (rong.width - im.width * r) / 2, c = Math.min(pad, w * kx * r);
+      if (pad > 0) {
+        __cv.drawImage(id, rong.__id, left ? pad - c : rong.width - pad, sy * r, c, sh * r, u0, y0 - top, w, h, 1, 0, 0, 1, e, 0,
+                       s.alpha, __OPS[s.op], 0, 0, s.bright, s.sat);
+        continue;
+      }
+    }
+    const st = w * __WIDE_STRIP * kx, edge = left ? sx : sx + sw;   // the edge strip, stretched outward
+    put(left ? edge : edge - st, sy, st, sh, u0, w);
+  }
+}
+
 class CanvasRenderingContext2D {
   constructor(canvas) {
     this.canvas = canvas;
@@ -53,6 +170,7 @@ class CanvasRenderingContext2D {
     this._stack = [];
     this._path = [];
     this.imageSmoothingEnabled = true;
+    this._ox = canvas.__id === 0 ? __SIDE : 0;   // the screen on a wide canvas: the page's 640 in the middle
   }
   get fillStyle() { return this._s.fs; }
   set fillStyle(v) { this._s.fs = v; this._s.fill = v instanceof CanvasGradient ? v : __rgba(v); }
@@ -136,16 +254,27 @@ class CanvasRenderingContext2D {
   setTransform(a, b, c, d, e, f) { this._s.m = [a, b, c, d, e, f]; }
   resetTransform() { this._s.m = [1, 0, 0, 1, 0, 0]; }
   fillRect(x, y, w, h) {
-    const s = this._s, m = s.m;
+    const s = this._s;
+    let m = s.m;
     if (w < 0) { x += w; w = -w; } if (h < 0) { y += h; h = -h; }
     if (s.clip) { const r = this._clipped(0, 0, 1, 1, x, y, w, h); if (!r) return; [x, y, w, h] = r.slice(4); }
-    const f = s.fill;
-    if (f && f.__checker) return __cv.fillRect(this.canvas.__id, x, y, w, h, m[0], m[1], m[2], m[3], m[4], m[5], __col(f.__solid), s.alpha, __OPS[s.op], f.__checker);
-    __cv.fillRect(this.canvas.__id, x, y, w, h, m[0], m[1], m[2], m[3], m[4], m[5], __col(f), s.alpha, __OPS[s.op]);
+    else if (this._ox) [x, w, m] = this._wideFill(x, w, m);
+    const f = s.fill, ox = this._ox;
+    if (f && f.__checker) return __cv.fillRect(this.canvas.__id, x, y, w, h, m[0], m[1], m[2], m[3], m[4] + ox, m[5], __col(f.__solid), s.alpha, __OPS[s.op], f.__checker);
+    __cv.fillRect(this.canvas.__id, x, y, w, h, m[0], m[1], m[2], m[3], m[4] + ox, m[5], __col(f), s.alpha, __OPS[s.op]);
   }
   clearRect(x, y, w, h) {
-    const s = this._s, m = s.m;
-    __cv.fillRect(this.canvas.__id, x, y, w, h, m[0], m[1], m[2], m[3], m[4], m[5], 0, 1, 2);
+    let m = this._s.m;
+    if (this._ox && !this._s.clip) [x, w, m] = this._wideFill(x, w, m);
+    __cv.fillRect(this.canvas.__id, x, y, w, h, m[0], m[1], m[2], m[3], m[4] + this._ox, m[5], 0, 1, 2);
+  }
+  // a fill over the screen's whole width goes on over the sides of a wide screen: [x, w, matrix] to fill with
+  _wideFill(x, w, m) {
+    if (m[1] || m[2] || m[0] <= 0) return [x, w, m];
+    const x0 = m[0] * x + m[4], x1 = m[0] * (x + w) + m[4];
+    if (x0 > __SHAKE || x1 < 640 - __SHAKE || x1 - x0 < 600) return [x, w, m];
+    const a = Math.min(x0, -__SIDE), b = Math.max(x1, 640 + __SIDE);
+    return [a, b - a, [1, 0, 0, m[3], 0, m[5]]];
   }
   drawImage(im, a, b, c, d, e, f, g, h) {
     if (!im || im.__id === undefined) return;
@@ -154,10 +283,21 @@ class CanvasRenderingContext2D {
     else { sx = a; sy = b; sw = c; sh = d; dx = e; dy = f; dw = g; dh = h; }
     const s = this._s, m = s.m;
     if (s.clip) { const r = this._clipped(sx, sy, sw, sh, dx, dy, dw, dh); if (!r) return; [sx, sy, sw, sh, dx, dy, dw, dh] = r; }
-    const k = im.__k;
+    if (im.__id === 0 && __SIDE) sx += __SIDE;                  // the screen itself, read where the page's 640 is
+    const k = im.__k, x0 = sx, y0 = sy, w0 = sw, h0 = sh;
     if (k) { sx /= k; sy /= k; sw /= k; sh /= k; }               // stored at 1/k of the size the page uses
-    __cv.drawImage(this.canvas.__id, im.__id, sx, sy, sw, sh, dx, dy, dw, dh, m[0], m[1], m[2], m[3], m[4], m[5],
+    // a picture over the screen's whole width (a backdrop) on a wide screen: over the sides too
+    let wide = null;
+    if (this._ox && !s.clip && im.__id !== 0 && !im.__wideKeep && !m[1] && !m[2] && m[0] > 0 && m[3] > 0 && dw > 0 && dh > 0) {
+      const X0 = m[0] * dx + m[4], X1 = m[0] * (dx + dw) + m[4], Y0 = m[3] * dy + m[5], Y1 = m[3] * (dy + dh) + m[5];
+      if (X0 <= __SHAKE && X1 >= 640 - __SHAKE && X1 - X0 >= 600 && Y1 - Y0 >= 240) {
+        if (__wideStretch(this.canvas.__id, im, x0, y0, w0, h0, X0, X1, Y0, Y1, s)) return;
+        wide = [X0, X1, Y0, Y1];
+      }
+    }
+    __cv.drawImage(this.canvas.__id, im.__id, sx, sy, sw, sh, dx, dy, dw, dh, m[0], m[1], m[2], m[3], m[4] + this._ox, m[5],
                    s.alpha, __OPS[s.op], s.blur > 0 ? s.shadow : 0, s.blur, s.bright, s.sat);
+    if (wide) __wideSides(this.canvas.__id, im, x0, y0, w0, h0, ...wide, s);
   }
   // paths: whole ellipses / circles (ellipse, arc) and polygons (moveTo, lineTo, curves as short lines, rect,
   // roundRect), each filled or stroked whole; a polygon left open is stroked open
@@ -226,27 +366,27 @@ class CanvasRenderingContext2D {
     for (const p of this._path) {
       if (Array.isArray(p)) {
         if (p.length >= (line ? 4 : 6))
-          __cv.poly(this.canvas.__id, p, m[0], m[1], m[2], m[3], m[4], m[5], colour, s.alpha, line, __OPS[s.op], line && !p.closed ? 1 : 0);
+          __cv.poly(this.canvas.__id, p, m[0], m[1], m[2], m[3], m[4] + this._ox, m[5], colour, s.alpha, line, __OPS[s.op], line && !p.closed ? 1 : 0);
       }
-      else __cv.ellipse(this.canvas.__id, p.x, p.y, p.rx, p.ry, m[0], m[1], m[2], m[3], m[4], m[5], colour, s.alpha, line, __OPS[s.op]);
+      else __cv.ellipse(this.canvas.__id, p.x, p.y, p.rx, p.ry, m[0], m[1], m[2], m[3], m[4] + this._ox, m[5], colour, s.alpha, line, __OPS[s.op]);
     }
   }
   fill() { this._shape(this._s.fill, 0); }
   stroke() { this._shape(this._s.stroke, Math.max(1, this._s.lw)); }
   _text(t, x, y, colour, stroke) {
     const s = this._s, m = s.m;
-    __cv.text(this.canvas.__id, String(t), x, y, m[0], m[1], m[2], m[3], m[4], m[5], s.size, s.bold,
+    __cv.text(this.canvas.__id, String(t), x, y, m[0], m[1], m[2], m[3], m[4] + this._ox, m[5], s.size, s.bold,
               __ALIGN[s.align] || 0, __BASE[s.base] || 0, colour, s.alpha, stroke);
   }
   fillText(t, x, y) { this._text(t, x, y, __col(this._s.fill), 0); }
   strokeText(t, x, y) { this._text(t, x, y, __col(this._s.stroke), Math.max(1, this._s.lw)); }
   getImageData(x, y, w, h) {
-    const b = __cv.pixels(this.canvas.__id, x, y, w, h);
+    const b = __cv.pixels(this.canvas.__id, x + this._ox, y, w, h);
     return { width: w, height: h, data: b ? new Uint8ClampedArray(b) : new Uint8ClampedArray(w * h * 4) };
   }
   putImageData(d, x, y) {
     const a = d.data, buf = a.byteOffset === 0 && a.byteLength === a.buffer.byteLength ? a.buffer : a.slice().buffer;
-    __cv.put(this.canvas.__id, x | 0, y | 0, d.width, d.height, buf);
+    __cv.put(this.canvas.__id, (x | 0) + this._ox, y | 0, d.width, d.height, buf);
   }
   createImageData(w, h) { return { width: w, height: h, data: new Uint8ClampedArray(w * h * 4) }; }
   measureText(t) { return { width: __cv.measure(String(t), this._s.size, this._s.bold) }; }
@@ -254,8 +394,8 @@ class CanvasRenderingContext2D {
 
 class HTMLCanvasElement {
   constructor(id, w, h) { this.__id = id; this._w = w; this._h = h; this._ctx = null; this.style = {}; }
-  get width() { return this._w; } set width(v) { this._w = Math.max(0, v | 0); __cv.resize(this.__id, this._w, this._h); }
-  get height() { return this._h; } set height(v) { this._h = Math.max(0, v | 0); __cv.resize(this.__id, this._w, this._h); }
+  get width() { return this._w; } set width(v) { this._w = Math.max(0, v | 0); __sealed.delete(this.__id); __cv.resize(this.__id, this._w, this._h); }
+  get height() { return this._h; } set height(v) { this._h = Math.max(0, v | 0); __sealed.delete(this.__id); __cv.resize(this.__id, this._w, this._h); }
   getContext() { return this._ctx || (this._ctx = new CanvasRenderingContext2D(this)); }
 }
 
@@ -316,7 +456,8 @@ globalThis.localStorage = {
   removeItem: k => { __cv.writeText(`${__cv.saveDir}/${k}.json`, ''); },
 };
 // the game's sounds (in a browser, index.html makes these with <audio>)
-globalThis.SOUND = { sfx: (name, vol) => __cv.sfx(name, vol), music: name => __cv.music(name || '') };
+globalThis.SOUND = { sfx: (name, vol) => __cv.sfx(name, vol), music: name => __cv.music(name || ''),
+                     vol: v => { if (__cv.musicVol) __cv.musicVol(v); } };   // vol: the music's, 0..256
 
 // URLSearchParams (Solo đối kháng reads its pets and bot level from a query string)
 if (typeof URLSearchParams === 'undefined') globalThis.URLSearchParams = class {
