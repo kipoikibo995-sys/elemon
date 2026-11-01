@@ -41,7 +41,7 @@ static Sound sounds[MAX_SOUNDS];
 static int n_sounds;
 static Channel chan[CHANNELS];
 static struct { int sound, vol; } pending[16];
-static int n_pending, music_next = -1;     /* -1 nothing to do, -2 stop, else the sound to loop on channel 0 */
+static int n_pending, music_next = -1, music_vol = 140;   /* music_vol: holua.musicVol, 0..256 */     /* -1 nothing to do, -2 stop, else the sound to loop on channel 0 */
 static JSRuntime *rt;
 static JSContext *jc;
 static double now_ms;
@@ -697,8 +697,9 @@ void jsrt_audio_commit(void) {
     if (music_next == -2) chan[0].d = 0;
     else if (music_next >= 0) {
         chan[0].d = sounds[music_next].data; chan[0].len = sounds[music_next].len;
-        chan[0].pos = 0; chan[0].vol = 140; chan[0].loop = 1;
+        chan[0].pos = 0; chan[0].loop = 1;
     }
+    chan[0].vol = music_vol;                        /* Cài đặt's Nhạc nền, on the song playing too */
     music_next = -1;
     for (i = 0; i < n_pending; ++i) {
         int best = 1;
@@ -1110,6 +1111,14 @@ static JSValue b_music(JSContext *ctx, JSValueConst t, int argc, JSValueConst *a
     return JS_UNDEFINED;
 }
 
+/* holua.musicVol(0..256): the music's loudness (Cài đặt -> Nhạc nền), the sounds and the voice as they are */
+static JSValue b_music_vol(JSContext *ctx, JSValueConst t, int argc, JSValueConst *argv) {
+    int v = argc ? ARG_I(0) : 140;
+    (void)t;
+    music_vol = v < 0 ? 0 : v > 256 ? 256 : v;
+    return JS_UNDEFINED;
+}
+
 static void print_exception(void) {
     JSValue e = JS_GetException(jc), stack;
     const char *s = JS_ToCString(jc, e);
@@ -1175,7 +1184,7 @@ int jsrt_init(const char *dir) {
         { "now", b_now, 0 }, { "clock", b_clock, 0 }, { "pad", b_pad, 0 }, { "log", b_log, 1 }, { "newCanvas", b_new_canvas, 2 },
         { "resize", b_resize, 3 }, { "loadImage", b_load_image, 1 }, { "fillRect", b_fill_rect, 14 },
         { "drawImage", b_draw_image, 22 }, { "ellipse", b_ellipse, 15 }, { "text", b_text, 17 },
-        { "measure", b_measure, 3 }, { "sfx", b_sfx, 2 }, { "music", b_music, 1 }, { "voice", b_voice, 1 }, { "poly", b_poly, 13 }, { "pixels", b_pixels, 5 }, { "put", b_put, 6 }, { "free", b_free, 1 }, { "seal", b_seal, 1 },
+        { "measure", b_measure, 3 }, { "sfx", b_sfx, 2 }, { "music", b_music, 1 }, { "musicVol", b_music_vol, 1 }, { "voice", b_voice, 1 }, { "poly", b_poly, 13 }, { "pixels", b_pixels, 5 }, { "put", b_put, 6 }, { "free", b_free, 1 }, { "seal", b_seal, 1 },
         { "readText", b_read_text, 1 }, { "writeText", b_write_text, 2 }, { "exit", b_exit, 0 }, { "ota", b_ota, 1 } };
     /* the scripts to run, in order: js/load.txt (one path a line, scripts/r36s_game.py), else the test page's set */
     static const char *scripts[] = { "js/shim.js", "js/data.js", "js/page.js", "js/am-thanh.js" };

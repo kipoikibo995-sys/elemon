@@ -316,7 +316,8 @@ globalThis.localStorage = {
   removeItem: k => { __cv.writeText(`${__cv.saveDir}/${k}.json`, ''); },
 };
 // the game's sounds (in a browser, index.html makes these with <audio>)
-globalThis.SOUND = { sfx: (name, vol) => __cv.sfx(name, vol), music: name => __cv.music(name || '') };
+globalThis.SOUND = { sfx: (name, vol) => __cv.sfx(name, vol), music: name => __cv.music(name || ''),
+                     vol: v => { if (__cv.musicVol) __cv.musicVol(v); } };   // vol: the music's, 0..256
 
 // URLSearchParams (Solo đối kháng reads its pets and bot level from a query string)
 if (typeof URLSearchParams === 'undefined') globalThis.URLSearchParams = class {

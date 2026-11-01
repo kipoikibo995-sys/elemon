@@ -36,7 +36,7 @@ ADD = '''<script data-browser-only>
 window.SOUND = (() => {
   const V = '__SND_V__';                     // the build: a browser never plays an old copy from its cache
   const cache = {}, play = a => a.play().catch(() => {});
-  let song = null;
+  let song = null, songVol = 0.5;
   for (const ev of ['keydown', 'pointerdown']) addEventListener(ev, () => { if (song && song.paused) play(song); });
   return {
     sfx(name, vol) {
@@ -47,8 +47,9 @@ window.SOUND = (() => {
       if (song) song.pause();
       song = null;
       if (!name) return;
-      song = new Audio(`nhac/${name}.wav?v=${V}`); song.loop = true; song.volume = 0.5; play(song);
+      song = new Audio(`nhac/${name}.wav?v=${V}`); song.loop = true; song.volume = songVol; play(song);
     },
+    vol(v) { songVol = Math.min(1, v / 280); if (song) song.volume = songVol; },   // the music's, 0..256
   };
 })();
 // a button beside "Chơi lại" that clears the save (testing in a browser)
