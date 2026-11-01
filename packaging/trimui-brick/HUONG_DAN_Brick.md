@@ -11,8 +11,14 @@ Elemon: nuôi tinh linh Ngũ Hành, cho ăn, tiến hóa, đi Vùng đất đán
 
 ## Cập nhật lên bản mới
 
-Chép đè thư mục `Apps/Elemon/` của bản mới lên bản cũ. Bản lưu nằm riêng ở `Saves/elemon/` trên thẻ, không mất.
-Nếu máy chạy lag sau khi chép, xóa hẳn `Apps/Elemon/` rồi chép lại.
+Ngay trên máy (từ bản 1.1, cần wifi): **Cài đặt → Cập nhật → A**. Game chỉ tải những file đã đổi, kiểm tra từng
+file, cài xong tự mở lại. Mất wifi giữa chừng thì bản đang chơi giữ nguyên, lần sau tải tiếp. Bản mới không mở được
+thì game tự quay về bản cũ.
+
+Hoặc cài tay: chép đè thư mục `Apps/Elemon/` của bản mới lên bản cũ. Nếu máy chạy lag sau khi chép, xóa hẳn
+`Apps/Elemon/` rồi chép lại.
+
+Bản lưu nằm riêng ở `Saves/elemon/` trên thẻ, cập nhật kiểu nào cũng không mất.
 
 ## Phím
 

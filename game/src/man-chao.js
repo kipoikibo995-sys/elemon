@@ -167,22 +167,72 @@
   }
 
   // ---------- the settings screen ----------
+  // Cập nhật (the in-device update): only on the handheld build, where elemon runs ota.sh (packaging/trimui-brick)
+  const OTA = typeof __cv === 'object' && !!__cv.ota && !__cv.test && __cv.readText('ota.sh') !== null;
   const ROWS = [
-    ['nhac', 'Nhạc nền'], ['tiengDong', 'Tiếng động'], ['giong', 'Giọng đọc truyện'], ['noi', 'Pet nói chuyện'], ['ve', 'Quay lại'],
+    ['nhac', 'Nhạc nền'], ['tiengDong', 'Tiếng động'], ['giong', 'Giọng đọc truyện'], ['noi', 'Pet nói chuyện'],
+    ...(OTA ? [['capNhat', 'Cập nhật']] : []), ['ve', 'Quay lại'],
   ];
   function openSettings(back = 'title') { S.cd = { sel: 0, back }; S.mode = 'caiDat'; }
+
+  // the update: ota.sh writes .ota/state ("status=..." lines); the version here is files.txt's "#version"
+  const readKv = path => {
+    const t = __cv.readText(path), o = {};
+    if (t) for (const l of t.split('\n')) { const i = l.indexOf('='); if (i > 0) o[l.slice(0, i)] = l.slice(i + 1); }
+    return o;
+  };
+  const myVersion = () => { const t = OTA && __cv.readText('files.txt'); const m = t && /^#version (\S+)/m.exec(t); return m ? m[1] : ''; };
+  const MB = b => `${Math.max(0.1, (+b || 0) / 1048576).toFixed(1)} MB`;
+  let otaSt = {}, otaT = 0, otaMine = false;                 // otaMine: started in this run (else a state left over)
+  function otaState(now) {
+    if (now - otaT > 400) { otaT = now; otaSt = readKv('.ota/state'); }
+    const s = otaSt.status;
+    if (!otaMine && (s === 'checking' || s === 'dl')) return { status: 'cut' };   // the game was closed mid-way
+    return otaSt;
+  }
+  function otaLine(st) {                                     // [value at the row's right, the line under the list]
+    const v = myVersion() || 'v1.0';
+    switch (st.status) {
+      case 'checking': return ['Đang kiểm tra…', 'Đang hỏi máy chủ có bản mới không'];
+      case 'same': return [v, `Đang là bản mới nhất (${v})`];
+      case 'new': return [`Có ${st.version}`, `Bản ${st.version}: ${st.files} file, ${MB(st.bytes)} · A: tải về`];
+      case 'dl': return [`${Math.round(100 * (+st.got || 0) / Math.max(1, +st.bytes))}%`,
+                         `Đang tải ${st.done}/${st.total} file · ${MB(st.got)} / ${MB(st.bytes)} · cứ chơi tiếp được`];
+      case 'ready': return ['Sẵn sàng', `Đã tải xong ${st.version} · A: cài ngay (game tự mở lại)`];
+      case 'installed': return [v, `Đã cài ${st.version}`];
+      case 'cut': return [v, 'Lần tải trước chưa xong · A: tải tiếp'];
+      case 'error': return ['Lỗi', st.msg || 'Có lỗi, thử lại sau'];
+      default: return [v, 'A: kiểm tra bản mới (cần wifi)'];
+    }
+  }
+  function otaPress(now) {
+    const s = otaState(now).status;
+    if (s === 'checking' || s === 'dl') return toast('Đang chạy, đợi chút');
+    if (s === 'ready') {                                       // quit; launch.sh puts it in and opens the game again
+      if (typeof __quit === 'function') __quit();
+      toast('Đang cài bản mới…');
+      return setTimeout(() => __cv.exit(), 600);
+    }
+    otaMine = __cv.ota(s === 'new' || s === 'cut' ? 'get' : 'check');
+    otaT = 0;
+    if (!otaMine) toast('Không chạy được trình cập nhật');
+  }
+  // a version just put in says it started (ota.sh after keeps it; without this it is undone on quitting)
+  if (OTA && __cv.readText('.ota/trial')) setTimeout(() => __cv.writeText('.ota/ok', myVersion() || 'ok'), 5000);
   globalThis.__caiDat = back => fadeTo(() => openSettings(back));   // the room's START (game/build_game.py WORDING)
   function drawSettings(now) {
     pickBack();
     ctx.fillStyle = 'rgba(10,6,4,0.45)'; ctx.fillRect(0, 0, 640, 480);
     title('CÀI ĐẶT', 320, 44, 32, '#ffecaa', 5);
-    const X = 90, W = 460, Y0 = 96, H = 54, G = 10;
+    const X = 90, W = 460, Y0 = 92, H = OTA ? 46 : 54, G = OTA ? 8 : 10;
+    const ota = OTA ? otaLine(otaState(now)) : null;
     ROWS.forEach(([k, name], i) => {
       const y = Y0 + i * (H + G), on = i === S.cd.sel;
       frameBox(X, y, W, H, on);
       text(name, X + 22, y + H / 2 + 1, 17, on ? '#fff2d8' : '#f0e4ce', 'left', true, 3);
       if (k === 've') return;
       const vx = X + W - 22, cy = y + H / 2 + 1;
+      if (k === 'capNhat') return text(ota[0], vx, cy, 15, '#ffe6a8', 'right', true, 3);
       if (k === 'tiengDong') {
         for (let j = 0; j < 10; j++) {
           ctx.fillStyle = j < CD.tiengDong ? '#ffd36e' : 'rgba(255,255,255,0.15)';
@@ -191,6 +241,7 @@
         text(CD.tiengDong ? String(CD.tiengDong) : 'Tắt', vx - 30, cy, 15, '#ffe6a8', 'right', true, 2);
       } else text(CD[k] ? '◄ Bật ►' : '◄ Tắt ►', vx, cy, 16, CD[k] ? '#8ce16e' : '#c98a7a', 'right', true, 3);
     });
+    if (ota && ROWS[S.cd.sel][0] === 'capNhat') text(ota[1], 320, 436, 14, '#fff2d8', 'center', true, 3);
     text('▲ ▼ chọn · ◄ ► hoặc A: đổi · B: quay lại', 320, 464, 13, '#c9bba8', 'center', false, 3);
   }
   function setPress(btn) {
@@ -199,6 +250,7 @@
     if (btn === 'B' || (k === 've' && (btn === 'A' || btn === 'START'))) {
       sfx('quay-lai', 180); return fadeTo(() => { S.mode = c.back || 'title'; S.cd = null; });
     }
+    if (k === 'capNhat') { if (btn === 'A') { sfx('chon', 190); otaPress(performance.now()); } return; }
     if (!['LEFT', 'RIGHT', 'A'].includes(btn) || k === 've') return;
     if (k === 'tiengDong') {
       const dir = btn === 'LEFT' ? -1 : 1;

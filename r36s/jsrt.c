@@ -1154,13 +1154,29 @@ static JSValue b_exit(JSContext *ctx, JSValueConst t, int argc, JSValueConst *ar
 }
 int jsrt_wants_exit(void) { return exit_asked; }
 
+/* the in-device update (Cài đặt -> Cập nhật): ota("check") or ota("get") starts ota.sh beside the game in the
+   background (its output in .ota/log.txt); the game reads .ota/state to follow it. -> true when started */
+static JSValue b_ota(JSContext *ctx, JSValueConst t, int argc, JSValueConst *argv) {
+    const char *what = argc ? JS_ToCString(ctx, argv[0]) : 0;
+    char cmd[1400];
+    int ok = 0;
+    (void)t;
+    if (what && (!strcmp(what, "check") || !strcmp(what, "get"))) {
+        snprintf(cmd, sizeof cmd, "cd '%s' && mkdir -p .ota && [ -f ota.sh ] && (sh ./ota.sh %s </dev/null >>.ota/log.txt 2>&1 &)",
+                 root, what);
+        ok = system(cmd) == 0;
+    }
+    if (what) JS_FreeCString(ctx, what);
+    return JS_NewBool(ctx, ok);
+}
+
 int jsrt_init(const char *dir) {
     static const struct { const char *name; JSCFunction *f; int n; } fns[] = {
         { "now", b_now, 0 }, { "clock", b_clock, 0 }, { "pad", b_pad, 0 }, { "log", b_log, 1 }, { "newCanvas", b_new_canvas, 2 },
         { "resize", b_resize, 3 }, { "loadImage", b_load_image, 1 }, { "fillRect", b_fill_rect, 14 },
         { "drawImage", b_draw_image, 22 }, { "ellipse", b_ellipse, 15 }, { "text", b_text, 17 },
         { "measure", b_measure, 3 }, { "sfx", b_sfx, 2 }, { "music", b_music, 1 }, { "voice", b_voice, 1 }, { "poly", b_poly, 13 }, { "pixels", b_pixels, 5 }, { "put", b_put, 6 }, { "free", b_free, 1 }, { "seal", b_seal, 1 },
-        { "readText", b_read_text, 1 }, { "writeText", b_write_text, 2 }, { "exit", b_exit, 0 } };
+        { "readText", b_read_text, 1 }, { "writeText", b_write_text, 2 }, { "exit", b_exit, 0 }, { "ota", b_ota, 1 } };
     /* the scripts to run, in order: js/load.txt (one path a line, scripts/r36s_game.py), else the test page's set */
     static const char *scripts[] = { "js/shim.js", "js/data.js", "js/page.js", "js/am-thanh.js" };
     char *list, *line, *save = 0, save_dir[1200];
