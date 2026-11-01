@@ -92,6 +92,17 @@ figcaption::before { content: "> "; color: var(--gold) }
 .abxy i { width: 20px; height: 20px; border-radius: 50%; background: #111 }
 .abxy i:nth-child(1) { grid-area: 1 / 2 } .abxy i:nth-child(2) { grid-area: 2 / 1 } .abxy i:nth-child(3) { grid-area: 2 / 3 } .abxy i:nth-child(4) { grid-area: 3 / 2 }
 
+/* the game's own scenes behind the page: the evolution screen's night over the top, and a dimmed scene behind some bands */
+body { position: relative }
+body::before { content: ""; position: absolute; z-index: -1; inset: 0 0 auto 0; height: min(1100px, 140vh); image-rendering: pixelated;
+  background: linear-gradient(to bottom, #10122b33 0, #10122b88 55%, var(--sky) 100%), url(img/bg/dem.webp) center 70% / cover no-repeat }
+section.band.scene { image-rendering: pixelated;
+  background: linear-gradient(to right, var(--line) 50%, #0000 0) top / 16px 4px repeat-x,
+    linear-gradient(to bottom, #0c0e24 0, #0c0e24d0 22%, #0c0e24d0 78%, #0c0e24 100%),
+    var(--bg) center / cover no-repeat }
+section.band.scene.lit { background: linear-gradient(to right, var(--line) 50%, #0000 0) top / 16px 4px repeat-x,
+    linear-gradient(to bottom, #10122b 0, #10122b66 30%, #10122b99 100%), var(--bg) center 70% / cover no-repeat }
+
 /* table of contents: a game menu */
 .toc { display: flex; flex-wrap: wrap; gap: 10px; padding-block: 0 16px }
 .toc a { text-decoration: none; color: var(--ink); background: var(--sky-2); border: 3px solid var(--black); box-shadow: inset 0 0 0 2px var(--line), 3px 3px 0 var(--black); padding: 4px 12px 2px; font: 1.3rem/1.2 var(--term) }
@@ -259,7 +270,7 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: s
     </div>
   </section>
 
-  <section class="band" id="cham-soc">
+  <section class="band scene" id="cham-soc" style="--bg:url(img/bg/phong.webp)">
     <div class="wrap">
       <div class="head">
         <p class="eyebrow">Chăm pet mỗi ngày</p>
@@ -349,7 +360,7 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: s
     </div>
   </section>
 
-  <section class="band" id="hoat-dong">
+  <section class="band scene" id="hoat-dong" style="--bg:url(img/bg/ban-do.webp)">
     <div class="wrap">
       <div class="head">
         <p class="eyebrow">Hoạt động</p>
@@ -402,7 +413,7 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: s
     </div>
   </section>
 
-  <section class="band" id="vung-dat">
+  <section class="band scene" id="vung-dat" style="--bg:url(img/bg/vung-hoa.webp)">
     <div class="wrap">
       <div class="head">
         <p class="eyebrow">Vùng đất</p>
@@ -420,7 +431,7 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: s
     </div>
   </section>
 
-  <section class="band" id="dau-truong">
+  <section class="band scene" id="dau-truong" style="--bg:url(img/bg/cay-kim.webp)">
     <div class="wrap split">
       <div class="text">
         <p class="eyebrow">Đấu trường</p>
@@ -486,7 +497,7 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: s
     </div>
   </section>
 
-  <section class="band">
+  <section class="band scene lit" style="--bg:url(img/bg/dem.webp)">
     <div class="wrap final">
       <div class="lineup"><span class="spr" style="--w:211;--h:220;--d:-0.24s"><img src="img/game/pet-hoa-ho.webp" alt="Hỏa Hổ" width="844" height="220" loading="lazy"></span><span class="spr" style="--w:197;--h:232;--d:-0.61s"><img src="img/game/pet-kim-te.webp" alt="Kim Tê" width="788" height="232" loading="lazy"></span><span class="spr" style="--w:224;--h:226;--d:-0.08s"><img src="img/game/pet-moc-hung.webp" alt="Mộc Hùng" width="896" height="226" loading="lazy"></span><span class="spr" style="--w:206;--h:234;--d:-0.45s"><img src="img/game/pet-thuy-sa.webp" alt="Thủy Sa" width="824" height="234" loading="lazy"></span><span class="spr" style="--w:210;--h:233;--d:-0.82s"><img src="img/game/pet-tho-nguu.webp" alt="Thổ Ngưu" width="840" height="233" loading="lazy"></span></div>
       <h2>Trứng đang chờ nở</h2>
