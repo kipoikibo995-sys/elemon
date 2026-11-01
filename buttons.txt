@@ -1,0 +1,8 @@
+# Elemon button map, TrimUI Brick: its pad reports positions (south = printed B), so A/B and X/Y are swapped
+# here to keep the printed names. One "button=pad button" per line; the right side is an SDL name:
+#   a b x y leftshoulder rightshoulder lefttrigger righttrigger back start dpup dpdown dpleft dpright
+# SELECT + START held together quits. If A and B come out the wrong way round, put a # in front of these 4 lines.
+A=b
+B=a
+X=y
+Y=x
