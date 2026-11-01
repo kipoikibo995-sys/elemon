@@ -107,9 +107,10 @@
     return st;
   }
   const luc = st => Math.round(st.hp / 4 + st.atk + st.skill);    // Lực chiến: the two sides of a Solo match compared
-  // Solo: each side's damage times the power ratio (at most x1.5, at least x0.67); hp0: the pet's HP at the start
-  function pow(foeLv, foeK = 1) {
-    const me = luc(pet()), foe = luc(of(foeLv, foeAttrs(foeLv))) * foeK, r = me / foe;
+  // Solo: each side's damage times the power ratio (at most x1.5, at least x0.67); hp0: the pet's HP at the start.
+  // foeA: the foe's own six attributes (Đấu online: another player's pet, game/src/dau-online.js), else a foe's of its level
+  function pow(foeLv, foeK = 1, foeA = null) {
+    const me = luc(pet()), foe = luc(of(foeLv, foeA || foeAttrs(foeLv))) * foeK, r = me / foe;
     return { me: clamp(r, 1 / POW_MAX, POW_MAX), foe: clamp(1 / r, 1 / POW_MAX, POW_MAX), hp0: clamp(need().sk, 1, 100) / 100,
              luc: me, lucFoe: Math.round(foe) };
   }

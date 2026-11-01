@@ -23,3 +23,5 @@ js/dat-ten.js
 js/loi-noi.js
 js/man-chao.js
 js/cay-dau-truong.js
+js/dau-online.js
+js/dau-wifi.js
