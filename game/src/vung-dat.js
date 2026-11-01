@@ -38,6 +38,10 @@
   const GUARD_R = 230;                                     // px from the way on where the khu's boss steps out
   const FREE_MS = 900;                                     // a freed spirit running off
   const MINI_ARMOUR = 0.08, MINI_RUN = 240, MINI_AFTER = 1500, MINI_FOES = [2, 3], FLOW_MS = 400;
+  // a khu painted without tà khí (khu 1 of Mộc, Kim, Thủy: no nests) still has its hunt (the user, 02/11: there the
+  // boss stood waiting at the start, no foes, nothing to do): HUNT_NEED Bóng Hư freed, strays coming in all the while
+  // (HUNT_LIVE at a time), the mini boss after HUNT_MINI of them, then the khu's boss
+  const HUNT_NEED = 8, HUNT_MINI = 3, HUNT_LIVE = 4;
   const ARENA = { cx: 320, cy: 322, rx: 280, ry: 128 };    // the arena floor: an ellipse inside its stone ring
   for (const kind in KIND) KIND[kind].k = VG.foeK[kind] || 1;
   const foeKey = kind => Math.round(VG.foeK[kind] * 100);
@@ -221,13 +225,14 @@
     });
     // foes: a pair round each nest; on a cleansed khu a few strays
     for (const n of w.nests) for (let j = 0; j < 2; j++) spawnNear(n, now);
-    if (!w.nests.length && !kbDue()) for (let j = 0; j < 5; j++) spawnFree(now);
+    w.hunt = !k.nests.length && kbDue() ? { got: 0, spawnT: now + 2500 } : null;
+    if (!w.nests.length) for (let j = 0; j < 5; j++) spawnFree(now);
     w.miniDone = false;
-    if (kbDue() && !w.nests.length) bossOut(now);
+    if (kbDue() && !w.nests.length && !w.hunt) bossOut(now);   // its nests broken on an earlier trip: the boss waits
     w.loading = false;
     camFollow(true);
     music(isBossKhu() ? 'vung-boss' : 'chien-dau-8bit');
-    const goal = (w.nests.length ? `Phá ${w.nests.length} ổ khói Hư, ` : '') + (kbDue() ? `giải thoát ${petName(kbDir(he, w.ki))}` : 'Khói Hư đã tan');
+    const goal = (w.nests.length ? `Phá ${w.nests.length} ổ khói Hư, ` : w.hunt ? `Giải thoát ${HUNT_NEED} Bóng Hư, ` : '') + (kbDue() ? `giải thoát ${petName(kbDir(he, w.ki))}` : 'Khói Hư đã tan');
     w.banner = { t0: now, title: `Khu ${w.ki + 1} · ${k.name}`, goal };
     w.face = faceOf(w.me);
   }
@@ -339,12 +344,15 @@
     const m = newMob(dir, last ? 'boss' : 'kboss', at[0], at[1], now, tierOf(W.ki, true).lv, sp);
     if (!m) return;
     // the user: going straight to the way on meets it at full strength; breaking every nest first weakens it
-    const strong = !last && !!near && W.nests.length > 0, k = last ? { hp: 1, dmg: 1, spd: 1 } : strong ? BOSS_STRONG : W.nests.length ? { hp: 1, dmg: 1, spd: 1 } : BOSS_WEAK;
+    const dirty = W.nests.length > 0 || !!(W.hunt && W.hunt.got < HUNT_NEED);
+    const strong = !last && !!near && dirty, k = last ? { hp: 1, dmg: 1, spd: 1 } : strong ? BOSS_STRONG : dirty ? { hp: 1, dmg: 1, spd: 1 } : BOSS_WEAK;
     m.hp = m.hpMax = Math.round(m.hpMax * k.hp); m.dmg *= k.dmg; m.spd *= k.spd; m.strong = strong;
     // the user: a boss is fought in a Solo match, not on the map; how it was met sets the bot's level and its minions
     const weak = !last && !strong;
     const tr = tierOf(W.ki, true), sk = strong ? 1.2 : weak ? 0.85 : 1;
-    m.duel = { tier: tr, sk, level: Math.max(0, Math.min(3, tr.bot + (strong ? 1 : weak ? -1 : 0))),
+    // never below Dễ: bot level 0 (Tập) is the arena's practice dummy that never attacks (the user, 02/11: the boss
+    // of khu 1 stood still)
+    m.duel = { tier: tr, sk, level: Math.max(1, Math.min(3, tr.bot + (strong ? 1 : weak ? -1 : 0))),
                foes: strong ? 3 : last ? 2 : weak ? 1 : 2 };
     if (!soloOk(m)) m.duel = null;                            // no Solo for it (R36S mirror match): fought on the map
     m.freedPk = sidePack(dir, true);
@@ -814,7 +822,18 @@
       num(`+${coins} vàng`, m.x, m.y - m.sp.ch * 0.9 - 18, '#ffd36e', now);
       sfx(`solo/${m.he}_trung`, 170);
       if (m.boss) bossDown(now);
+      else if (!m.mini && W.hunt && W.hunt.got < HUNT_NEED) huntStep(now);
     }
+  }
+  function huntStep(now) {                                  // a Bóng Hư freed on a khu with no nests (HUNT_NEED)
+    const h = W.hunt;
+    h.got++;
+    if (h.got === HUNT_MINI && !W.miniT && !W.miniDone && miniDir(W.t.he, W.ki)) W.miniT = now + MINI_AFTER;
+    if (h.got < HUNT_NEED) return toastV(`Giải thoát Bóng Hư! Còn ${HUNT_NEED - h.got}`, now);
+    toastV('Khói Hư đã tan, khu được thanh tẩy!', now);
+    W.clean = true; W.cleanT = now;
+    __chiSo.cost('clear');
+    if (kbDue() && !W.boss) bossOut(now);
   }
   function hurtNest(n, dmg, now) {
     if (n.hp <= 0) return;
@@ -1190,6 +1209,10 @@
     for (const n of w.nests) {                                  // nests send out more while they stand
       if (now > n.spawnT && n.out < 2 && n.made < 6 && Math.hypot(n.x - p.x, n.y - p.y) < 700) { spawnNear(n, now); n.spawnT = now + rnd(6000, 9000); }
     }
+    if (w.hunt && w.hunt.got < HUNT_NEED && now > w.hunt.spawnT && !w.arena) {   // the hunt: strays keep coming in
+      if (w.mobs.filter(m => m.hp > 0 && !m.mini && !m.boss).length < HUNT_LIVE) spawnFree(now);
+      w.hunt.spawnT = now + rnd(2500, 4500);
+    }
     if (w.chest && Math.hypot(w.chest.x - p.x, w.chest.y - p.y) < 34) openChest(now);
     if (w.miniT && now > w.miniT && !w.arena && !w.mini && !w.miniDone && !p.down) miniOut(now);
     if (!w.arena && !w.boss && !p.down && kbDue() && w.k.on >= 0) {   // coming to the way on: its boss steps out
@@ -1509,9 +1532,10 @@
     const left = w.nests.length, foes = w.arena ? w.mobs.filter(m => m.hp > 0).length : 0;
     uiAt('bang-nho', 0, 434, 2);
     word(`${w.k.name} ${w.ki + 1}/${w.R.khu.length}`, 534, 17, 11, '#ffe6a8', 'center', true, 2);
-    const ic = w.boss ? ICON.crown : left || foes ? ICON.nest : ICON.clean;
+    const hunt = w.hunt && w.hunt.got < HUNT_NEED ? HUNT_NEED - w.hunt.got : 0;
+    const ic = w.boss ? ICON.crown : left || foes || hunt ? ICON.nest : ICON.clean;
     uiMid('icon', ic, 462, 36);
-    word(w.arena ? `Còn ${foes}` : w.boss ? `Giải thoát ${petName(w.boss.dir)}` : left ? `Còn ${left} ổ` : kbDue() ? 'Tới lối đi tiếp' : 'Đã thanh tẩy', 480, 37, 11,
+    word(w.arena ? `Còn ${foes}` : w.boss ? `Giải thoát ${petName(w.boss.dir)}` : left ? `Còn ${left} ổ` : hunt ? `Còn ${hunt} Bóng Hư` : kbDue() ? 'Tới lối đi tiếp' : 'Đã thanh tẩy', 480, 37, 11,
          left || w.boss || foes ? '#e0a8ff' : '#a8f0a0', 'left', true, 2);
     uiMid('xu', 0, 566, 37);
     word(`${t.loot.coins}`, 578, 37, 11, '#ffd36e', 'left', true, 2);
