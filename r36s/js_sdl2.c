@@ -18,6 +18,30 @@ static struct { const char *name; unsigned bit; int button, axis; } map[] = {
 };
 #define N_MAP (sizeof map / sizeof *map)
 static SDL_GameController *pads[4];
+/* a pad whose SDL mapping has no back or start (some clones' ArkOS, e.g. the R46H: SELECT and START did nothing):
+   the first raw buttons its mapping leaves out stand in for them, -1 when the mapping has them */
+static int raw_sel[4] = { -1, -1, -1, -1 }, raw_start[4] = { -1, -1, -1, -1 };
+static char raw_seen[4][32];                               /* raw buttons outside the mapping already logged */
+
+static void setup_pad(int k) {
+    char *m = SDL_GameControllerMapping(pads[k]);
+    SDL_Joystick *j = SDL_GameControllerGetJoystick(pads[k]);
+    int nb = j ? SDL_JoystickNumButtons(j) : 0, b, used[64] = { 0 };
+    const char *p;
+    raw_sel[k] = raw_start[k] = -1;
+    memset(raw_seen[k], 0, sizeof raw_seen[k]);
+    printf("pad %d: %s, %d buttons | %s\n", k, SDL_GameControllerName(pads[k]), nb, m ? m : "no mapping");
+    if (!m) return;
+    for (p = m; (p = strstr(p, ":b")) != 0; p += 2) { b = atoi(p + 2); if (b >= 0 && b < 64) used[b] = 1; }
+    for (b = 0; b < nb && b < 64; ++b)
+        if (!used[b]) {
+            if (!strstr(m, "back:") && raw_sel[k] < 0) raw_sel[k] = b;
+            else if (!strstr(m, "start:") && raw_start[k] < 0) raw_start[k] = b;
+        }
+    if (raw_sel[k] >= 0 || raw_start[k] >= 0)
+        printf("pad %d: no back/start in its mapping: SELECT = raw button %d, START = raw button %d\n", k, raw_sel[k], raw_start[k]);
+    SDL_free(m);
+}
 
 /* the handheld's own volume: TrimUI's keymon writes the volume buttons' level (0..20, "vol") and "mute" into
    system.json but sets no mixer the game's sound goes through, so the game scales its sound by it (30 dB from 1 to 20,
@@ -112,6 +136,11 @@ static unsigned read_pad(void) {
             if (map[i].axis >= 0 && SDL_GameControllerGetAxis(pads[k], (SDL_GameControllerAxis)map[i].axis) > 16000) bits |= map[i].bit;
         }
         stick |= sticks(pads[k]);
+        {
+            SDL_Joystick *j = SDL_GameControllerGetJoystick(pads[k]);
+            if (j && raw_sel[k] >= 0 && SDL_JoystickGetButton(j, raw_sel[k])) bits |= PAD_SELECT;
+            if (j && raw_start[k] >= 0 && SDL_JoystickGetButton(j, raw_start[k])) bits |= PAD_START;
+        }
     }
     stick_bits = stick;
     bits |= stick;
@@ -130,6 +159,9 @@ static unsigned read_pad(void) {
     if (keys[SDL_SCANCODE_2]) bits |= PAD_R2;
     if (keys[SDL_SCANCODE_E] || keys[SDL_SCANCODE_LSHIFT]) bits |= PAD_SELECT;
     if (keys[SDL_SCANCODE_S]) bits |= PAD_START;
+    /* a handheld whose SELECT / START come in as keys rather than pad buttons */
+    if (keys[SDL_SCANCODE_SELECT] || keys[SDL_SCANCODE_RSHIFT]) bits |= PAD_SELECT;
+    if (keys[SDL_SCANCODE_MENU] || keys[SDL_SCANCODE_AC_HOME] || keys[SDL_SCANCODE_KP_ENTER]) bits |= PAD_START;
     return bits;
 }
 
@@ -193,9 +225,7 @@ int main(int argc, char **argv) {
     load_map();
     for (i = 0; i < SDL_NumJoysticks() && n < 4; ++i)
         if (SDL_IsGameController(i) && (pads[n] = SDL_GameControllerOpen(i)) != 0) {
-            char *mapping = SDL_GameControllerMapping(pads[n]);
-            printf("pad %d: %s | %s\n", n, SDL_GameControllerName(pads[n]), mapping ? mapping : "no mapping");
-            SDL_free(mapping);
+            setup_pad(n);
             ++n;
         }
     SDL_memset(&want, 0, sizeof want);
@@ -223,8 +253,30 @@ int main(int argc, char **argv) {
         SDL_Event e;
         while (SDL_PollEvent(&e)) {
             if (e.type == SDL_QUIT) running = 0;
-            if (e.type == SDL_CONTROLLERDEVICEADDED)
-                for (i = 0; i < 4; ++i) if (!pads[i]) { pads[i] = SDL_GameControllerOpen(e.cdevice.which); break; }
+            if (e.type == SDL_CONTROLLERDEVICEADDED) {
+                /* SDL also announces the pads already open at start: those are not opened twice */
+                SDL_JoystickID id = SDL_JoystickGetDeviceInstanceID(e.cdevice.which);
+                int open = 0;
+                for (i = 0; i < 4; ++i)
+                    if (pads[i] && SDL_JoystickInstanceID(SDL_GameControllerGetJoystick(pads[i])) == id) open = 1;
+                if (!open)
+                    for (i = 0; i < 4; ++i) if (!pads[i]) { if ((pads[i] = SDL_GameControllerOpen(e.cdevice.which)) != 0) setup_pad(i); break; }
+            }
+            /* a raw button the pad's mapping leaves out: logged once, so a log from a new handheld shows its keys */
+            if (e.type == SDL_JOYBUTTONDOWN && e.jbutton.button < 32)
+                for (i = 0; i < 4; ++i)
+                    if (pads[i] && SDL_JoystickInstanceID(SDL_GameControllerGetJoystick(pads[i])) == e.jbutton.which &&
+                        !raw_seen[i][e.jbutton.button]) {
+                        char *m = SDL_GameControllerMapping(pads[i]), key[8];
+                        snprintf(key, sizeof key, ":b%d,", e.jbutton.button);
+                        if (!m || !strstr(m, key)) printf("pad %d: raw button %d pressed (not in its mapping)\n", i, e.jbutton.button);
+                        raw_seen[i][e.jbutton.button] = 1;
+                        SDL_free(m);
+                    }
+            if (e.type == SDL_KEYDOWN && !e.key.repeat) {
+                static int keys_logged;
+                if (keys_logged++ < 12) printf("key %s pressed\n", SDL_GetScancodeName(e.key.keysym.scancode));
+            }
         }
         pad = read_pad();
         /* SELECT + START held for half a second quits (on their own they are the page's buttons) */

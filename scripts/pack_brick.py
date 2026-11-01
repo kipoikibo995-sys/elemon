@@ -43,9 +43,9 @@ def sha(p):
     return h.hexdigest()
 
 
-def manifest(ver, listed):
-    """files.txt: the version, its git tag, then a line a file"""
-    lines = [f'#version {ver}', f'#ref ota-{ver}']
+def manifest(ver, listed, ref=None):
+    """files.txt: the version, its git tag (the R36S build's: ota-r36s-<version>), then a line a file"""
+    lines = [f'#version {ver}', f'#ref {ref or "ota-" + ver}']
     lines += [f'{sha(p)} {os.path.getsize(p)} {n}' for n, p in listed]
     return '\n'.join(lines) + '\n'
 

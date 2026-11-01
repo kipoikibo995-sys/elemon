@@ -1047,7 +1047,14 @@ function strip(name, k, x, y, n = 6) {
 // a bag thing's picture: the shop's own (food_<file>), or for what the game makes (a caught fish, a crop, a dish) its
 // source picture; looked up here, not only when the thing was caught (after loading a save those had none: empty slots)
 function foodImg(file) {
-  return IMG['food_' + file] || (IMG['food_' + file] = IMG[file.startsWith('CA_') ? 'cc_' + file : file.startsWith('mon_') ? 'na_' + file : 'fm_' + file]);
+  const n = file.startsWith('CA_') ? 'cc_' + file : file.startsWith('mon_') ? 'na_' + file : 'fm_' + file;
+  const im = IMG['food_' + file] || IMG[n];
+  if (im) return (IMG['food_' + file] = im);
+  // a fish or a dish whose picture is read with its screen (game/src/tai-man.js) and not in yet: asked for now, an
+  // empty slot meanwhile (the bag drew from nothing and stopped the frame on the R36S)
+  const L = globalThis.__LAZY, asked = foodImg.asked || (foodImg.asked = {});
+  if (L && L.load && !asked[n]) { asked[n] = 1; L.load(n, `img/${n}.png`); }
+  return foodImg.blank || (foodImg.blank = Object.assign(document.createElement('canvas'), { width: 1, height: 1 }));
 }
 function bag(file, name, he, effect, stars = 0) {   // a caught fish / a crop / a dish (its stars) goes into the bag as food
   foodImg(file);

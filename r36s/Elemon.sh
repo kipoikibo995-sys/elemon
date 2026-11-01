@@ -36,7 +36,17 @@ if command -v perfmax >/dev/null 2>&1; then sudo -n perfmax >/dev/null 2>&1
 elif [ -n "$OLD_GOV" ]; then echo performance | sudo -n tee $GOV >/dev/null 2>&1; fi
 echo "cpu: $(cat $GOV 2>/dev/null) $(cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq 2>/dev/null) kHz" > log.txt
 
-./elemon >> log.txt 2>&1
+# an update downloaded in the game (Cài đặt -> Cập nhật, ota.sh beside the game) goes in before the game starts;
+# "Cài ngay" quits the game with one ready, so it is put in and the game opened again (twice at most); a new version
+# that never says it started is undone (ota.sh after)
+for run in 1 2 3; do
+  [ -f ./ota.sh ] && sh ./ota.sh apply >> log.txt 2>&1
+  chmod +x ./elemon 2>/dev/null
+  ./elemon >> log.txt 2>&1
+  [ -f ./ota.sh ] && sh ./ota.sh after >> log.txt 2>&1
+  [ -f .ota/ready ] || [ -f .ota/rolled ] || break
+  rm -f .ota/rolled
+done
 
 if command -v perfnorm >/dev/null 2>&1; then sudo -n perfnorm >/dev/null 2>&1
 elif [ -n "$OLD_GOV" ]; then echo "$OLD_GOV" | sudo -n tee $GOV >/dev/null 2>&1; fi
