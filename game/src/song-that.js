@@ -185,9 +185,45 @@
     };
   }
 
+  // ---------- toys ----------
+  // playing takes a toy (the user, 02/11/2026: "phải vô chợ mua đồ chơi thì mới chơi được, khi chơi hết thì báo vào
+  // chợ mua"): Bóng đồ chơi from Chợ -> Đặc biệt is good for BALL_PLAYS games, R2 or from the bag, then it is worn out;
+  // S.bongLuot is what is left of the one in play (saved with S)
+  const BALL_PLAYS = 5;
+  const ballAt = () => S.items.findIndex((it, i) => it.use === 'ball' && S.bag[i] > 0);
+  const hasToy = () => (S.bongLuot || 0) > 0 || ballAt() >= 0;
+  const BUY_TOY = 'vào Chợ → Đặc biệt mua Bóng đồ chơi';
+  function noToy() {
+    emote('bc_hoi'); toast(`Hết đồ chơi rồi: ${BUY_TOY}`);
+    if (typeof __noi === 'function') __noi('het_do_choi');
+  }
+  function played() {                                             // after a game: the ball wears
+    if (!((S.bongLuot || 0) > 0)) { const i = ballAt(); if (i < 0) return; consume(i); S.bongLuot = BALL_PLAYS; }
+    S.bongLuot--;
+    if (S.bongLuot > 0) { if (S.bongLuot <= 2) toast(`Bóng còn chơi được ${S.bongLuot} lần`); }
+    else if (ballAt() < 0) toast(`Bóng hỏng rồi! Muốn chơi tiếp thì ${BUY_TOY}`);
+    else toast('Bóng hỏng rồi, lấy quả mới trong túi');
+  }
+  const useItem0 = useItem;
+  globalThis.useItem = function (i) {                             // the ball from the bag: one game, as R2
+    const it = S.items[i];
+    if (!it || it.use !== 'ball' || S.sick) return useItem0.apply(this, arguments);
+    const r = useItem0.apply(this, arguments);
+    played();
+    return r;
+  };
+
   // ---------- buttons ----------
   const press0 = press;
   globalThis.press = function (btn) {
+    // R2 in the room plays only with a toy; a game played wears the ball
+    if (btn === 'R2' && S.mode === 'room' && S.stats === null && S.popupGoal === 0 && S.pickerGoal === 0 && S.fade === 0 &&
+        S.night <= 0.5 && !(S.truyen && S.truyen.dang)) {
+      if (!S.sick && S.need && S.need.nl >= 10 && !hasToy()) return noToy();
+      const t0 = S.playedT, r = press0(btn);
+      if (S.playedT !== t0) played();
+      return r;
+    }
     if (S.mode === 'title') {
       if (loading) return;
       if ((btn === 'A' || btn === 'START') && S.fade === 0) {
