@@ -20,8 +20,12 @@
   // right (game/src/dau-online.js; its picture: assets/source/vo-duong/online/THE_dau-online.png cut to hinh_online(_lon))
   const CARDS = [{ key: 'tap-luyen', name: 'Tập luyện', open: true, say: 'Đấm theo nhịp, lướt tới đánh theo mũi tên: nhiều EXP' },
                  { key: 'solo', name: 'Solo đối kháng', say: 'Đấu 1-1 với bot cùng Level', get open() { return typeof __soloOpen === 'function'; } },
-                 { key: 'online', name: 'Đấu online', say: 'Đấu với đội của người chơi khác (cần wifi)',
-                   get open() { return typeof __dauOnline === 'function'; } }];
+                 { key: 'online', name: 'Đấu online', say: 'Đấu với đội của người chơi khác (cần wifi)', soon: 'Sắp ra mắt',
+                   get open() { return typeof __dauOnline === 'function' && onlineThu(); } }];
+  // Đấu online waits for its launch (the user, 02/11/2026: "chế độ online thì click vào thì bảo sắp ra mắt"): it opens
+  // only for a test build, one with online-thu.txt in the game folder, and in the harness
+  let THU = null;                                                    // looked up once, the first time the menu shows
+  const onlineThu = () => THU !== null ? THU : (THU = typeof __cv === 'object' && (!!__cv.test || __cv.readText('online-thu.txt') !== null));
   const CARD_X = [140, 320, 500], CARD_Y = 210, LABEL_Y = 352;
   globalThis.__vdCard = key => CARDS.findIndex(c => c.key === key);   // the card to come back to (solo.js, dau-online.js)
   const HIT = { strong: { exp: 8, bag: [2, 3, 1, 0], fx: 1, word: 'Mạnh!' }, ok: { exp: 4, bag: [1, 3, 0], fx: 0.75, word: 'Trúng' },
@@ -67,7 +71,7 @@
       if (!c.open && k) ctx.drawImage(k, CARD_X[i] - 62, LABEL_Y - 14, k.width * 0.34, k.height * 0.34);   // not open yet
       text(c.name, tx, LABEL_Y, c.name.length > 12 ? 13 : 15, c.open ? '#ffe6a8' : '#d8c8a8', 'center', true, 3);
     });
-    text(CARDS[v.sel] && CARDS[v.sel].open ? CARDS[v.sel].say : 'Sắp có',
+    text(CARDS[v.sel] && CARDS[v.sel].open ? CARDS[v.sel].say : (CARDS[v.sel] && CARDS[v.sel].soon) || 'Sắp có',
          320, 404, 14, '#fff2d8', 'center', true, 3);
     text('◀ ▶ chọn · A: vào · B: ra bản đồ', 320, 462, 13, '#f0e4ce', 'center', false, 3);
   }
@@ -442,7 +446,7 @@
       if (btn === 'RIGHT') v.sel = (v.sel + 1) % CARDS.length;
       if (btn === 'B') fadeTo(() => { S.mode = 'map'; });
       const k = CARDS[v.sel].key;
-      if (btn === 'A') !CARDS[v.sel].open ? toast(`${CARDS[v.sel].name}: sắp có`) : k === 'solo' ? __soloOpen() : k === 'online' ? __dauOnline() : startTraining(now);
+      if (btn === 'A') !CARDS[v.sel].open ? toast(`${CARDS[v.sel].name}: ${(CARDS[v.sel].soon || 'sắp có').toLowerCase()}`) : k === 'solo' ? __soloOpen() : k === 'online' ? __dauOnline() : startTraining(now);
       return;
     }
     if (/^solo/.test(v.view) && typeof __soloPress === 'function') return __soloPress(btn);
