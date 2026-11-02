@@ -15,8 +15,8 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 GAME = os.path.join(ROOT, 'dist', 'elemon', 'elemon')
 BRICK = os.path.join(ROOT, 'packaging', 'trimui-brick')
 OUT = os.path.join(ROOT, 'build', 'release')
-OWN = ['launch.sh', 'config.json', 'icon.png', 'buttons.txt', 'ota.sh', 'cacert.pem']   # the Brick's own, over the game's
-RUNNABLE = ('elemon', 'launch.sh', 'ota.sh')
+OWN = ['launch.sh', 'config.json', 'icon.png', 'buttons.txt', 'ota.sh', 'cacert.pem', 'mang.sh', 'mang-url.txt']   # the Brick's own, over the game's
+RUNNABLE = ('elemon', 'launch.sh', 'ota.sh', 'mang.sh')
 GUIDE = 'HUONG_DAN_Brick.md'
 STORED = ('.png', '.ogg', '.hli', '.wav', '.mp3', '.jpg')         # already packed: stored as they are
 SAFE = re.compile(r'^[A-Za-z0-9._/-]+$')                           # ota.sh puts paths in URLs as they are
@@ -56,7 +56,7 @@ def main():
     ver = sys.argv[1]
     if not os.path.isfile(os.path.join(GAME, 'elemon')):
         sys.exit(f'no game at {GAME}: run game/build_game.py and scripts/r36s_game.py first')
-    for n in ('launch.sh', 'ota.sh'):
+    for n in ('launch.sh', 'ota.sh', 'mang.sh'):
         if b'\r' in open(os.path.join(BRICK, n), 'rb').read():
             sys.exit(f'{n} has Windows line ends: the Brick\'s sh cannot run it')
     listed = files()

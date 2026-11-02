@@ -20,9 +20,11 @@ GAME = os.path.join(DIST, 'elemon')
 OUT = os.path.join(ROOT, 'build', 'release')
 OWN = {'ota.sh': os.path.join(ROOT, 'packaging', 'trimui-brick', 'ota.sh'),
        'cacert.pem': os.path.join(ROOT, 'packaging', 'trimui-brick', 'cacert.pem'),
+       'mang.sh': os.path.join(ROOT, 'packaging', 'trimui-brick', 'mang.sh'),            # Đấu online (game/src/dau-online.js)
+       'mang-url.txt': os.path.join(ROOT, 'packaging', 'trimui-brick', 'mang-url.txt'),
        'ota-branch.txt': os.path.join(ROOT, 'packaging', 'r36s', 'ota-branch.txt')}
 LEAVE = ('files.txt', 'log.txt')                                   # made here, or left by a run
-RUNNABLE = ('elemon', 'ota.sh')
+RUNNABLE = ('elemon', 'ota.sh', 'mang.sh')
 STORED = ('.png', '.ogg', '.hli', '.wav', '.mp3', '.jpg')          # already packed: stored as they are
 GUIDE = """Elemon cho R36S (ArkOS, dArkOS, AmberELEC... có PortMaster)
 

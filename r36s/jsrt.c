@@ -14,6 +14,13 @@
 #include <sys/stat.h>
 #include <time.h>
 #include <pthread.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <ifaddrs.h>
+#include <net/if.h>
 
 #define MAX_SURF 32768                       /* pictures at once; a freed slot is handed out again (surf_add) */
 #define SLOT_BITS 15                         /* an id is slot | generation << SLOT_BITS (MAX_SURF = 1 << SLOT_BITS) */
@@ -1201,13 +1208,164 @@ static JSValue b_ota(JSContext *ctx, JSValueConst t, int argc, JSValueConst *arg
     return JS_NewBool(ctx, ok);
 }
 
+/* Elemon online (game/src/dau-online.js): net(id, "GET"|"POST", path, body) asks the server through mang.sh beside
+   the game (curl, else wget). A thread of its own writes .mang/<id>.req and runs the script, so neither the card nor
+   the wifi ever holds a frame up; the game reads .mang/<id>.st (written last) and .mang/<id>.res. -> true when
+   started. id: [a-z0-9] only, path: [A-Za-z0-9/_.?=&-] only (they reach the shell) */
+typedef struct { char id[24], method[8], path[256], *body; size_t len; } NetJob;
+static void *net_job(void *arg) {
+    NetJob *j = (NetJob *)arg;
+    char full[1400], cmd[1800];
+    snprintf(full, sizeof full, "%s/.mang", root);
+    mkdir(full, 0755);
+    snprintf(full, sizeof full, "%s/.mang/%s.req", root, j->id);
+    if (write_file_now(full, j->body, j->len)) {
+        snprintf(cmd, sizeof cmd, "cd '%s' && [ -f mang.sh ] && sh ./mang.sh %s '%s' %s </dev/null >>.mang/log.txt 2>&1",
+                 root, j->method, j->path, j->id);
+        if (system(cmd) != 0) printf("net: mang.sh %s failed\n", j->path);
+    }
+    free(j->body); free(j);
+    return 0;
+}
+static int net_safe(const char *s, const char *ok) {
+    for (; *s; ++s)
+        if (!((*s >= 'a' && *s <= 'z') || (*s >= 'A' && *s <= 'Z') || (*s >= '0' && *s <= '9') || (*ok && strchr(ok, *s))))
+            return 0;
+    return 1;
+}
+static JSValue b_net(JSContext *ctx, JSValueConst t, int argc, JSValueConst *argv) {
+    const char *id = argc > 2 ? JS_ToCString(ctx, argv[0]) : 0, *method = id ? JS_ToCString(ctx, argv[1]) : 0,
+               *path = method ? JS_ToCString(ctx, argv[2]) : 0, *body = 0;
+    size_t len = 0;
+    int ok = 0;
+    (void)t;
+    if (path && argc > 3) body = JS_ToCStringLen(ctx, &len, argv[3]);
+    if (path && *id && strlen(id) < 24 && net_safe(id, "") && (!strcmp(method, "GET") || !strcmp(method, "POST")) &&
+        strlen(path) < 256 && net_safe(path, "/_.?=&-")) {
+        NetJob *j = (NetJob *)calloc(1, sizeof *j);
+        pthread_t th;
+        pthread_attr_t at;
+        if (j) {
+            snprintf(j->id, sizeof j->id, "%s", id); snprintf(j->method, sizeof j->method, "%s", method);
+            snprintf(j->path, sizeof j->path, "%s", path);
+            j->len = body ? len : 0;
+            j->body = (char *)malloc(j->len + 1);
+            if (j->body) {
+                if (j->len) memcpy(j->body, body, j->len);
+                pthread_attr_init(&at); pthread_attr_setdetachstate(&at, PTHREAD_CREATE_DETACHED);
+                ok = pthread_create(&th, &at, net_job, j) == 0;
+                pthread_attr_destroy(&at);
+            }
+            if (!ok) { free(j->body); free(j); }
+        }
+    }
+    if (body) JS_FreeCString(ctx, body);
+    if (path) JS_FreeCString(ctx, path);
+    if (method) JS_FreeCString(ctx, method);
+    if (id) JS_FreeCString(ctx, id);
+    return JS_NewBool(ctx, ok);
+}
+
+/* Đấu qua wifi (game/src/dau-wifi.js): one UDP socket, never blocking a frame. udpOpen(port) binds it (0: any port,
+   broadcasts allowed), udpSend(ip, port, text) sends one datagram (ip "*": the broadcast address of every network
+   the handheld is on, and 255.255.255.255), udpRecv() -> [[ip, port, text], ...] all that came in since,
+   udpClose(), myIp() -> the handheld's address on its network (or null) */
+static int udp_fd = -1;
+static JSValue b_udp_close(JSContext *ctx, JSValueConst t, int argc, JSValueConst *argv) {
+    (void)ctx; (void)t; (void)argc; (void)argv;
+    if (udp_fd >= 0) close(udp_fd);
+    udp_fd = -1;
+    return JS_UNDEFINED;
+}
+static JSValue b_udp_open(JSContext *ctx, JSValueConst t, int argc, JSValueConst *argv) {
+    struct sockaddr_in a;
+    int on = 1, port = argc ? ARG_I(0) : 0;
+    (void)t;
+    b_udp_close(ctx, t, 0, argv);
+    udp_fd = socket(AF_INET, SOCK_DGRAM, 0);
+    if (udp_fd < 0) return JS_FALSE;
+    setsockopt(udp_fd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof on);
+    setsockopt(udp_fd, SOL_SOCKET, SO_BROADCAST, &on, sizeof on);
+    memset(&a, 0, sizeof a);
+    a.sin_family = AF_INET; a.sin_addr.s_addr = htonl(INADDR_ANY); a.sin_port = htons((unsigned short)port);
+    if (bind(udp_fd, (struct sockaddr *)&a, sizeof a) != 0 || fcntl(udp_fd, F_SETFL, fcntl(udp_fd, F_GETFL, 0) | O_NONBLOCK) != 0) {
+        close(udp_fd); udp_fd = -1; return JS_FALSE;
+    }
+    return JS_TRUE;
+}
+static int udp_to(unsigned addr, int port, const char *s, size_t n) {
+    struct sockaddr_in a;
+    memset(&a, 0, sizeof a);
+    a.sin_family = AF_INET; a.sin_addr.s_addr = addr; a.sin_port = htons((unsigned short)port);
+    return sendto(udp_fd, s, n, 0, (struct sockaddr *)&a, sizeof a) == (ssize_t)n;
+}
+static JSValue b_udp_send(JSContext *ctx, JSValueConst t, int argc, JSValueConst *argv) {
+    const char *ip = argc > 2 ? JS_ToCString(ctx, argv[0]) : 0, *s = 0;
+    size_t n = 0;
+    int port = argc > 2 ? ARG_I(1) : 0, ok = 0;
+    (void)t;
+    if (ip) s = JS_ToCStringLen(ctx, &n, argv[2]);
+    if (udp_fd >= 0 && ip && s && port > 0 && n < 1400) {
+        if (!strcmp(ip, "*")) {
+            struct ifaddrs *ifs = 0, *i;
+            ok = udp_to(htonl(INADDR_BROADCAST), port, s, n);
+            if (getifaddrs(&ifs) == 0) {
+                for (i = ifs; i; i = i->ifa_next)
+                    if (i->ifa_addr && i->ifa_addr->sa_family == AF_INET && (i->ifa_flags & IFF_BROADCAST) && i->ifa_broadaddr &&
+                        !(i->ifa_flags & IFF_LOOPBACK))
+                        ok |= udp_to(((struct sockaddr_in *)i->ifa_broadaddr)->sin_addr.s_addr, port, s, n);
+                freeifaddrs(ifs);
+            }
+        } else {
+            struct in_addr ia;
+            if (inet_pton(AF_INET, ip, &ia) == 1) ok = udp_to(ia.s_addr, port, s, n);
+        }
+    }
+    if (s) JS_FreeCString(ctx, s);
+    if (ip) JS_FreeCString(ctx, ip);
+    return JS_NewBool(ctx, ok);
+}
+static JSValue b_udp_recv(JSContext *ctx, JSValueConst t, int argc, JSValueConst *argv) {
+    JSValue out = JS_NewArray(ctx);
+    char buf[1500], ip[INET_ADDRSTRLEN];
+    int k = 0;
+    (void)t; (void)argc; (void)argv;
+    while (udp_fd >= 0 && k < 128) {
+        struct sockaddr_in a;
+        socklen_t al = sizeof a;
+        ssize_t n = recvfrom(udp_fd, buf, sizeof buf, 0, (struct sockaddr *)&a, &al);
+        JSValue row;
+        if (n < 0) break;
+        inet_ntop(AF_INET, &a.sin_addr, ip, sizeof ip);
+        row = JS_NewArray(ctx);
+        JS_SetPropertyUint32(ctx, row, 0, JS_NewString(ctx, ip));
+        JS_SetPropertyUint32(ctx, row, 1, JS_NewInt32(ctx, ntohs(a.sin_port)));
+        JS_SetPropertyUint32(ctx, row, 2, JS_NewStringLen(ctx, buf, (size_t)n));
+        JS_SetPropertyUint32(ctx, out, (uint32_t)k++, row);
+    }
+    return out;
+}
+static JSValue b_my_ip(JSContext *ctx, JSValueConst t, int argc, JSValueConst *argv) {
+    struct ifaddrs *ifs = 0, *i;
+    char ip[INET_ADDRSTRLEN] = "";
+    (void)t; (void)argc; (void)argv;
+    if (getifaddrs(&ifs) != 0) return JS_NULL;
+    for (i = ifs; i && !*ip; i = i->ifa_next)
+        if (i->ifa_addr && i->ifa_addr->sa_family == AF_INET && !(i->ifa_flags & IFF_LOOPBACK) && (i->ifa_flags & IFF_UP))
+            inet_ntop(AF_INET, &((struct sockaddr_in *)i->ifa_addr)->sin_addr, ip, sizeof ip);
+    freeifaddrs(ifs);
+    return *ip ? JS_NewString(ctx, ip) : JS_NULL;
+}
+
 int jsrt_init(const char *dir) {
     static const struct { const char *name; JSCFunction *f; int n; } fns[] = {
         { "now", b_now, 0 }, { "clock", b_clock, 0 }, { "pad", b_pad, 0 }, { "log", b_log, 1 }, { "newCanvas", b_new_canvas, 2 },
         { "resize", b_resize, 3 }, { "loadImage", b_load_image, 1 }, { "fillRect", b_fill_rect, 14 },
         { "drawImage", b_draw_image, 22 }, { "ellipse", b_ellipse, 15 }, { "text", b_text, 17 },
         { "measure", b_measure, 3 }, { "sfx", b_sfx, 2 }, { "music", b_music, 1 }, { "musicVol", b_music_vol, 1 }, { "voice", b_voice, 1 }, { "poly", b_poly, 13 }, { "pixels", b_pixels, 5 }, { "put", b_put, 6 }, { "free", b_free, 1 }, { "seal", b_seal, 1 },
-        { "readText", b_read_text, 1 }, { "writeText", b_write_text, 2 }, { "exit", b_exit, 0 }, { "ota", b_ota, 1 }, { "exists", b_exists, 1 } };
+        { "readText", b_read_text, 1 }, { "writeText", b_write_text, 2 }, { "exit", b_exit, 0 }, { "ota", b_ota, 1 }, { "exists", b_exists, 1 }, { "net", b_net, 4 },
+        { "udpOpen", b_udp_open, 1 }, { "udpSend", b_udp_send, 3 }, { "udpRecv", b_udp_recv, 0 }, { "udpClose", b_udp_close, 0 },
+        { "myIp", b_my_ip, 0 } };
     /* the scripts to run, in order: js/load.txt (one path a line, scripts/r36s_game.py), else the test page's set */
     static const char *scripts[] = { "js/shim.js", "js/data.js", "js/page.js", "js/am-thanh.js" };
     char *list, *line, *save = 0, save_dir[1200];

@@ -193,7 +193,7 @@
       if (S.fade > 0) return;
       if (['UP', 'DOWN', 'LEFT', 'RIGHT', 'L1', 'R1'].includes(btn)) { move(v.c, btn); return sfx('menu', 160); }
       if (btn === 'A') return fight(v.c);
-      if (btn === 'B') { sfx('quay-lai', 180); return fadeTo(() => { S.vd = { view: 'menu', sel: 1 }; }); }
+      if (btn === 'B') { sfx('quay-lai', 180); return fadeTo(() => { S.vd = { view: 'menu', sel: typeof __vdCard === 'function' ? __vdCard('solo') : 1 }; }); }
       return;
     }
     // a tree match left: a Trưởng thành beaten here opens its Huyền thoại; then back to the tree, on that node

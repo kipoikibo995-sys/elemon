@@ -1,0 +1,9 @@
+name = "elemon-online"
+main = "src/worker.js"
+compatibility_date = "2026-10-01"
+
+# D1: tạo bằng  npx wrangler d1 create elemon-online  rồi chép database_id nó in ra vào đây (HUONG_DAN.md bước 3)
+[[d1_databases]]
+binding = "DB"
+database_name = "elemon-online"
+database_id = "2da1064a-e0af-4c02-903c-9e6b3abeebb8"

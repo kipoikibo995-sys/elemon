@@ -1,0 +1,1 @@
+{ "type": "module", "private": true, "scripts": { "test": "node test/api-test.mjs", "local": "node test/local-server.mjs", "deploy": "wrangler deploy" } }
