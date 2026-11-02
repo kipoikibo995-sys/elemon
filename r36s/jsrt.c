@@ -31,7 +31,17 @@
 #define CHANNELS 9                           /* 0 the music, 1-7 sounds, VOICE the story's voice */
 #define VOICE (CHANNELS - 1)
 
+#ifndef JSRT_LAZY
 typedef struct { int w, h, opaque; uint32_t *px; } Surf;   /* opaque: a picture with no see-through pixel */
+#define PIN(s)
+#else
+/* JSRT_LAZY (the Miyoo Mini build, 128 MB): a picture from the card keeps its file name; its pixels are read the
+   first time it is drawn and given back again when the pictures drawn lately take more than the budget
+   (lazy_evict, between frames). A picture drawn into (PIN) stops being one from the card and is never given back */
+typedef struct { int w, h, opaque; uint32_t *px; char *file; unsigned used; } Surf;
+static void lazy_pin(Surf *s);
+#define PIN(s) lazy_pin(s)
+#endif
 typedef struct { int size, bold, ascent, descent, loaded; Surf atlas; uint16_t map[0x3000];
                  struct { short x, y, w, h, l, adv, top; } g[MAX_GLYPHS]; } Font;
 typedef struct { char name[48]; int16_t *data; int len; } Sound;
@@ -752,8 +762,56 @@ static int slot_of(int id) {
     if (id < 0 || k >= n_surf || !surf[k] || (unsigned)id >> SLOT_BITS != slot_gen[k]) return -1;
     return k;
 }
+#ifdef JSRT_LAZY
+static double lazy_budget = 40.0 * 1048576;  /* bytes of pictures from the card kept between frames (HOLUA_PIC_MB) */
+static double lazy_bytes;                    /* the pixels of pictures from the card read in now */
+static unsigned lazy_frame = 1;
+static unsigned lazy_reads, lazy_drops;      /* for the log: pictures read in and given back since the last line */
+static double lazy_read_ms;
+/* the pixels of a picture from the card, read in now if they were given back (or never read) */
+static void lazy_need(Surf *s) {
+    s->used = lazy_frame;
+    if (s->px || !s->file) return;
+    {
+        double t0 = clock_ms();
+        Surf *t = load_hli(s->file);
+        if (t && t->w == s->w && t->h == s->h) { s->px = t->px; s->opaque = t->opaque; }
+        else { printf("picture %s could not be read again\n", s->file); free(t ? t->px : 0); s->px = (uint32_t *)calloc((size_t)(s->w * s->h) + 1, 4); }
+        free(t);
+        lazy_bytes += (double)s->w * s->h * 4;
+        ++lazy_reads;
+        lazy_read_ms += clock_ms() - t0;
+    }
+}
+static void lazy_pin(Surf *s) {
+    if (!s || !s->file) return;
+    lazy_need(s);
+    lazy_bytes -= (double)s->w * s->h * 4;
+    free(s->file); s->file = 0;
+}
+/* between frames: over the budget, the pictures from the card drawn longest ago give their pixels back (never one
+   drawn in this frame or the one before it) */
+static void lazy_evict(void) {
+    while (lazy_bytes > lazy_budget) {
+        int i, best = -1;
+        unsigned age = 1;
+        for (i = 1; i < n_surf; ++i) {
+            Surf *s = surf[i];
+            if (s && s->file && s->px && lazy_frame - s->used > age) { age = lazy_frame - s->used; best = i; }
+        }
+        if (best < 0) break;
+        free(surf[best]->px); surf[best]->px = 0;
+        lazy_bytes -= (double)surf[best]->w * surf[best]->h * 4;
+        ++lazy_drops;
+    }
+    ++lazy_frame;
+}
+#endif
 static Surf *surf_arg(JSContext *ctx, int argc, JSValueConst *argv, int i) {
     int k = slot_of((int)double_arg(ctx, argc, argv, i));
+#ifdef JSRT_LAZY
+    if (k >= 0) lazy_need(surf[k]);
+#endif
     return k >= 0 ? surf[k] : 0;
 }
 /* a new picture in a free slot (one given back by free() first): its id, or -1 when all are taken */
@@ -805,6 +863,9 @@ static JSValue b_free(JSContext *ctx, JSValueConst t, int argc, JSValueConst *ar
     int k = slot_of(ARG_I(0));
     (void)t;
     if (k > 0) {
+#ifdef JSRT_LAZY
+        if (surf[k]->file) { if (surf[k]->px) lazy_bytes -= (double)surf[k]->w * surf[k]->h * 4; free(surf[k]->file); }
+#endif
         free(surf[k]->px); free(surf[k]); surf[k] = 0;
         slot_gen[k] = (uint16_t)((slot_gen[k] + 1) & 0xFFFF);
         free_slot[n_free++] = k;
@@ -815,6 +876,7 @@ static JSValue b_resize(JSContext *ctx, JSValueConst t, int argc, JSValueConst *
     Surf *s = surf_arg(ctx, argc, argv, 0);
     int w = ARG_I(1), h = ARG_I(2);
     (void)t;
+    PIN(s);
     if (s) {                                   /* like a canvas: setting the size clears it */
         w = w < 0 ? 0 : w;
         h = h < 0 ? 0 : h;
@@ -837,7 +899,25 @@ static JSValue b_seal(JSContext *ctx, JSValueConst t, int argc, JSValueConst *ar
 static JSValue b_load_image(JSContext *ctx, JSValueConst t, int argc, JSValueConst *argv) {
     const char *path = argc ? JS_ToCString(ctx, argv[0]) : 0;
     double t0 = clock_ms();
+#ifndef JSRT_LAZY
     Surf *s = path ? load_hli(path) : 0;
+#else
+    Surf *s = 0;
+    if (path) {                                /* only the size now, from the file's head: the pixels when drawn */
+        char full[1024];
+        uint8_t head[10];
+        FILE *f;
+        snprintf(full, sizeof full, "%s/%s", root, path);
+        if ((f = fopen(full, "rb"))) {
+            if (fread(head, 1, 10, f) == 10 && !memcmp(head, "HLI1", 4)) {
+                s = (Surf *)calloc(1, sizeof *s);
+                s->w = head[4] | head[5] << 8; s->h = head[6] | head[7] << 8;
+                s->file = strdup(path);
+            }
+            fclose(f);
+        }
+    }
+#endif
     JSValue r;
     int id;
     if (path && clock_ms() - t0 > 200) printf("slow: picture %s took %.0f ms\n", path, clock_ms() - t0);
@@ -856,6 +936,7 @@ static JSValue b_fill_rect(JSContext *ctx, JSValueConst t, int argc, JSValueCons
     Surf *s = surf_arg(ctx, argc, argv, 0);
     Mat m = mat_args(ctx, argc, argv, 5);
     (void)t;
+    PIN(s);
     if (s) fill_rect(s, ARG_D(1), ARG_D(2), ARG_D(3), ARG_D(4), &m, u32_arg(ctx, argc, argv, 11), ARG_D(12), ARG_I(13),
                      argc > 14 ? ARG_I(14) : 0);
     return JS_UNDEFINED;
@@ -866,6 +947,7 @@ static JSValue b_draw_image(JSContext *ctx, JSValueConst t, int argc, JSValueCon
     Surf *d = surf_arg(ctx, argc, argv, 0), *s = surf_arg(ctx, argc, argv, 1);
     Mat m = mat_args(ctx, argc, argv, 10);
     (void)t;
+    PIN(d);
     set_filter(argc > 20 ? ARG_D(20) : 1, argc > 21 ? ARG_D(21) : 1);
     if (d && s && d != s)
         draw_image(d, s, ARG_D(2), ARG_D(3), ARG_D(4), ARG_D(5), ARG_D(6), ARG_D(7), ARG_D(8), ARG_D(9), &m,
@@ -878,6 +960,7 @@ static JSValue b_ellipse(JSContext *ctx, JSValueConst t, int argc, JSValueConst 
     Surf *s = surf_arg(ctx, argc, argv, 0);
     Mat m = mat_args(ctx, argc, argv, 5);
     (void)t;
+    PIN(s);
     if (s) ellipse(s, ARG_D(1), ARG_D(2), ARG_D(3), ARG_D(4), &m, u32_arg(ctx, argc, argv, 11), ARG_D(12), ARG_D(13), ARG_I(14));
     return JS_UNDEFINED;
 }
@@ -887,6 +970,7 @@ static JSValue b_text(JSContext *ctx, JSValueConst t, int argc, JSValueConst *ar
     const char *str = argc > 1 ? JS_ToCString(ctx, argv[1]) : 0;
     Mat m = mat_args(ctx, argc, argv, 4);
     (void)t;
+    PIN(s);
     if (s && str) draw_text(s, str, ARG_D(2), ARG_D(3), &m, ARG_I(10), ARG_I(11), ARG_I(12), ARG_I(13),
                             u32_arg(ctx, argc, argv, 14), ARG_D(15), ARG_D(16));
     if (str) JS_FreeCString(ctx, str);
@@ -899,6 +983,7 @@ static JSValue b_poly(JSContext *ctx, JSValueConst t, int argc, JSValueConst *ar
     double pts[128];
     int n = 0, i;
     (void)t;
+    PIN(s);
     if (!s || argc < 12) return JS_UNDEFINED;
     for (i = 0; i < 128; ++i) {
         JSValue v = JS_GetPropertyUint32(ctx, argv[1], (uint32_t)i);
@@ -941,6 +1026,7 @@ static JSValue b_put(JSContext *ctx, JSValueConst t, int argc, JSValueConst *arg
     size_t n = 0;
     uint8_t *b = argc > 5 ? JS_GetArrayBuffer(ctx, &n, argv[5]) : 0;
     (void)t;
+    PIN(s);
     if (!s || !b || w <= 0 || h <= 0 || n < (size_t)w * h * 4) return JS_UNDEFINED;
     for (Y = 0; Y < h; ++Y)
         for (X = 0; X < w; ++X) {
@@ -1373,6 +1459,9 @@ int jsrt_init(const char *dir) {
     JSValue global, cv;
     unsigned i;
     snprintf(root, sizeof root, "%s", dir);
+#ifdef JSRT_LAZY
+    if (getenv("HOLUA_PIC_MB") && atof(getenv("HOLUA_PIC_MB")) > 0) lazy_budget = atof(getenv("HOLUA_PIC_MB")) * 1048576;
+#endif
     surf[n_surf++] = surf_new(screen_w, JS_SCREEN_H);          /* canvas 0: the screen */
     for (i = 0; i < (unsigned)(screen_w * JS_SCREEN_H); ++i) surf[0]->px[i] = 0xFF000000u;
     rt = JS_NewRuntime();
@@ -1432,7 +1521,11 @@ void jsrt_mem(char *buf, int size) {
     int np = 0, nb = 0, ns = 0, i;
     long rss = 0;
     FILE *f;
+#ifndef JSRT_LAZY
     for (i = 1; i < n_surf; ++i) if (surf[i] && surf[i]->w) {       /* 0 is the screen */
+#else
+    for (i = 1; i < n_surf; ++i) if (surf[i] && surf[i]->w && surf[i]->px) {   /* only the ones read in */
+#endif
         double b = (double)surf[i]->w * surf[i]->h * 4;
         pics += b; ++np;
         if (b >= 512 * 1024) { big += b; ++nb; }                  /* the big ones: backdrops, atlases */
@@ -1443,6 +1536,14 @@ void jsrt_mem(char *buf, int size) {
     snprintf(buf, (size_t)size, "mem: pictures %.0f MB (%d, of them %d over 0.5 MB: %.0f MB), sounds %.0f MB (%d), "
              "fonts %.0f MB, process %ld MB", pics / 1048576, np, nb, big / 1048576, snd / 1048576, ns,
              fnt / 1048576, rss / 1048576);
+#ifdef JSRT_LAZY
+    {
+        size_t l = strlen(buf);
+        snprintf(buf + l, (size_t)size - l, "; from the card %.0f of %.0f MB, %u read in (%.0f ms), %u given back",
+                 lazy_bytes / 1048576, lazy_budget / 1048576, lazy_reads, lazy_read_ms, lazy_drops);
+        lazy_reads = lazy_drops = 0; lazy_read_ms = 0;
+    }
+#endif
 }
 
 const uint32_t *jsrt_frame(double now, unsigned pad) {
@@ -1456,6 +1557,9 @@ const uint32_t *jsrt_frame(double now, unsigned pad) {
     JS_FreeValue(jc, f);
     JS_FreeValue(jc, global);
     run_jobs();
+#ifdef JSRT_LAZY
+    lazy_evict();
+#endif
     return surf[0]->px;
 }
 
@@ -1465,7 +1569,11 @@ void jsrt_shutdown(void) {
     if (jc) JS_FreeContext(jc);
     if (rt) JS_FreeRuntime(rt);
     jc = 0; rt = 0;
-    for (i = 0; i < n_surf; ++i) if (surf[i]) { free(surf[i]->px); free(surf[i]); surf[i] = 0; }
+    for (i = 0; i < n_surf; ++i) if (surf[i]) {
+#ifdef JSRT_LAZY
+        free(surf[i]->file);
+#endif
+        free(surf[i]->px); free(surf[i]); surf[i] = 0; }
     n_surf = n_free = 0;
     for (i = 0; i < n_fonts; ++i) { free(fonts[i]->atlas.px); free(fonts[i]); }
     n_fonts = 0;
