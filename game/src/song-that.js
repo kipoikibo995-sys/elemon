@@ -62,7 +62,7 @@
   SAVE = read(KEY) || (slots()[0] || {}).sv || null;
   if (SAVE && !read(KEY)) KEY = SLOT(slots()[0].n);
   if (SAVE) S.titleSel = 1;
-  const inGame = () => !OUT.includes(S.mode) && !loading && !!S.need;
+  const inGame = () => !OUT.includes(S.mode) && !(S.mode === 'datTen' && !S.real) && !loading && !!S.need;   // (naming at the hatching)
   function save() {
     if (!inGame() || globalThis.__noSave) return;               // __noSave: the browser's "Xóa bản lưu" button
     try {
@@ -274,7 +274,7 @@
       if (asleep && S.night > 0.5) S.need.nl = Math.min(100, nl + dt * SLEEP_PER_MS);
     }
     // a new game: the real starting purse once the egg has hatched
-    if (mode0 === 'egg' && S.mode === 'room' && !S.real) {
+    if ((mode0 === 'egg' || mode0 === 'datTen') && S.mode === 'room' && !S.real) {   // (datTen: named at the hatching)
       Object.assign(S, START); S.real = true; S.pool = undefined; fillPool();
       S.gemBag = {}; S.ngoc = 0;                                   // no gems: they drop from the bosses
       if (Array.isArray(S.gems)) S.gems = S.gems.map(() => null);
