@@ -140,7 +140,9 @@
     while (i > 0 && cuts && !cuts[`img/${dir}/${STAGES[i]}/s.png`]) i--;
     return STAGES[i];
   };
-  function start(me, foe, level) {
+  // opt (Đấu qua wifi, game/src/dau-wifi.js): meStage the left fighter's body, san the arena's ground (&san=), drive(arena)
+  // runs the match's frames instead of the buttons and the clock here (two handhelds stepping it in lockstep)
+  function start(me, foe, level, opt = {}) {
     const AC = globalThis.AudioContext || globalThis.webkitAudioContext;
     // R36S: the arena draws straight onto the screen (a second context on surface 0, its own state), saving a
     // 640x480 copy a frame; in a browser it has a canvas of its own, copied over
@@ -196,10 +198,10 @@
     const blank = { innerHTML: '', style: {}, classList: { add() {} }, appendChild() {}, insertBefore() {}, querySelector: () => blank };
     const doc = { getElementById: id => id === 'c' ? cv : blank, body: blank, title: '',
                   createElement: t => { const e = document.createElement(t); owned.push(e); return e; } };
-    const search = `?${me.p}&vs=${foe.p}&bot=${level}`;
+    const search = `?${me.p}&vs=${foe.p}&bot=${level}${opt.san ? '&san=' + opt.san : ''}`;
     // the pet being raised fights in its own stage's body (a Con as a Nhi: no arena body for it)
     const own = DATA.pet && me.dir === DATA.pet.creature;
-    globalThis.__soloMeStage = __soloStage(me.dir, own ? String(S.stage || 'child').replace(/4$/, '').replace('baby', 'child') : 'child');
+    globalThis.__soloMeStage = __soloStage(me.dir, opt.meStage || (own ? String(S.stage || 'child').replace(/4$/, '').replace('baby', 'child') : 'child'));
     // Hư Ảnh in Võ đường: the arena with its own hooks (game/src/vung-dat.js; Vùng đất hands in its own copy instead)
     const hu = foe.dir === 'hu-anh' && globalThis.__SOLO_SRC === RAW && typeof __vgHuDuel === 'function' && __vgHuDuel();
     const run = hu || (globalThis.__SOLO_SRC === RAW ? statSrc() : globalThis.__SOLO_SRC);
@@ -207,7 +209,7 @@
                (u, o) => !AC && /\.ogg$/.test(u) ? Promise.resolve({ arrayBuffer: () => Promise.resolve(soundOf(u)) }) : fetch(fix(u), o),
                Img);
     arena = { cv, keyFns, rafs, ctxs, held: {}, me, foe, level, t0: performance.now(), load, started: false, owned, preload, preTotal: 0,
-              lost: 0, lastP: null, lastHp: 0 };
+              lost: 0, lastP: null, lastHp: 0, drive: opt.drive || null };
     console.log(`solo: ${me.dir} vs ${foe.dir}, bot ${level}`);                  // log.txt on the R36S: where the fps lines are
     const fire = k => { for (const fn of keyFns.keydown) fn({ key: k, preventDefault() {} }); };
     fire('F1'); arena.keyFns.keyup.forEach(fn => fn({ key: 'F1', preventDefault() {} }));   // a "key" that does nothing: wakes its sound
@@ -334,7 +336,7 @@
     }
     if (btn === 'L1') v.level = (v.level + 3) % 4;
     if (btn === 'R1') v.level = (v.level + 1) % 4;
-    if (btn === 'B') { if (v.step === 1) { v.step = 0; v.cur = v.me; } else fadeTo(() => { S.vd = { view: 'menu', sel: 1 }; }); }
+    if (btn === 'B') { if (v.step === 1) { v.step = 0; v.cur = v.me; } else fadeTo(() => { S.vd = { view: 'menu', sel: typeof __vdCard === 'function' ? __vdCard('solo') : 1 }; }); }
     if (btn === 'A') {
       if (v.step === 0) {                                         // the foe starts on the next element's first pet
         const els = tabsOf(0);
@@ -408,7 +410,7 @@
   globalThis.__soloDraw = now => {
     const v = S.vd;
     if (v.view === 'solo-pick') return drawPick(now);
-    if (!arena) { S.vd = { view: 'menu', sel: 1 }; return; }        // e.g. after a reload: back to the menu
+    if (!arena) { S.vd = { view: 'menu', sel: typeof __vdCard === 'function' ? __vdCard('solo') : 1 }; return; }        // e.g. after a reload: back to the menu
     if (!arena.started && !arena.rafs.length) return drawLoading(now);   // the arena still loading its pictures
     if (!arena.started && arena.aimWarm !== false && typeof __aimWarm === 'function' &&
         !arena.preload.length && !preSounds.length) {                 // then the aiming pictures (the arena's __aimWarm)
@@ -429,9 +431,12 @@
     // the VS screen (Vùng đất's, when it draws) stays at least VS_MIN_MS before the match
     if (!v.quiet && typeof __vgVs === 'function' && performance.now() - arena.t0 < VS_MIN_MS) return drawLoading(now);
     arena.started = true;
-    feedKeys();
-    const cbs = arena.rafs.splice(0);                            // the same list the arena keeps adding to
-    for (const fn of cbs) try { fn(performance.now()); } catch (e) { console.log('arena: ' + (e && e.stack || e)); }
+    if (arena.drive) arena.drive(arena);                         // Đấu qua wifi: its own frames, its own keys
+    else {
+      feedKeys();
+      const cbs = arena.rafs.splice(0);                          // the same list the arena keeps adding to
+      for (const fn of cbs) try { fn(performance.now()); } catch (e) { console.log('arena: ' + (e && e.stack || e)); }
+    }
     const seen = globalThis.__soloSeen, p = seen && seen.P();      // the HP the pet loses (each round a new fighter)
     if (p) { if (p === arena.lastP && p.hp < arena.lastHp) arena.lost += arena.lastHp - p.hp; arena.lastP = p; arena.lastHp = p.hp; }
     if (arena.cv !== ctx.canvas && arena.cv.__id !== 0) ctx.drawImage(arena.cv, 0, 0);
@@ -454,7 +459,7 @@
       }
       toast(said);
       globalThis.__soloPow = null; globalThis.__soloSeen = null;
-      stop(); fadeTo(() => { S.vd = { view: 'menu', sel: 1 }; });
+      stop(); fadeTo(() => { S.vd = { view: 'menu', sel: typeof __vdCard === 'function' ? __vdCard('solo') : 1 }; });
     }
     // everything else reaches the arena through the held buttons (feedKeys)
   };

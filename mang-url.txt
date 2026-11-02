@@ -1,0 +1,3 @@
+https://elemon-online.kipoikibo995.workers.dev
+# Dòng đầu: địa chỉ Worker Elemon online, vd https://elemon-online.<ten-ban>.workers.dev (server/elemon-online/HUONG_DAN.md).
+# Để trống thì phần Đấu online báo "chưa có địa chỉ máy chủ" và game chạy như cũ.
