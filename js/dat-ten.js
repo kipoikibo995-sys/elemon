@@ -1,4 +1,7 @@
-// Elemon: naming the pet again after each evolution (Con → Nhi → Thiếu niên → Trưởng thành → Huyền thoại).
+// Elemon: naming the pet when its egg hatches (the user, 02/11/2026: "đặt tên tại thời điểm nở trứng"), and again
+// after each evolution (Con → Nhi → Thiếu niên → Trưởng thành → Huyền thoại).
+// At the hatching: A on the hatched egg brings this screen up before the room (the species' name filled in); Xong
+// runs the demo's own way into the room, so its greeting and Già Quy's welcome already say the new name.
 // A on the demo's "A: tiếp tục" lets its own fade run, then this screen comes up over the stage the fade set
 // (room, or 'end' after Huyền thoại) with the old name filled in; Xong puts the name in DATA.pet.name (saved with
 // the pet by song-that.js) and goes back to that screen.
@@ -67,9 +70,9 @@
   }
 
   // ---------- the screen ----------
-  function open(back) {
+  function open(back, then) {                                   // then: the hatching's way into the room, run on Xong
     const name = DATA.pet.name || '';
-    S.datTen = { name, old: name, r: 0, c: 0, caps: false, back, t0: performance.now() };
+    S.datTen = { name, old: name, r: 0, c: 0, caps: false, back, then, t0: performance.now() };
     S.mode = MODE;
   }
   globalThis.__datTen = open;                                   // the egg screen could use it too
@@ -121,7 +124,9 @@
     DATA.pet.name = name || d.old;
     sfx('vui', 220);
     fadeTo(() => {
-      S.mode = d.back; S.datTen = null;
+      S.datTen = null;
+      if (d.then) return d.then();                               // hatched: the demo's "Chào <name>!" says it
+      S.mode = d.back;
       toast(name && name !== d.old ? `Từ nay gọi là ${DATA.pet.name}!` : `${DATA.pet.name} vẫn giữ tên cũ`);
     });
   }
@@ -149,6 +154,12 @@
       press0(btn);                                               // the demo's own fade: the new stage, the gold
       const cb = fadeCb;
       if (cb) fadeCb = () => { const r = cb(); open(S.mode); return r; };
+      return;
+    }
+    if (S.mode === 'egg' && btn === 'A' && S.egg && S.egg.hatchT && S.fade === 0) {
+      press0(btn);                                               // the demo's fade into the room, once hatched
+      const cb = fadeCb;
+      if (cb) fadeCb = () => open('egg', cb);                    // the name first, then that
       return;
     }
     if (S.mode !== MODE || !S.datTen) return press0(btn);
