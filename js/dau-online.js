@@ -14,7 +14,33 @@
   const VIEW = 'solo-online';                             // /^solo/: Võ đường hands it to __soloDraw / __soloPress
   const DEV = typeof __cv === 'object' && !!__cv.net;
   const clock = () => (DEV && __cv.clock ? __cv.clock() : Date.now());   // real ms: the harness's frame time runs its own pace
-  const POLL = 200, TIMEOUT = 30e3, LEVEL = 3, SOLO_NL = 15, MAX_TEAM = 3;
+  const POLL = 200, TIMEOUT = 30e3, LEVEL = 3, SUPER = 4, SOLO_NL = 15, MAX_TEAM = 3;
+  // the bot holding the foe's team (the user, 02/11/2026: "mặc định ở mức khó, và siêu khó", picked by the ranking):
+  // Khó, or Siêu khó against a team with more points than yours; the player never picks it
+  const levelFor = o => (RATING !== null && o && o.rating > RATING ? SUPER : LEVEL);
+  const LEVEL_NAME = { [LEVEL]: 'Khó', [SUPER]: 'Siêu khó' };
+  // the arena for an online match: Võ đường's hooked one (the foe in its stage's body) with a Siêu khó bot level, and
+  // no way to change the match from the keyboard (a browser has one): no 0/1/2/3 bot level, no Enter rematch, no line
+  // saying so (the user, 02/11/2026: "khoá luôn đi")
+  const ONLINE_HOOKS = [
+    ["  3: { name: 'Khó',  react: 130, aimErr: 0.05, dodge: 0.9,  lead: 1,   speed: 0.16, hold: [200, 380], juke: 0.8, punish: 1,   gap: 0 },\n",
+     "  3: { name: 'Khó',  react: 130, aimErr: 0.05, dodge: 0.9,  lead: 1,   speed: 0.16, hold: [200, 380], juke: 0.8, punish: 1,   gap: 0 },\n" +
+     "  4: { name: 'Siêu khó', react: 70, aimErr: 0.02, dodge: 0.97, lead: 1, speed: 0.18, hold: [150, 300], juke: 1, punish: 1, gap: 0 },\n"],
+    ["  if (k === 'enter' && over) newRound();", ''],
+    ["  if (k.length === 1 && '0123'.includes(k)) { level = +k; newRound(); }", ''],
+    ["    center('Enter: đấu lại · 0/1/2/3: Tập/Dễ/Vừa/Khó', 290, 14, '#ddd');", ''],
+  ];
+  let ONLINE_SRC = null;                                  // made once; false when the arena has changed where a hook goes
+  function onlineSrc() {
+    if (ONLINE_SRC !== null) return ONLINE_SRC;
+    const duel = typeof __vgDuelSrc === 'function' && __vgDuelSrc();   // a function: its text hooked, then made again
+    let src = typeof duel === 'function' ? String(duel) : '';
+    for (const [a, b] of ONLINE_HOOKS) {
+      if (src.split(a).length !== 2) { console.log('dau-online: the arena has changed, no hook at: ' + a.slice(0, 50)); return (ONLINE_SRC = false); }
+      src = src.replace(a, () => b);
+    }
+    try { return (ONLINE_SRC = (0, eval)('(' + src + ')')); } catch (e) { console.log('dau-online: hooked arena: ' + e); return (ONLINE_SRC = false); }
+  }
   const STAGE_NAME = { baby: 'Con', child: 'Nhi', teen: 'Thiếu niên', adult: 'Trưởng thành', legend: 'Huyền thoại' };
   const sfx = (n, v) => { if (typeof SOUND === 'object' && SOUND) SOUND.sfx(n, v); };
   const roster = dir => SM.ROSTER.find(r => r.dir === dir && r.he !== 'hu');
@@ -134,17 +160,18 @@
     const why = __chiSo.fit(SOLO_NL);
     if (why) return toast(`${DATA.pet.name} chưa đấu được: ${why}, về nghỉ đã`);
     if (globalThis.__SOLO_CUTS && foe.dir === mine.dir) return toast('Chọn pet khác loài với pet của bạn');
+    if (!onlineSrc()) return toast('Chưa vào được trận online');
     (UP ? Promise.resolve(true) : upload()).then(ok => ok && call('POST', '/api/fight', { ...me(), foe: foeTeam.id, pet: U.pi }, 'Đang mở trận…'))
       .then(d => {
         if (!d) return;
-        const pet = d.foe.pet, st = pet.stage === 'baby' ? 'child' : pet.stage;
+        const pet = d.foe.pet, st = pet.stage === 'baby' ? 'child' : pet.stage, lv = levelFor(foeTeam);   // after the upload: your points now
         if (typeof __vgVs === 'function') __vgVs(mine.dir, foe.dir, 0, 0);
         fadeTo(() => {
-          S.vd = { view: 'solo', sel: 1, level: LEVEL, online: { token: d.token, name: d.foe.name, pet } };
+          S.vd = { view: 'solo', sel: 1, level: lv, online: { token: d.token, name: d.foe.name, pet } };
           // the foe in its own stage's body (Vùng đất's hooked arena, as the tree does: game/src/cay-dau-truong.js)
-          const src = typeof __vgDuelSrc === 'function' && __vgDuelSrc(), plain = globalThis.__SOLO_SRC;
-          if (src) { globalThis.__vgBotStage = __soloStage(foe.dir, st); globalThis.__SOLO_SRC = src; }
-          try { SM.start(mine, foe, LEVEL); } finally { globalThis.__SOLO_SRC = plain; }
+          const src = onlineSrc(), plain = globalThis.__SOLO_SRC;
+          globalThis.__vgBotStage = __soloStage(foe.dir, st); globalThis.__SOLO_SRC = src;
+          try { SM.start(mine, foe, lv); } finally { globalThis.__SOLO_SRC = plain; }
           globalThis.__soloPow = __chiSo.pow(pet.lv, 1, pet.attr);   // after start: the foe as strong as its own numbers
         });
       });
@@ -197,12 +224,12 @@
     text('▲▼ chọn · A: vào · B: về Võ đường', 320, 438, 12, '#e0cfb0', 'center', false, 3);
   }
   function drawList() {
-    text('Chọn một đội để đấu (bot mức Khó cầm đội đó)', 320, 82, 13, '#e0cfb0', 'center', false, 3);
+    text('Chọn một đội để đấu (bot Khó cầm đội đó; đội nhiều điểm hơn bạn: Siêu khó)', 320, 82, 13, '#e0cfb0', 'center', false, 3);
     U.list.forEach((o, i) => {
       const y = 98 + i * 54, on = i === U.li;
       box(40, y, 560, 48, on);
       text(`${o.name}`, 56, y + 17, 15, on ? '#fff2d8' : '#f0e4ce', 'left', true, 3);
-      text(`Lv${o.level} · Lực ${o.luc} · ${o.rating} điểm`, 584, y + 17, 13, '#ffe6a8', 'right', true, 2);
+      text(`Lv${o.level} · Lực ${o.luc} · ${o.rating} điểm${levelFor(o) === SUPER ? ' · Siêu khó' : ''}`, 584, y + 17, 13, levelFor(o) === SUPER ? '#ff9a7a' : '#ffe6a8', 'right', true, 2);
       text(o.team.map(p => `${(roster(p.dir) || {}).name || p.dir} Lv${p.lv}`).join(' · '), 56, y + 36, 11, '#cdbb9c', 'left', false, 2);
     });
     text('▲▼ chọn · A: xem đội · B: quay lại', 320, 438, 12, '#e0cfb0', 'center', false, 3);
@@ -225,7 +252,7 @@
     text(`${DATA.pet.name} Lv${S.level || 1} · Lực chiến ${mine}`, 320, 376, 13, '#9fd8ff', 'center', true, 3);
     const why = __chiSo.fit(SOLO_NL);
     if (why) text(`Chưa đấu được: ${why}`, 320, 396, 12, '#ff8a7a', 'center', true, 3);
-    text(`${n > 1 ? '◀▶ chọn pet · ' : ''}A: đấu (bot Khó) · B: quay lại`, 320, 438, 12, '#e0cfb0', 'center', false, 3);
+    text(`${n > 1 ? '◀▶ chọn pet · ' : ''}A: đấu (bot ${LEVEL_NAME[levelFor(o)]}) · B: quay lại`, 320, 438, 12, '#e0cfb0', 'center', false, 3);
   }
   function drawTop() {
     const d = U.top, rows = d.top.slice(U.ti, U.ti + 9);
@@ -306,7 +333,7 @@
 
   // ---------- the hooks ----------
   globalThis.__dauOnline = () => fadeTo(open);
-  globalThis.__dauOnlineTest = { ask, team, me, state: () => U };   // tests (build/qjs-host)
+  globalThis.__dauOnlineTest = { ask, team, me, state: () => U, src: onlineSrc, levelFor, setRating: r => { RATING = r; } };   // tests (build/qjs-host)
   const draw0 = __soloDraw;
   globalThis.__soloDraw = now => {
     const v = S.vd;

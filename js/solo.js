@@ -29,7 +29,7 @@
   const BOSS = 'hu';                                     // its "element": a tab of its own, at the foe's pick only
   const VS_MIN_MS = 1200;                                // the VS screen's least time on screen
   const SOLO_NL = 15;                                   // the energy a match needs (a match then costs 8)
-  const LEVEL_NAMES = ['Tập', 'Dễ', 'Vừa', 'Khó'];
+  const LEVEL_NAMES = ['Tập', 'Dễ', 'Vừa', 'Khó', 'Siêu khó'];   // Siêu khó: online matches only (dau-online.js); the pick screen cycles the first four
   const KEY = { UP: 'ArrowUp', DOWN: 'ArrowDown', LEFT: 'ArrowLeft', RIGHT: 'ArrowRight', A: 'j', B: 'k', X: 'l', Y: 'i',
                 R1: 'Shift', L1: 'Shift', START: 'Enter' };
   // the pick screen: one element at a time (UP/DOWN), its pets in a row (LEFT/RIGHT)
