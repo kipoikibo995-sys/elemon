@@ -2,6 +2,9 @@
 own firmware: build/release/Elemon_<version>_Brick_Stock.zip, holding Apps/Elemon/ (the game, plus the Brick's
 launcher, menu entry, icon, button map, the updater ota.sh and its CA list from packaging/trimui-brick/) and the
 guide. The save lives outside the app (Saves/elemon), so copying a new version over never touches it.
+The same files also go in build/release/Elemon_<version>_Brick_NXRedux.zip as Tools/Elemon.pak/, where NX Redux
+(a NextUI fork for the same machines) finds its apps; every path in the game and ota.sh is relative to its own
+folder, so the one build runs and updates in either place.
 
 Apps/Elemon/files.txt lists every file as "<sha256> <size> <path>" under "#version" and "#ref" (the git tag
 scripts/push_ota.py puts the files at): the in-device update (ota.sh) compares it with the newest version's list
@@ -18,6 +21,8 @@ OUT = os.path.join(ROOT, 'build', 'release')
 OWN = ['launch.sh', 'config.json', 'icon.png', 'buttons.txt', 'ota.sh', 'cacert.pem', 'mang.sh', 'mang-url.txt']   # the Brick's own, over the game's
 RUNNABLE = ('elemon', 'launch.sh', 'ota.sh', 'mang.sh')
 GUIDE = 'HUONG_DAN_Brick.md'
+# (zip name, folder of the game in it, guide): the stock firmware's Apps menu, NX Redux's Tools
+KINDS = [('Brick_Stock', 'Apps/Elemon/', GUIDE), ('Brick_NXRedux', 'Tools/Elemon.pak/', 'HUONG_DAN_NXRedux.md')]
 STORED = ('.png', '.ogg', '.hli', '.wav', '.mp3', '.jpg')         # already packed: stored as they are
 SAFE = re.compile(r'^[A-Za-z0-9._/-]+$')                           # ota.sh puts paths in URLs as they are
 
@@ -67,20 +72,20 @@ def main():
     text = manifest(ver, listed)
     with open(os.path.join(OUT, f'ota-{ver}.txt'), 'w', newline='\n') as f:
         f.write(text)
-    zpath = os.path.join(OUT, f'Elemon_{ver}_Brick_Stock.zip')
-    with zipfile.ZipFile(zpath, 'w') as z:
-        for n, p in listed:
-            info = zipfile.ZipInfo.from_file(p, 'Apps/Elemon/' + n)
-            if n in RUNNABLE:
-                info.external_attr = 0o100755 << 16                # runnable when unzipped on Linux
-            kind = zipfile.ZIP_STORED if n.lower().endswith(STORED) else zipfile.ZIP_DEFLATED
-            with open(p, 'rb') as f:
-                z.writestr(info, f.read(), compress_type=kind)
-        z.writestr('Apps/Elemon/files.txt', text, zipfile.ZIP_DEFLATED)
-        z.write(os.path.join(BRICK, GUIDE), GUIDE, zipfile.ZIP_DEFLATED)
     size = sum(os.path.getsize(p) for _, p in listed)
-    print(f'{zpath}: {len(listed)} files, {size / 1048576:.1f} MB unpacked, {os.path.getsize(zpath) / 1048576:.1f} MB zip')
-
+    for kind_name, top, guide in KINDS:
+        zpath = os.path.join(OUT, f'Elemon_{ver}_{kind_name}.zip')
+        with zipfile.ZipFile(zpath, 'w') as z:
+            for n, p in listed:
+                info = zipfile.ZipInfo.from_file(p, top + n)
+                if n in RUNNABLE:
+                    info.external_attr = 0o100755 << 16            # runnable when unzipped on Linux
+                kind = zipfile.ZIP_STORED if n.lower().endswith(STORED) else zipfile.ZIP_DEFLATED
+                with open(p, 'rb') as f:
+                    z.writestr(info, f.read(), compress_type=kind)
+            z.writestr(top + 'files.txt', text, zipfile.ZIP_DEFLATED)
+            z.write(os.path.join(BRICK, guide), guide, zipfile.ZIP_DEFLATED)
+        print(f'{zpath}: {len(listed)} files, {size / 1048576:.1f} MB unpacked, {os.path.getsize(zpath) / 1048576:.1f} MB zip')
 
 if __name__ == '__main__':
     main()
