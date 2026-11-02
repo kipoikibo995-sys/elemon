@@ -27,6 +27,13 @@
       ban: ['{ten} hôi hôi rồi…', 'Tắm cho {ten} đi chủ'],
       om: ['{ten} mệt quá… chủ ơi…', 'Đau đau…'],
       buon: ['Chủ chơi với {ten} đi…', '{ten} buồn xo…'],
+      // hints (the user, 02/11/2026: complaints that tell you what to do): {mon} a dish of its element sold at Chợ,
+      // {do} the next thing the room lacks, {nha} the home to move to next, {viec} somewhere to go
+      them: ['{ten} thèm {mon} quá à…', 'Chủ ơi, mua {mon} cho {ten} nha?', 'Ọt ọt… {ten} muốn ăn {mon}!'],
+      thieu_do: ['Nhà mình thiếu {do} nè chủ', '{ten} muốn có {do}!'],
+      nha_moi: ['Chủ ơi, mình dọn qua {nha} đi!', '{ten} muốn ở {nha} cơ!'],
+      muon_di: ['Chủ ơi, đi {viec} hông?', '{ten} muốn đi {viec}!'],
+      het_do_choi: ['Bóng hỏng rồi… chủ mua bóng mới cho {ten} nha', '{ten} hông có gì chơi hết…'],
       vui: ['La la la~', '{ten} thương chủ!', 'Hôm nay vui ghê!', 'Chủ thấy {ten} lớn chưa?'],
     },
     child: {
@@ -45,6 +52,11 @@
       ban: ['Người em bẩn rồi, tắm đi chủ', 'Em ngứa quá à'],
       om: ['Em không khỏe… cho em uống thuốc nha', 'Em mệt lắm chủ ơi'],
       buon: ['Chủ quên em rồi hả…', 'Chơi với em một xíu đi'],
+      them: ['Em thèm {mon} quá chủ ơi', 'Hôm nay ăn {mon} được không chủ?', 'Ra Chợ mua {mon} cho em nha!'],
+      thieu_do: ['Phòng mình còn thiếu {do} đó chủ', 'Có {do} thì nhà đẹp hơn nhiều!'],
+      nha_moi: ['Nhà này chật quá, mình chuyển qua {nha} đi chủ', 'Em mơ được ở {nha} lắm!'],
+      muon_di: ['Mình đi {viec} đi chủ!', 'Ở nhà hoài chán, đi {viec} nha?'],
+      het_do_choi: ['Hết bóng rồi chủ ơi, ra Chợ mua quả mới nha', 'Em muốn chơi mà không có bóng…'],
       vui: ['Chủ là nhất!', 'Em lớn rồi đó nha!', 'Hôm nay trời đẹp ghê', 'Em muốn ra ngoài chơi!'],
     },
     teen: {
@@ -63,6 +75,11 @@
       ban: ['Ghê quá, tắm cho tui đi.', 'Dơ thế này sao ra đường.'],
       om: ['Tui… hơi mệt. Không phải than đâu nha.', 'Thuốc đâu… nhanh lên.'],
       buon: ['Chán. Chán thật sự.', 'Không ai chơi với tui hết.'],
+      them: ['Thèm {mon} muốn xỉu.', 'Mua {mon} đi, đừng có keo.', 'Ăn hoài đồ cũ, tui muốn {mon}.'],
+      thieu_do: ['Nhà gì thiếu cả {do}.', 'Kiếm cái {do} về coi, trống trơn à.'],
+      nha_moi: ['Ở đây hoài quê lắm. Lên {nha} đi.', 'Bạn tui ở {nha} hết rồi đó.'],
+      muon_di: ['Đi {viec} đi, ngồi nhà mốc meo rồi.', 'Bao giờ mới đi {viec} vậy?'],
+      het_do_choi: ['Bóng đâu? Hết rồi thì ra Chợ mua đi chứ.', 'Không có đồ chơi thì chơi cái gì?'],
       vui: ['Tui ngầu nhất cái nhà này.', 'Tâm trạng đang tốt, đừng phá.', 'Bao giờ mới được ra ngoài đánh nhau?'],
     },
     adult: {
@@ -81,6 +98,11 @@
       ban: ['Bộ dạng này không hợp với tôi.', 'Tôi cần tắm.'],
       om: ['Bệnh vặt thôi… không sao… khụ.', 'Lấy thuốc giúp tôi.'],
       buon: ['Cậu bận quá nhỉ.', 'Nhà vắng thật.'],
+      them: ['Tôi cần {mon}. Ở Chợ có bán.', 'Hôm nay tôi muốn {mon}.'],
+      thieu_do: ['Căn phòng thiếu {do}.', 'Thêm {do} thì tôi ở yên hơn.'],
+      nha_moi: ['Đến lúc chuyển lên {nha} rồi.', 'Nơi này không còn hợp với tôi. {nha} thì được.'],
+      muon_di: ['Đi {viec}. Tôi cần vận động.', 'Ngồi yên lâu quá. {viec} chứ?'],
+      het_do_choi: ['Hết bóng. Chợ có bán.', 'Không có đồ chơi thì tôi tập một mình vậy.'],
       vui: ['Khói Hư không làm gì được tôi.', 'Tôi mạnh hơn nhiều rồi.', 'Cậu nuôi tôi khéo đấy.'],
     },
     legend: {
@@ -99,6 +121,11 @@
       ban: ['Nhà gì như cái chuồng. Dọn đi!', 'Tắm cho tao. Nước ấm. Nhanh.'],
       om: ['Khụ… nhìn gì… lấy thuốc mau lên…', 'Tao mà chết là tại mày đấy…'],
       buon: ['Chán mày quá.', 'Bỏ bê tao đấy à? Được lắm.'],
+      them: ['Con sen, ra Chợ mua {mon} cho tao. Ngay.', 'Bổn tọa thèm {mon}. Còn đứng đó à?', 'Không có {mon} thì đừng về.'],
+      thieu_do: ['Nhà không có nổi cái {do}. Nhục.', 'Mua {do} về, đừng để tao nhắc lần hai.'],
+      nha_moi: ['Huyền thoại mà ở cái ổ này à? Lên {nha} mau.', 'Tao chỉ ở {nha}. Lo mà kiếm tiền.'],
+      muon_di: ['Dẫn tao đi {viec}. Ngồi đây mục xương rồi.', '{viec}. Đi. Bây giờ.'],
+      het_do_choi: ['Mày bắt tao chơi với không khí à? Mua bóng!', 'Bóng hỏng rồi. Chợ. Ngay.'],
       vui: ['Thiên hạ này là của tao.', 'Ngũ Hành á? Tao một mình cũng đủ.', 'Được nuôi tao là phúc ba đời nhà mày.', 'Quỳ xuống mà chiêm ngưỡng.'],
     },
   };
@@ -106,7 +133,7 @@
   const ON_ACT = { greet: 'chao', wave: 'chao', eat: () => S.bubble === 'bong_tim' ? 'an_thich' : 'an', refuse: 'tu_choi',
                    petted: 'vuot', angry: 'bat_mat', happy: x => x && x.toy !== undefined ? 'choi' : null,
                    sleep: 'ngu', wake: 'day', train: 'tap' };
-  const ALWAYS = new Set(['chao', 'ngu', 'day', 'bat_mat', 'tu_choi']);    // said even right after another line
+  const ALWAYS = new Set(['chao', 'ngu', 'day', 'bat_mat', 'tu_choi', 'het_do_choi']);    // said even right after another line
   const SAY_MS = 2600, PER_CHAR_MS = 45;                 // how long a line stays: a base and a bit a letter
   const ALONE_MS = [22e3, 40e3];                         // on its own: once in this long, while nothing happens
   const PET_EVERY = 6000;                                // petting: one line in this long at most
@@ -114,18 +141,19 @@
 
   const stageOf = () => ({ adult4: 'adult', legend4: 'legend' })[S.stage] || S.stage;
   let last = {}, said = null, nextAlone = 0, petT = -1e9, box = null;
-  function say(kind, now = performance.now()) {
+  function say(kind, now = performance.now(), vars = null) {
     const set = (LOI[stageOf()] || {})[kind];
     if (!set || !set.length || (globalThis.CAI_DAT && CAI_DAT.noi === false)) return;   // Cài đặt: Pet nói chuyện (man-chao.js)
     if (!ALWAYS.has(kind) && said && now - said.t < said.ms * 0.6) return;
     let i = Math.floor(Math.random() * set.length);
     if (set.length > 1 && i === last[kind]) i = (i + 1) % set.length;
     last[kind] = i;
-    const s = set[i].replace(/\{ten\}/g, DATA.pet.name);
+    const s = set[i].replace(/\{ten\}/g, DATA.pet.name).replace(/\{(mon|do|nha|viec)\}/g, (m, k) => (vars && vars[k]) || m);
     said = { s, t: now, ms: SAY_MS + s.length * PER_CHAR_MS, legend: stageOf() === 'legend' };
     nextAlone = now + ALONE_MS[0] + Math.random() * (ALONE_MS[1] - ALONE_MS[0]);
   }
   globalThis.__noi = say;                                 // for the test harness
+  globalThis.__noiGoiY = () => ({ them: craving(), nha: house(), di: outing() });
   globalThis.__noiDa = () => said && said.s;
 
   const act0 = act;
@@ -161,11 +189,53 @@
 
   const calm = () => S.mode === 'room' && S.stats === null && S.fade === 0 && S.popup < 0.05 && S.picker < 0.05 &&
     !(S.truyen && S.truyen.dang);
+  // ---------- the hints: what the pet asks for (each null when there is nothing to ask) ----------
+  const HE = { hoa: 'Hỏa', kim: 'Kim', moc: 'Mộc', thuy: 'Thủy', tho: 'Thổ' };
+  const pick = a => a.length ? a[Math.floor(Math.random() * a.length)] : null;
+  const low = w => w.charAt(0).toLowerCase() + w.slice(1);           // a dish or a thing, said mid-line (homes keep their names)
+  // a dish of its own element (its favourite kind: the demo's heart bubble) from Chợ's food tab
+  function craving() {
+    const he = HE[DATA.pet.element], rows = DATA.shop && DATA.shop.rows ? DATA.shop.rows.flat() : [];
+    const r = pick(rows.filter(r => r && r.he === he && r.name && r.file && /^[A-Z][a-z]+_\d/.test(r.file)));
+    return r ? { mon: low(r.name) } : null;
+  }
+  // the home: a thing its room still lacks, else the next home up (its own element's first) once it may be had
+  function house() {
+    if (typeof HOME !== 'function' || typeof isPlaced !== 'function' || !S.homes) return null;
+    const h = HOME();
+    if (!h) return null;
+    const lack = h.items.filter(d => !isPlaced(h, d.id));
+    if (lack.length) return { kind: 'thieu_do', do: low(pick(lack).name) };
+    const next = DATA.houses.map((n, i) => [n, i]).filter(([n, i]) => n.tier === h.tier + 1 && !S.homes[i] &&
+      (typeof houseNeed !== 'function' || !houseNeed(i)));
+    if (!next.length) return null;
+    const own = next.filter(([n]) => n.he === HE[DATA.pet.element]);
+    return { kind: 'nha_moi', nha: (own.length ? own : next)[0][0].name };
+  }
+  // somewhere to go (a Con stays in the village: Vùng đất is for the bigger ones)
+  function outing() {
+    const go = ['câu cá', 'trồng rau', 'học ở trường', 'Võ đường tập'];
+    if (S.stage !== 'baby') go.push('Vùng đất', 'Võ đường đấu Solo');
+    return { viec: pick(go) };
+  }
   function alone(now) {                                   // a line of its own, from how it feels
     if (!nextAlone) { nextAlone = now + 8000; return; }
     if (now < nextAlone || S.act || S.walk || S.night > 0.05) return;
     const n = S.need;
-    say(S.sick ? 'om' : n.no < 30 ? 'doi' : n.nl < 20 ? 'buon_ngu' : n.sach < 30 ? 'ban' : n.vui < 30 ? 'buon' : 'vui', now);
+    if (S.sick) return say('om', now);
+    if (n.no < 30) { const c = craving(); return c && Math.random() < 0.5 ? say('them', now, c) : say('doi', now); }
+    if (n.nl < 20) return say('buon_ngu', now);
+    if (n.sach < 30) return say('ban', now);
+    if (n.vui < 30) {                                   // bored: no toy left is the first thing to say (song-that.js)
+      if (S.items && !(S.bongLuot > 0) && !S.items.some((it, i) => it.use === 'ball' && S.bag[i] > 0) && Math.random() < 0.6) return say('het_do_choi', now);
+      return Math.random() < 0.5 ? say('muon_di', now, outing()) : say('buon', now);
+    }
+    // nothing wrong: now and then a wish (a dish, the home, an outing), else it is just happy
+    const r = Math.random(), h = r < 0.3 && house(), c = r >= 0.3 && r < 0.5 && n.no < 80 && craving();
+    if (h) return say(h.kind, now, h);
+    if (c) return say('them', now, c);
+    if (r >= 0.5 && r < 0.65) return say('muon_di', now, outing());
+    say('vui', now);
   }
   function lines(s) {                                     // the line broken to fit W_MAX
     ctx.font = FONT;
