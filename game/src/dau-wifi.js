@@ -6,8 +6,10 @@
 // tick n count at tick n + DELAY, sent with the last few ticks' so a lost packet is covered by the next; a tick runs only
 // once both sides' buttons for it are in. Everything the arena draws by chance comes from one seeded generator (the
 // room's seed) while a tick runs, its clock is the tick's, and the room maker is the left fighter (P), the one who
-// joins the right one (B, the bot's place: its brain is swapped for the other player's buttons, LAN_HOOKS). Both
-// fight in their Nhi body, their strength from their own six attributes (the same __soloPow on both). Best of three.
+// joins the right one (B, the bot's place: its brain is swapped for the other player's buttons, LAN_HOOKS). Each
+// fights in its own stage's body (a Con as a Nhi; the room's two stages, the same on both handhelds, since a body's
+// height moves where its shots start and land), its strength from its own six attributes (the same __soloPow on
+// both). Best of three.
 // Every HASH_EVERY ticks each side sends where the fighters are; a difference is logged ("wifi: LỆCH") and marked.
 // Notes on what makes a match differ between runs: LOCKSTEP.md.
 (() => {
@@ -31,6 +33,12 @@
   // ---------- the arena, hooked for two players (on top of chi-so.js's and solo.js's hooks) ----------
   const LAN_HOOKS = [
     ['  if (dt) think();', '  if (dt) { if (globalThis.__lanB) __lanB(B, press, release, live); else think(); }'],
+    // the right fighter's body by its stage (img/<pet>/teen/, adult/, legend/ above Nhi), as Vùng đất's foes
+    ["const stage = bot ? (NHI || PET || BOTPET ? 'child' : 'adult')", "const stage = bot ? (globalThis.__vgBotStage || (NHI || PET || BOTPET ? 'child' : 'adult'))"],
+    ["    const T = async (n, c, r) => { const cells = cut(await load(dir + n + '.png'), c, r); WB[n] = mirror ? tint(cells, 'hue-rotate(170deg) saturate(1.2)') : cells; };",
+     "    const bdir = globalThis.__vgBotStage && __vgBotStage !== 'child' ? dir + __vgBotStage + '/' : dir, BODY_N = ['s', 'se', 'e', 'ne', 'n', 'chung'];\n" +
+     "    const T = async (n, c, r) => { const cells = cut(await load((BODY_N.includes(n) ? bdir : dir) + n + '.png'), c, r); WB[n] = mirror ? tint(cells, 'hue-rotate(170deg) saturate(1.2)') : cells; };"],
+    ["    WB.cutin = cut(await load(dir + 'cutin.png'), 1, 1)[0];", "    WB.cutin = cut(await load(bdir + 'cutin.png'), 1, 1)[0];"],
     ['const sp = (f.bot ? LEVELS[level].speed : SPEED)', 'const sp = (f.bot && !globalThis.__lanB ? LEVELS[level].speed : SPEED)'],
     ['if (l && !f.act && !f.bot) f.ang = Math.atan2(f.my, f.mx);', 'if (l && !f.act && (!f.bot || globalThis.__lanB)) f.ang = Math.atan2(f.my, f.mx);'],
     ['  if (f.bot) { a.ang = a.base; a.t0 = now; }', '  if (f.bot && !globalThis.__lanB) { a.ang = a.base; a.t0 = now; }'],
@@ -41,6 +49,8 @@
      '  SAN = pool[globalThis.__lanSan !== undefined && globalThis.__lanSan !== null ? __lanSan % pool.length : Math.floor(Math.random() * pool.length)];'],
     ["    center(over.winner === P ? 'THẮNG!' : 'THUA!', 250, 44, over.winner === P ? '#ffe08a' : '#8fd8ff');",
      "    { const w = (over.winner === P) !== !!globalThis.__lanFlip; center(w ? 'THẮNG!' : 'THUA!', 250, 44, w ? '#ffe08a' : '#8fd8ff'); }"],
+    // the skill row at the bottom is the one this handheld plays: the right fighter's for the one who joined
+    ['  skillRow(P);', '  skillRow(globalThis.__lanFlip ? B : P);'],
     ["    center('Enter: đấu lại · 0/1/2/3: Tập/Dễ/Vừa/Khó', 290, 14, '#ddd');",
      "    if (!globalThis.__lanB) center('Enter: đấu lại · 0/1/2/3: Tập/Dễ/Vừa/Khó', 290, 14, '#ddd');"],
   ];
@@ -98,6 +108,7 @@
     return { dir: DATA.pet.creature, ten: DATA.pet.name, stage: st, lv: S.level || 1, attr: __chiSo.attrs().map(v => Math.round(v * 100) / 100) };
   }
   const lucOf = p => __chiSo.luc(__chiSo.of(p.lv, p.attr));
+  const bodyOf = p => __soloStage(p.dir, String(p.stage || 'child').replace(/4$/, '').replace('baby', 'child'));   // the arena's body for a pet
   function powOf(left, right) {                          // the left fighter's (P's) damage ratio and the right one's
     const r = lucOf(left) / Math.max(1, lucOf(right)), c = v => Math.max(1 / 1.5, Math.min(1.5, v));
     return { me: c(r), foe: c(1 / r), hp0: 1, luc: lucOf(left), lucFoe: lucOf(right) };
@@ -192,10 +203,10 @@
     if (typeof __vgVs === 'function') __vgVs(left.dir, right.dir, 0, 0);
     fadeTo(() => {
       S.vd = { view: 'solo', sel: 1, level: 3, lan: true, quiet: false };
-      globalThis.__lanSan = bat.san; globalThis.__lanFlip = !host; globalThis.__vgBotStage = null;
+      globalThis.__lanSan = bat.san; globalThis.__lanFlip = !host; globalThis.__vgBotStage = bodyOf(bat.right);
       const plain = globalThis.__SOLO_SRC;
       globalThis.__SOLO_SRC = src;
-      try { SM.start(left, right, 3, { meStage: 'child', drive }); } finally { globalThis.__SOLO_SRC = plain; }
+      try { SM.start(left, right, 3, { meStage: bodyOf(bat.left), drive }); } finally { globalThis.__SOLO_SRC = plain; }
       globalThis.__soloPow = bat.pow;
     });
   }
@@ -291,7 +302,7 @@
     const sc = globalThis.__soloSeen && __soloSeen.score, mine = sc ? (L.host ? sc.me : sc.bot) : 0, theirs = sc ? (L.host ? sc.bot : sc.me) : 0;
     W.res = { mine, theirs, them: L.host ? L.bat.right : L.bat.left, gone: L.gone, desync: L.desync, ticks: L.tick };
     log(`left at tick ${L.tick}: ${mine}-${theirs}, ${L.desync} differences`);
-    globalThis.__lanB = null; globalThis.__lanSan = null; globalThis.__lanFlip = null; globalThis.__soloPow = null;
+    globalThis.__lanB = null; globalThis.__lanSan = null; globalThis.__lanFlip = null; globalThis.__soloPow = null; globalThis.__vgBotStage = null;
     L = null;
     SM.stop();
     closeSock();

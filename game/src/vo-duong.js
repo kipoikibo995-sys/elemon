@@ -20,12 +20,9 @@
   // right (game/src/dau-online.js; its picture: assets/source/vo-duong/online/THE_dau-online.png cut to hinh_online(_lon))
   const CARDS = [{ key: 'tap-luyen', name: 'Tập luyện', open: true, say: 'Đấm theo nhịp, lướt tới đánh theo mũi tên: nhiều EXP' },
                  { key: 'solo', name: 'Solo đối kháng', say: 'Đấu 1-1 với bot cùng Level', get open() { return typeof __soloOpen === 'function'; } },
-                 { key: 'online', name: 'Đấu online', say: 'Đấu với đội của người chơi khác (cần wifi)', soon: 'Sắp ra mắt',
-                   get open() { return typeof __dauOnline === 'function' && onlineThu(); } }];
-  // Đấu online waits for its launch (the user, 02/11/2026: "chế độ online thì click vào thì bảo sắp ra mắt"): it opens
-  // only for a test build, one with online-thu.txt in the game folder, and in the harness
-  let THU = null;                                                    // looked up once, the first time the menu shows
-  const onlineThu = () => THU !== null ? THU : (THU = typeof __cv === 'object' && (!!__cv.test || __cv.readText('online-thu.txt') !== null));
+                 { key: 'online', name: 'Đấu online', say: 'Đấu với đội của người chơi khác (cần wifi)',
+                   get open() { return typeof __dauOnline === 'function'; } }];
+  // Đấu online opened for everyone in v1.4.2 (the user, 02/11/2026; until then only a test build with online-thu.txt)
   const CARD_X = [140, 320, 500], CARD_Y = 210, LABEL_Y = 352;
   globalThis.__vdCard = key => CARDS.findIndex(c => c.key === key);   // the card to come back to (solo.js, dau-online.js)
   const HIT = { strong: { exp: 8, bag: [2, 3, 1, 0], fx: 1, word: 'Mạnh!' }, ok: { exp: 4, bag: [1, 3, 0], fx: 0.75, word: 'Trúng' },
