@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Elemon · game nuôi pet Ngũ Hành cho TrimUI Brick</title>
-<meta name="description" content="Ấp trứng Ngũ Hành, nuôi tinh linh tới Huyền thoại, đánh trùm năm vùng đất. Game nuôi pet miễn phí cho TrimUI Brick.">
+<title>Elemon · game nuôi pet Ngũ Hành cho máy cầm tay</title>
+<meta name="description" content="Ấp trứng Ngũ Hành, nuôi tinh linh tới Huyền thoại, đánh trùm năm vùng đất. Game nuôi pet miễn phí cho TrimUI Brick, R36S và Miyoo Mini Plus.">
 <meta property="og:title" content="Elemon">
-<meta property="og:description" content="Ấp trứng Ngũ Hành, nuôi tinh linh tới Huyền thoại, đánh trùm năm vùng đất. Game nuôi pet miễn phí cho TrimUI Brick.">
+<meta property="og:description" content="Ấp trứng Ngũ Hành, nuôi tinh linh tới Huyền thoại, đánh trùm năm vùng đất. Game nuôi pet miễn phí cho TrimUI Brick, R36S và Miyoo Mini Plus.">
 <meta property="og:image" content="https://elemon-game.pages.dev/img/title.jpg">
 <meta property="og:url" content="https://elemon-game.pages.dev/">
 <meta name="twitter:card" content="summary_large_image">
@@ -167,6 +167,13 @@ td.he { font: 800 1.35rem/1 var(--pixel); color: var(--c); white-space: nowrap }
 .steps { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; counter-reset: st }
 .steps li { counter-increment: st; padding: 20px; display: grid; gap: 8px; align-content: start }
 .steps li::before { content: "0" counter(st); font: 800 2.4rem/1 var(--pixel); color: var(--gold); text-shadow: 3px 3px 0 var(--black) }
+.dl { grid-template-columns: repeat(2, 1fr) }
+.dl li { gap: 10px }
+.dl li::before { content: none }
+.dl h3 { color: var(--gold); font-size: 1.9rem }
+.dl .fw { font: 1.2rem/1.3 var(--term); color: var(--mist) }
+.dl .btn { justify-self: start; margin-top: 6px; font-size: 1.35rem }
+.ota.online li::before { content: "▶" }
 .facts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; margin-top: 28px }
 .facts div { padding: 18px; display: grid; gap: 4px; min-width: 0; border-right: 2px dashed var(--line) }
 .facts div:last-child { border-right: 0 }
@@ -204,7 +211,7 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: s
 
 @media (max-width: 900px) {
   .acts, .g4 { grid-template-columns: repeat(2, 1fr) }
-  .ota, .steps { grid-template-columns: 1fr }
+  .ota, .steps, .dl { grid-template-columns: 1fr }
   .pets { grid-template-columns: repeat(4, minmax(0, 1fr)) }
 }
 @media (max-width: 820px) {
@@ -230,13 +237,13 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: s
     <p class="eyebrow">Game nuôi pet · máy cầm tay</p>
     <h1 class="logo"><img src="img/game/logo.webp" alt="Elemon" width="760" height="268"></h1>
     <p class="lede">Ấp một quả trứng Ngũ Hành, chăm tinh linh của bạn từng bữa ăn giấc ngủ, nuôi nó từ lúc lọt lòng tới Huyền thoại, rồi dẫn nó đi đánh trùm khắp năm vùng đất.</p>
-    <p class="sub">Viết riêng cho TrimUI Brick. Chơi bằng D-pad, không cần mạng, miễn phí, cập nhật ngay trên máy.</p>
+    <p class="sub">Chạy trên TrimUI Brick, Smart Pro, R36S và Miyoo Mini Plus. Chơi bằng D-pad, không cần mạng, miễn phí, cập nhật ngay trên máy. Có wifi thì đấu với bạn bè.</p>
     <p class="press" aria-hidden="true">▶ BẤM A ĐỂ BẮT ĐẦU</p>
     <div class="cta">
-      <a class="btn" href="https://retrohub.info/store/app/elemon">Tải trên RetroHub</a>
-      <a class="btn ghost" href="#cai-dat">Cách cài</a>
+      <a class="btn" href="#tai-ve">Tải Elemon</a>
+      <a class="btn ghost" href="#dau-online">Đấu online</a>
     </div>
-    <p class="meta" style="margin-top:14px">v1.1 · 594 MB · firmware gốc của Brick / Brick Pro</p>
+    <p class="meta" style="margin-top:14px">v1.4.3 · khoảng 600 MB · Brick, NX Redux, R36S, Miyoo Mini Plus</p>
   </div>
   <div class="brick" aria-hidden="true">
     <div class="screen"><img src="img/title.jpg" alt="" width="640" height="480"></div>
@@ -247,7 +254,7 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: s
 <nav class="wrap toc" aria-label="Các phần">
   <a href="#cham-soc">Chăm pet</a><a href="#chi-so">Chỉ số</a><a href="#lon-len">Tiến hóa</a><a href="#noi">Pet biết nói</a>
   <a href="#hoat-dong">Hoạt động</a><a href="#vo-duong">Võ đường</a><a href="#vung-dat">Vùng đất</a><a href="#dau-truong">Đấu trường</a>
-  <a href="#cap-nhat">Cập nhật</a><a href="#cai-dat">Cài đặt</a>
+  <a href="#dau-online">Đấu online</a><a href="#cap-nhat">Cập nhật</a><a href="#tai-ve">Tải về</a>
 </nav>
 
 <main>
@@ -330,7 +337,7 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: s
       <div class="text">
         <p class="eyebrow">Lớn lên</p>
         <h2>Năm bậc tiến hóa, mỗi lần một cái tên mới</h2>
-        <p>Đủ cấp và đủ điều kiện là pet tiến hóa: thân hình đổi hẳn, mở thêm ô khảm ngọc. Sau mỗi lần tiến hóa bạn đặt lại tên bằng bàn phím có <strong>đủ dấu tiếng Việt</strong>.</p>
+        <p>Đủ cấp và đủ điều kiện là pet tiến hóa: thân hình đổi hẳn, mở thêm ô khảm ngọc. Trứng vừa nở là bạn đặt tên cho pet, và sau mỗi lần tiến hóa lại được đặt tên mới, bằng bàn phím có <strong>đủ dấu tiếng Việt</strong>.</p>
         <ol class="evo" aria-label="Năm bậc của Hỏa Hổ"><li><span class="spr" style="--w:110;--h:106;--d:-0.42s"><img src="img/game/evo-baby.webp" alt="Hỏa Hổ bậc Con" width="440" height="106" loading="lazy"></span><span class="n">1</span>Con</li><li><span class="spr" style="--w:141;--h:141;--d:-0.79s"><img src="img/game/evo-child.webp" alt="Hỏa Hổ bậc Nhi" width="564" height="141" loading="lazy"></span><span class="n">2</span>Nhi</li><li><span class="spr" style="--w:159;--h:181;--d:-0.26s"><img src="img/game/evo-teen.webp" alt="Hỏa Hổ bậc Thiếu niên" width="636" height="181" loading="lazy"></span><span class="n">3</span>Thiếu niên</li><li><span class="spr" style="--w:211;--h:220;--d:-0.63s"><img src="img/game/evo-adult.webp" alt="Hỏa Hổ bậc Trưởng thành" width="844" height="220" loading="lazy"></span><span class="n">4</span>Trưởng thành</li><li><span class="spr" style="--w:211;--h:220;--d:-0.10s"><img src="img/game/evo-legend.webp" alt="Hỏa Hổ bậc Huyền thoại" width="844" height="220" loading="lazy"></span><span class="n">5</span>Huyền thoại</li></ol>
       </div>
       <div class="g2">
@@ -410,8 +417,9 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: s
         <p class="eyebrow">Võ đường</p>
         <h2>Tập cho khỏe trước khi ra trận</h2>
         <p>Đấm theo nhịp để tăng Sức mạnh, đấu Solo với bot để tăng Tinh thần. Mỗi bài tính điểm một buổi mỗi ngày, nên tập đều quan trọng hơn tập dồn. Đánh nhau tốn sức thật: mất Năng lượng, No, Sạch, và máu mất đi trừ vào Sức khỏe.</p>
+        <p>Thẻ thứ ba là <a href="#dau-online">Đấu online</a>: đấu qua wifi với máy bên cạnh, hoặc đấu với đội của người chơi khác qua mạng.</p>
       </div>
-      <figure><img class="shot" src="img/vo-duong.jpg" alt="Võ đường với hai thẻ Tập luyện và Solo đối kháng" width="640" height="480" loading="lazy"><figcaption>Tập luyện · Solo đối kháng</figcaption></figure>
+      <figure><img class="shot" src="img/vo-duong.jpg" alt="Võ đường với ba thẻ Tập luyện, Solo đối kháng và Đấu online" width="640" height="480" loading="lazy"><figcaption>Tập luyện · Solo đối kháng · Đấu online</figcaption></figure>
     </div>
   </section>
 
@@ -462,12 +470,27 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: s
     </div>
   </section>
 
+  <section class="band" id="dau-online">
+    <div class="wrap">
+      <div class="head">
+        <p class="eyebrow">Đấu online · mới ở 1.4.3</p>
+        <h2>Mang pet đi đấu với người thật</h2>
+        <p>Vào <strong>Võ đường → Đấu online</strong>. Không có wifi thì game vẫn chơi bình thường, chỉ phần này cần mạng.</p>
+      </div>
+      <ol class="ota online">
+        <li><h3>Đấu qua wifi</h3><p>Hai máy chung một wifi: một bên mở phòng, bên kia vào. Đấu 3 hiệp trực tiếp, mỗi pet đúng dáng và đúng chiêu của nó. Brick, Smart Pro, R36S, Miyoo đấu chung được, miễn là cùng bản game.</p></li>
+        <li><h3>Tải đội lên</h3><p>Gửi tối đa 3 pet của bạn lên máy chủ. Người khác đấu với đội của bạn cả lúc bạn tắt máy: pet giữ đúng dáng và chỉ số của nó.</p></li>
+        <li><h3>Tìm đối thủ, leo hạng</h3><p>Chọn một đội cùng tầm cấp, chọn pet rồi vào trận. Thắng thua đều được ghi điểm trên Bảng xếp hạng.</p></li>
+      </ol>
+    </div>
+  </section>
+
   <section class="band" id="cap-nhat">
     <div class="wrap">
       <div class="head">
         <p class="eyebrow">Cập nhật ngay trên máy</p>
         <h2>Có bản mới thì bấm A, không cần cắm máy tính</h2>
-        <p>Vào <strong>Cài đặt → Cập nhật</strong> khi máy có wifi. Game chỉ tải những file đã đổi, không tải lại cả gói.</p>
+        <p>Vào <strong>Cài đặt → Cập nhật</strong> khi máy có wifi. Game chỉ tải những file đã đổi, không tải lại cả gói, và đang ở bản cũ nào cũng lên thẳng bản mới nhất. Có trên Brick, NX Redux và R36S.</p>
       </div>
       <ol class="ota">
         <li><h3>Kiểm tra</h3><p>Game hỏi máy chủ có bản mới không, báo số file và dung lượng cần tải.</p></li>
@@ -478,24 +501,24 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: s
     </div>
   </section>
 
-  <section class="band" id="cai-dat">
+  <section class="band" id="tai-ve">
     <div class="wrap">
       <div class="head">
-        <p class="eyebrow">Cài trong 3 bước</p>
-        <h2>Chép vào thẻ là chơi</h2>
+        <p class="eyebrow">Tải về · v1.4.3</p>
+        <h2>Chọn đúng bản cho máy của bạn</h2>
+        <p>Mỗi máy một gói riêng, khoảng 600 MB. Link luôn là bản mới nhất. Đã cài rồi thì khỏi tải lại: vào <strong>Cài đặt → Cập nhật</strong> trong game.</p>
       </div>
-      <ol class="steps">
-        <li><h3>Tải gói</h3><p>Tải Elemon trên <a href="https://retrohub.info/store/app/elemon">RetroHub</a>.</p></li>
-        <li><h3>Chép vào thẻ</h3><p>Giải nén, chép thư mục <code>Apps</code> vào gốc thẻ nhớ của Brick.</p></li>
-        <li><h3>Mở game</h3><p>Bật máy, vào mục <strong>Apps</strong>, chọn <strong>Elemon</strong>.</p></li>
+      <ol class="steps dl">
+        <li><h3>TrimUI Brick</h3><p class="fw">Firmware gốc của Brick / Brick Pro</p><p>Giải nén, chép thư mục <code>Apps</code> vào gốc thẻ nhớ. Bật máy, vào <strong>Apps</strong>, chọn <strong>Elemon</strong>.</p><p class="meta">Bản lưu: <code>Saves/elemon/</code></p>
+          <a class="btn" href="https://github.com/kipoikibo995-sys/elemon/releases/latest/download/Elemon_Brick_Stock.zip">Tải bản TrimUI Brick</a></li>
+        <li><h3>NX Redux</h3><p class="fw">TrimUI Brick, Smart Pro chạy NX Redux</p><p>Giải nén, chép thư mục <code>Tools</code> vào gốc thẻ nhớ. Vào <strong>Tools</strong>, chọn <strong>Elemon</strong>.</p><p class="meta">Bản lưu: <code>Saves/elemon/</code></p>
+          <a class="btn" href="https://github.com/kipoikibo995-sys/elemon/releases/latest/download/Elemon_Brick_NXRedux.zip">Tải bản NX Redux</a></li>
+        <li><h3>R36S</h3><p class="fw">ArkOS, dArkOS, AmberELEC, máy có PortMaster (Anbernic RG40XXV chạy muOS, Knulli...)</p><p>Giải nén, chép <code>Elemon.sh</code> và thư mục <code>elemon</code> trong <code>ports</code> vào thư mục ports của thẻ. Vào <strong>Ports</strong>, chọn <strong>Elemon</strong>.</p><p class="meta">Bản lưu: <code>ports/elemon-save/</code></p>
+          <a class="btn" href="https://github.com/kipoikibo995-sys/elemon/releases/latest/download/Elemon_R36S.zip">Tải bản R36S</a></li>
+        <li><h3>Miyoo Mini Plus (bản thử)</h3><p class="fw">OnionOS hoặc firmware gốc · chưa có cập nhật trong game</p><p>Giải nén, chép thư mục <code>App</code> vào gốc thẻ nhớ. Vào <strong>Apps</strong>, chọn <strong>Elemon</strong>. Bản mới: chép đè lên.</p><p class="meta">Bản lưu: <code>Saves/elemon/</code></p>
+          <a class="btn" href="https://github.com/kipoikibo995-sys/elemon/releases/latest/download/Elemon_MiyooMiniPlus.zip">Tải bản Miyoo Mini Plus</a></li>
       </ol>
-      <dl class="facts">
-        <div><dt>Máy</dt><dd>TrimUI Brick / Brick Pro</dd></div>
-        <div><dt>Hệ điều hành</dt><dd>Firmware gốc</dd></div>
-        <div><dt>Dung lượng</dt><dd>594 MB</dd></div>
-        <div><dt>Bản lưu</dt><dd><code>Saves/elemon/</code></dd></div>
-      </dl>
-      <p class="meta" style="margin-top:14px">Phím: D-pad đi và chọn · A đồng ý · B quay lại · SELECT trong phòng về màn chào · START trong phòng mở Cài đặt. Thoát: nút Thoát game ở màn chào, hoặc giữ SELECT + START. Nút âm lượng của máy chỉnh tiếng game.</p>
+      <p class="meta" style="margin-top:18px">Phím: D-pad đi và chọn · A đồng ý · B quay lại · SELECT trong phòng về màn chào · START trong phòng mở Cài đặt. Thoát: nút Thoát game ở màn chào, hoặc giữ SELECT + START. Nút A và B bị ngược thì xem hướng dẫn trong gói. Các bản cũ: <a href="https://github.com/kipoikibo995-sys/elemon/releases">trang phát hành</a>.</p>
     </div>
   </section>
 
@@ -504,7 +527,7 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: s
       <div class="lineup"><span class="spr" style="--w:211;--h:220;--d:-0.24s"><img src="img/game/pet-hoa-ho.webp" alt="Hỏa Hổ" width="844" height="220" loading="lazy"></span><span class="spr" style="--w:197;--h:232;--d:-0.61s"><img src="img/game/pet-kim-te.webp" alt="Kim Tê" width="788" height="232" loading="lazy"></span><span class="spr" style="--w:224;--h:226;--d:-0.08s"><img src="img/game/pet-moc-hung.webp" alt="Mộc Hùng" width="896" height="226" loading="lazy"></span><span class="spr" style="--w:206;--h:234;--d:-0.45s"><img src="img/game/pet-thuy-sa.webp" alt="Thủy Sa" width="824" height="234" loading="lazy"></span><span class="spr" style="--w:210;--h:233;--d:-0.82s"><img src="img/game/pet-tho-nguu.webp" alt="Thổ Ngưu" width="840" height="233" loading="lazy"></span></div>
       <h2>Trứng đang chờ nở</h2>
       <p>Miễn phí, không quảng cáo, không cần mạng để chơi.</p>
-      <a class="btn" href="https://retrohub.info/store/app/elemon">Tải Elemon trên RetroHub</a>
+      <a class="btn" href="#tai-ve">Chọn bản cho máy của bạn</a>
       <p class="ai-note"><strong>Muốn cài bản AI?</strong> Liên hệ trực tiếp với tác giả qua Facebook.</p>    </div>
   </section>
 </main>
@@ -512,7 +535,7 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: s
 <footer>
   <div class="wrap">
     <span>Elemon · game làm tay cho máy cầm tay</span>
-    <span>Gặp lỗi? Bình luận trên <a href="https://retrohub.info/store/app/elemon">RetroHub</a>, kèm file <code>Apps/Elemon/log.txt</code></span>
+    <span>Gặp lỗi? Báo trên <a href="https://github.com/kipoikibo995-sys/elemon/issues">GitHub</a>, kèm file <code>log.txt</code> trong thư mục game</span>
   </div>
 </footer>
 </body>
