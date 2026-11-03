@@ -212,6 +212,23 @@
     played();
     return r;
   };
+  // the drink, the candy and the ball are used, not eaten: the bag's Dùng opens the care bag (thuốc, xà phòng), so
+  // they are listed there too; before, Dùng on Nước tăng lực opened a bag without it and A swept the floor (the
+  // user, 03/11/2026: "uống nước nhưng không tăng năng lượng")
+  if (typeof CARE !== 'undefined') for (const u of ['energy', 'candy', 'ball']) if (!CARE.includes(u)) CARE.push(u);
+  // the last one of a food eaten leaves S.items, but the closing bag still drew it from S.view (a script error a
+  // frame, inline-2.js 'b.file'): the list is made again from what is left
+  const pressBag = press;
+  globalThis.press = function (btn) {
+    const n0 = S.items ? S.items.length : 0, r = pressBag.apply(this, arguments);
+    if (S.items && S.items.length !== n0 && Array.isArray(S.view) && typeof CARE !== 'undefined') {
+      const pick = S.pick;
+      S.view = S.items.map((b, i) => i).filter(i => CARE.includes(S.items[i].use) === (S.bagKind === 'care'));
+      if (S.bagKind === 'care' && typeof SWEEP !== 'undefined') S.view.unshift(SWEEP);
+      S.pick = Math.max(0, Math.min(pick, S.view.length - 1));
+    }
+    return r;
+  };
 
   // ---------- buttons ----------
   const press0 = press;

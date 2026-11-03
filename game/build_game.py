@@ -81,6 +81,8 @@ window.SOUND = (() => {
 <script src="js/hoi-thoai.js"></script>
 <script src="js/dat-ten.js"></script>
 <script src="js/loi-noi.js"></script>
+<script src="js/xa-hoi.js"></script>
+<script src="js/tac-dung.js"></script>
 <script src="js/man-chao.js"></script>
 <script src="js/cay-dau-truong.js"></script>
 <script src="js/dau-online.js"></script>
@@ -701,7 +703,7 @@ def main():
     shutil.copy(os.path.join(HERE, 'src', 'nut-thu.js'), os.path.join(PAGE, 'js'))       # test buttons (browser)
     shutil.copy(os.path.join(HERE, 'src', 'di-bo.js'), os.path.join(PAGE, 'js'))
     shutil.copy(os.path.join(HERE, 'src', 've-nhanh.js'), os.path.join(PAGE, 'js'))
-    for name in ('tai-dan.js', 'tai-man.js', 'truyen.js', 'phim.js', 'hoi-thoai.js', 'dat-ten.js', 'loi-noi.js', 'man-chao.js', 'dau-online.js', 'dau-wifi.js'):     # truyen.js: the story's words
+    for name in ('tai-dan.js', 'tai-man.js', 'truyen.js', 'phim.js', 'hoi-thoai.js', 'dat-ten.js', 'loi-noi.js', 'xa-hoi.js', 'tac-dung.js', 'man-chao.js', 'dau-online.js', 'dau-wifi.js'):     # truyen.js: the story's words
         shutil.copy(os.path.join(HERE, 'src', name), os.path.join(PAGE, 'js'))
     shutil.copy(os.path.join(HERE, 'src', 'vo-duong.js'), os.path.join(PAGE, 'js'))
     shutil.copy(os.path.join(HERE, 'src', 'solo.js'), os.path.join(PAGE, 'js'))
