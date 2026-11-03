@@ -21,6 +21,8 @@ js/phim.js
 js/hoi-thoai.js
 js/dat-ten.js
 js/loi-noi.js
+js/xa-hoi.js
+js/tac-dung.js
 js/man-chao.js
 js/cay-dau-truong.js
 js/dau-online.js
