@@ -230,6 +230,20 @@
     return r;
   };
 
+  // fishing: the reel is held and let go for 5-10 s a fish, and only A did it, which wore A out (the user, 06/11/2026:
+  // "dễ bị liệt nút quá"): ▲, R1 and R2 held reel the same as A; the line under the bar says so
+  if (typeof drawFish === 'function' && typeof HELD === 'object' && HELD) {
+    const REEL = ['UP', 'R1', 'R2'], REEL_LINE = 'Giữ A, ▲ hoặc R1/R2 để kéo vùng xanh theo cá';
+    const drawFish0 = drawFish;
+    globalThis.drawFish = function () {
+      if (!S.fish || S.fish.st !== 'reel') return drawFish0.apply(this, arguments);
+      const a0 = HELD.A, text0 = text;
+      HELD.A = !!a0 || REEL.some(b => HELD[b]);
+      globalThis.text = function (s, ...rest) { return text0.call(this, s === 'Giữ A để kéo vùng xanh theo cá' ? REEL_LINE : s, ...rest); };
+      try { return drawFish0.apply(this, arguments); } finally { HELD.A = a0; globalThis.text = text0; }
+    };
+  }
+
   // ---------- buttons ----------
   const press0 = press;
   globalThis.press = function (btn) {
