@@ -1251,7 +1251,11 @@
   }
   function camFollow(snap) {
     const w = W, p = w.p, k = w.k;
-    const gx = clamp(p.x - 320, 0, k.w - 640), gy = clamp(p.y - 40 - 240, 0, k.h - 480);
+    // a wide screen shows __SIDE more on each side: the camera stays that far inside the map, so the sides are the map's
+    // own pixels (at its edge they had none, and the shim drew the edge strip again there: rocks and trees twice, a
+    // seam; the user, 05/11/2026). A map no wider than the screen (the arena, 640) keeps its old limits
+    const side = Math.max(0, Math.min(globalThis.__SIDE || 0, (k.w - 640) / 2));
+    const gx = clamp(p.x - 320, side, k.w - 640 - side), gy = clamp(p.y - 40 - 240, 0, k.h - 480);
     w.cam.x = Math.round(snap ? gx : w.cam.x + (gx - w.cam.x) * 0.2);
     w.cam.y = Math.round(snap ? gy : w.cam.y + (gy - w.cam.y) * 0.2);
   }
