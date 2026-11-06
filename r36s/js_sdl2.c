@@ -43,7 +43,7 @@ static void setup_pad(int k) {
     SDL_free(m);
 }
 
-/* the handheld's own volume: TrimUI's keymon writes the volume buttons' level (0..20, "vol") and "mute" into
+/* the handheld's own volume: TrimUI's keymon writes the volume buttons' level (0..20, "vol") into
    system.json but sets no mixer the game's sound goes through, so the game scales its sound by it (30 dB from 1 to 20,
    0 silent); without the file (R36S) the sound is as it was */
 #define VOL_FILE "/mnt/UDISK/system.json"
@@ -65,7 +65,9 @@ static void read_volume(void) {
     n = fread(buf, 1, sizeof buf - 1, f);
     fclose(f);
     buf[n] = 0;
-    v = json_int(buf, "\"mute\"", 0) ? 0 : json_int(buf, "\"vol\"", 20);
+    /* system.json's "mute" is not the handheld's mute: it stays 1 on a Brick that plays sound (06/11/2026, the
+       game was silent); keymon's own mute leaves /tmp/system/muted (and turns the speaker off itself) */
+    v = access("/tmp/system/muted", F_OK) == 0 ? 0 : json_int(buf, "\"vol\"", 20);
     if (v < 0) v = 0;
     if (v > 20) v = 20;
     if (v == last) return;
